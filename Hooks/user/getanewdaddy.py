@@ -25,8 +25,8 @@ from Core.db import session
 from Core.maps import Alliance, User
 from Core.loadable import loadable
 
-@loadable.module("member")
-class getanewdaddy(loadable):
+@loadable.module("admin")
+class demote(loadable):
     """Remove sponsorship of a member. Their access will be reduced to "galmate" level. Anyone is free to sponsor the person back under the usual conditions. This isn't a kick and it's not final.""" 
     usage = " pnick"
     paramre = re.compile(r"\s(\S+)")
@@ -37,10 +37,10 @@ class getanewdaddy(loadable):
         # do stuff here
         idiot = User.load(name=params.group(1), access="member")
         if idiot is None:
-            message.reply("That idiot isn't a member!")
+            message.reply("That user isn't a member!")
             return
         if (not user.is_admin()) and idiot.sponsor != user.name:
-            message.reply("You are not %s's sponsor"%(idiot.name,))
+            message.reply("You do not have sufficent access to demote this member.")
             return
         
         if "galmate" in Config.options("Access"):
@@ -55,12 +55,12 @@ class getanewdaddy(loadable):
                 intel.alliance = None
         
         session.commit()
-        
+
         message.privmsg("remuser %s %s"%(Config.get("Channels","home"), idiot.name,),'p')
-        message.privmsg("ban %s *!*@%s.users.netgamers.org Your sponsor doesn't like you anymore"%(Config.get("Channels","home"), idiot.name,),'p')
+        message.privmsg("remuser %s %s"%(Config.get("Channels","core"), idiot.name,),'p')
         if idiot.sponsor != user.name:
-            message.privmsg("note send %s Some admin has removed you for whatever reason. If you still wish to be a member, go ahead and find someone else to sponsor you back."%(idiot.name,),'p')
-            message.reply("%s has been reduced to \"galmate\" level and removed from the channel. %s is no longer %s's sponsor. If anyone else would like to sponsor that person back, they may."%(idiot.name,idiot.sponsor,idiot.name))
+            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
+            message.reply("%s has been reduced to \"galmate\" level and removed from the channel. "%(idiot.name,))
         else:
-            message.privmsg("note send %s Your sponsor (%s) no longer wishes to be your sponsor. If you still wish to be a member, go ahead and find someone else to sponsor you back."%(idiot.name,user.name,),'p')
-            message.reply("%s has been reduced to \"galmate\" level and removed from the channel. You are no longer %s's sponsor. If anyone else would like to sponsor that person back, they may."%(idiot.name,idiot.name))
+            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
+            message.reply("%s has been reduced to \"galmate\" level and removed from the channel."%(idiot.name,))

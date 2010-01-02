@@ -111,7 +111,7 @@ class victim(loadable):
         Q = Q.order_by(desc("maxcap"))
         Q = Q.order_by(desc(Planet.size))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:6]
+        result = Q[:10]
         
         if len(result) < 1:
             reply="No"
@@ -130,7 +130,7 @@ class victim(loadable):
             return
         
         replies = []
-        for planet, intel, maxcap in result[:5]:
+        for planet, intel, maxcap in result[:8]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s MaxCap: %s" % (planet.value,planet.size, maxcap)
             if intel:
@@ -139,6 +139,6 @@ class victim(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 5:
+        if len(result) > 8:
             replies[-1]+=" (Too many results to list, please refine your search)"
         message.reply("\n".join(replies))

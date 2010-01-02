@@ -18,9 +18,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
+from sqlalchemy.sql.functions import count, max
 from Core.db import session
-from Core.maps import Updates, Planet, Target
+from Core.maps import Updates, Planet, Scan
 from Core.loadable import loadable
 
 @loadable.module("member")
@@ -36,7 +37,7 @@ class details(loadable):
             message.reply("No planet matching '%s:%s:%s' found"%params.groups())
             return
         replies = [str(target)]
-        
+
         if self.user_has_planet(user):
             attacker = user.planet
             reply="Target "
@@ -59,14 +60,20 @@ class details(loadable):
         
         if target.intel is not None:
             replies.append(("Information stored for %s:%s:%s -"+str(target.intel) if str(target.intel) else "No information stored for %s:%s:%s") % (target.x, target.y, target.z,))
+
+        Q = session.query(Scan.scantype, max(Scan.tick), count())
+        Q = Q.filter(Scan.planet == target)
+        Q = Q.group_by(Scan.scantype)
+        result = Q.all()
         
-        bookings = target.bookings.filter(Target.tick > Updates.current_tick()).all()
-        if len(bookings) < 1:
-            replies.append("No bookings matching planet %s:%s:%s" % (target.x, target.y, target.z,))
-        else:
-            prev = []
-            for booking in bookings:
-                prev.append("(%s user:%s)" % (booking.tick,booking.user.name))
-            replies.append("Status for %s:%s:%s - " % (target.x, target.y, target.z,) + ", ".join(prev))
+        if len(result) < 1:
+            replies.append("No scans available on %s:%s:%s" % (target.x,target.y,target.z,))
+            return
         
+        prev=[]
+        for type, latest, number in result:
+            prev.append("(%d %s, latest pt%s)" % (number,type,latest,))
+        
+        reply="scans for %s:%s:%s - " % (target.x,target.y,target.z) + ", ".join(prev)
+        replies.append(reply)
         message.reply("\n".join(replies))

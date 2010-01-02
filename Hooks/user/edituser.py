@@ -61,22 +61,48 @@ class edituser(loadable):
         
         mbraxx = Config.getint("Access","member")
         home = Config.get("Channels","home")
+        coraxx = Config.getint("Access","core")
+        core = Config.get("Channels","core")
         
         if type(access) == int:
-            if member.active == True and member.access < mbraxx and access >= mbraxx:
-                message.privmsg("adduser %s %s 399" %(home, member.name,), "P")
-                message.reply("%s has been added to %s"%(member.name, home,))
+            if member.active == True and member.access < mbraxx and access == mbraxx:
+                message.privmsg("modinfo %s access %s 100" %(home, member.name,), "P")
+                message.privmsg("adduser %s %s 100" %(home, member.name,), "P")
+                message.reply("%s has been added to %s" %(member.name, home,))
+            if member.active == True and member.access < coraxx and access >= coraxx:
+                message.privmsg("modinfo %s access %s 150" %(home, member.name,), "P")
+                message.privmsg("adduser %s %s 150" %(home, member.name,), "P")
+                message.reply("%s has been added to %s" %(member.name, home,))
+                message.privmsg("adduser %s %s 150" %(core, member.name,), "P")
+                message.reply("%s has been added to %s" %(member.name, core,))
+            if member.active == True and member.access >= coraxx and access < coraxx:
+                message.privmsg("remuser %s %s" %(core, member.name,), "P")
+                message.reply("%s has been removed from %s" %(member.name, core,))
             if member.active == True and member.access >= mbraxx and access < mbraxx:
-                message.privmsg("remuser %s %s"%(home, member.name,), "P")
-                message.privmsg("ban %s *!*@%s.users.netgamers.org GTFO, EAAD"%(home, member.name,), "P")
+                message.privmsg("remuser %s %s" %(home, member.name,), "P")
+                message.privmsg("remuser %s %s" %(core, member.name,), "P")
+                message.privmsg("note send %s You have been removed from private channels."%(member.name,),'P')
+                message.reply("%s has been removed from all channels" %(member.name,))
             member.access = access
         else:
-            if member.active != access and access == True and member.access >= mbraxx:
-                message.privmsg("adduser %s %s 399" %(home, member.name,), "P")
+            if member.active != access and access == True and member.access == mbraxx:
+                message.privmsg("modinfo %s access %s 100" %(home, member.name,), "P")
+                message.privmsg("adduser %s %s 100" %(home, member.name,), "P")
                 message.reply("%s has been added to %s"%(member.name, home,))
+            if member.active != access and access == True and member.access >= coraxx:
+                message.privmsg("modinfo %s access %s 150" %(home, member.name,), "P")
+                message.privmsg("adduser %s %s 150" %(home, member.name,), "P")
+                message.reply("%s has been added to %s" %(member.name, home,))
+                message.privmsg("adduser %s %s 150" %(core, member.name,), "P")
+                message.reply("%s has been added to %s" %(member.name, core,))
+            if member.active != access and access == False and member.access >= coraxx:
+                message.privmsg("remuser %s %s" %(core, member.name,), "P")
+                message.reply("%s has been removed from %s" %(member.name, core,))
             if member.active != access and access == False and member.access >= mbraxx:
                 message.privmsg("remuser %s %s"%(home, member.name,), "P")
-                message.privmsg("ban %s *!*@%s.users.netgamers.org GTFO, EAAD"%(home, member.name,), "P")
+                message.privmsg("remuser %s %s" %(core, member.name,), "P")
+                message.privmsg("note send %s You have been removed from private channels."%(member.name,),'P')
+                message.reply("%s has been removed from all channels" %(member.name,))
             member.active = access
         session.commit()
         message.reply("Editted user %s access: %s" % (member.name, access,))

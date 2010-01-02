@@ -26,9 +26,6 @@ class bcalc(loadable):
     
     def execute(self, message, user, params):
         
-        bcalc = ["http://bcalc.thrud.co.uk/","http://beta.5th-element.org/","http://bcalc.lch-hq.org/index.php",
-                 "http://parser.5th-element.org/","http://munin.ascendancy.tv/",
-                 "http://pa.xqwzts.com/prod.aspx","http://www.everyday-hero.net/reshack.html",
-                 "http://patools.thrud.co.uk/", "http://game.planetarion.com/bcalc.pl"]
+        bcalc = ["http://game.planetarion.com/bcalc.pl"]
         
         message.reply("Bcalcs: "+" | ".join(bcalc))

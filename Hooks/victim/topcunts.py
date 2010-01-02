@@ -30,11 +30,11 @@ from Core.config import Config
 from Core.paconf import PA
 
 @loadable.module("member")
-class topcunts(loadable):
+class tophostiles(loadable):
     """Top planets attacking the specified target"""
     usage = " [x:y[:z]|alliance|user]"
     paramre = (loadable.coordre, re.compile(r"(?:\s(\S+))?"),)
-    
+
     def execute(self, message, user, params):
         
         planet = None

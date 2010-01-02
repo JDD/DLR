@@ -32,9 +32,9 @@ class searchdef(loadable):
     usage = " <number> <ship>"
     paramre = re.compile(r"\s+(\d+(?:\.\d+)?[mk]?)\s+(\S+)")
     ship_classes = ['fi','co','fr','de','cr','bs']
-    
+
     def execute(self, message, user, params):
-        
+
         count = self.short2num(params.group(1))
         name = params.group(2).lower()
 

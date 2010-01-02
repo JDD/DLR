@@ -106,7 +106,7 @@ class idler(loadable):
             Q = Q.filter(Planet.x == cluster)
         Q = Q.order_by(desc(Planet.idle))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:6]
+        result = Q[:10]
         
         if len(result) < 1:
             reply="No"
@@ -125,7 +125,7 @@ class idler(loadable):
             return
         
         replies = []
-        for planet, intel in result[:5]:
+        for planet, intel in result[:8]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s Idle: %s" % (planet.value,planet.size, planet.idle)
             if intel:
@@ -134,6 +134,6 @@ class idler(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 5:
+        if len(result) > 8:
             replies[-1]+=" (Too many results to list, please refine your search)"
         message.reply("\n".join(replies))

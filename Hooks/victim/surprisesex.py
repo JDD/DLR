@@ -30,7 +30,7 @@ from Core.config import Config
 from Core.paconf import PA
 
 @loadable.module("member")
-class surprisesex(loadable):
+class hostiles(loadable):
     """Top alliances attacking the specified target"""
     usage = " [x:y[:z]|alliance|user]"
     paramre = (loadable.coordre, re.compile(r"(?:\s(\S+))?"),)
@@ -40,7 +40,7 @@ class surprisesex(loadable):
         planet = None
         galaxy = None
         alliance = None
-        
+
         # Planet or Galaxy
         if len(params.groups()) == 3:
             # Planet

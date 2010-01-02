@@ -26,7 +26,7 @@ from Core.maps import Alliance, User, epenis
 from Core.loadable import loadable
 
 @loadable.module("member")
-class bigdicks(loadable):
+class topscorers(loadable):
     """BEEFCAKE!!!11onetwo"""
     
     def execute(self, message, user, params):
@@ -41,11 +41,11 @@ class bigdicks(loadable):
         result = Q[:5]
         
         if len(result) < 1:
-            message.alert("There is no penis")
+            message.alert("There is no growth record yet.")
             return
         
         prev = []
         for user, penis in result:
             prev.append("%d:%s (%s)"%(penis.rank, user.name, self.num2short(penis.penis)))
-        reply="Big dicks: " + ", ".join(prev)
+        reply="Top Scorers: " + ", ".join(prev)
         message.reply(reply)

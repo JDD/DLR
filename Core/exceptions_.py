@@ -21,31 +21,22 @@
  
 # The standard exceptions used by Merlin
 
-class MerlinError(Exception):
+class Quit(Exception):
     pass
 
-class MerlinSystemCall(MerlinError):
+class Reboot(Exception):
     pass
 
-class Quit(MerlinSystemCall):
+class Reload(Exception):
     pass
 
-class Reboot(MerlinSystemCall):
-    pass
-
-class Reload(MerlinSystemCall):
-    pass
-
-class Call999(MerlinSystemCall):
-    pass
-
-class LoadableError(MerlinError):
+class LoadableError(Exception):
     pass
 
 class PrefError(LoadableError):
     pass
 
-class ParseError(MerlinError):
+class ParseError(Exception):
     pass
 
 class ChanParseError(ParseError):
@@ -57,5 +48,5 @@ class MsgParseError(ParseError):
 class PNickParseError(ParseError):
     pass
 
-class UserError(MerlinError):
+class UserError(Exception):
     pass

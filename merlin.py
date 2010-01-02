@@ -18,24 +18,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
+import os
 import gc
+import socket
 import sys
 import time
+import traceback
 
 if not 2.6 <= float(sys.version[:3]) < 3.0:
     sys.exit("Python 2.6.x Required")
 
-from Core.exceptions_ import Quit, Reboot, Reload, Call999
+from Core.exceptions_ import Quit, Reboot, Reload
 
 # Redirect stderr to stdout
 sys.stderr = sys.stdout
 
 class merlin(object):
     # Main bot container
-    nick = None
-    irc = None
-    robocop = ()
     
     def run(self):
         Connection = None
@@ -56,49 +56,80 @@ class merlin(object):
                     # Later the import is done by a call to .reboot(),
                     #  but we need to import each time to get the new Loader
                     from Core.loader import Loader
+
+                    # Connect
+                    from Core.connection import Connection
+                    print "%s Connecting... (%s)" % (time.asctime(), Config.get("Connection", "server"),)
+                    Connection.connect()
+                    self.sock, self.file = Connection.detach()
+                    self.Message = None
                     
                     # System loop
                     #   Loop back to reload modules
                     while True:
                         
                         try: # break out with Reload exceptions
-                            
+
                             # Collect any garbage remnants that might have been left behind
                             #  from an old loader or backup that wasn't properly dereferenced
                             gc.collect()
-                            
+
                             # Import elements of Core we need
                             # These will have been refreshed by a call to
                             #  either Loader.reboot() or Loader.reload()
                             from Core.db import session
                             from Core.connection import Connection
-                            from Core.router import Router
-                            from Core.robocop import RoboCop
+                            from Core.actions import Action
+                            from Core.callbacks import Callbacks
                             
-                            # Attach the IRC connection and configure
-                            self.irc = Connection.attach(self.irc, self.nick)
-                            # Attach the RoboCop/clients sockets and configure
-                            self.robocop = RoboCop.attach(*self.robocop)
+                            # Attach the socket to the connection handler
+                            Connection.attach(self.sock, self.file)
+                            
+                            # If we've been asked to reload, report if it worked
+                            if self.Message is not None:
+                                if Loader.success: self.Message.reply("Core reloaded successfully.")
+                                else: self.Message.reply("Error reloading the core.")
+                            
+                            # Configure Core
+                            Connection.write("WHOIS %s" % self.nick)
                             
                             # Operation loop
-                            Router.run()
+                            #   Loop to parse every line received over connection
+                            while True:
+                                line = Connection.read()
+                                if not line:
+                                    raise Reboot
+
+
+                                try:
+                                   # Create a new message object
+                                    self.Message = Action()
+                                    # Parse the line
+                                    self.Message.parse(line)
+                                    # Callbacks
+                                    Callbacks.callback(self.Message)
+                                except (Reload, Reboot, socket.error, Quit):
+                                    raise
+                                except Exception:
+                                    # Error while executing a callback/mod/hook
+                                    self.Message.alert("An exception occured whilst processing your request. Please report the command you used to the bot owner as soon as possible.")
+                                    traceback.print_exc()
+                                    continue
+                                finally:
+                                    # Remove any uncommitted or unrolled-back state
+                                    session.remove()
+                                
                             
-                        except Call999 as exc:
-                            # RoboCop server failed, restart it
-                            self.robocop = RoboCop.disconnect(str(exc))
-                            continue
-                        
                         except Reload:
                             print "%s Reloading..." % (time.asctime(),)
                             # Reimport all the modules
                             Loader.reload()
                             continue
                     
-                except Reboot as exc:
+                except (Reboot, socket.error) as exc:
                     # Reset the connection first
-                    self.irc = Connection.disconnect(str(exc) or "Rebooting")
-                    
-                    print "%s Rebooting..." % (time.asctime(),)
+                    Connection.disconnect(str(exc) or "Rebooting")
+                    print "%s Rebooting... (%s)" % (time.asctime(), exc,)
                     # Reboot the Loader and reimport all the modules
                     Loader.reboot()
                     continue
@@ -112,4 +143,8 @@ class merlin(object):
 Merlin = merlin()
 if __name__ == "__main__":
     # Start the bot here, if we're the main module.
+    fd = os.open("log.txt", os.O_RDWR | os.O_APPEND | os.O_CREAT)
+    os.dup2(fd,1)
+    os.dup2(fd,2)
+
     Merlin.run()

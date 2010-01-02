@@ -72,11 +72,19 @@ class adduser(loadable):
         session.commit()
         if len(exists):
             message.reply("Users (%s) already exist" % (",".join(exists),))
+        # Bot access
         if len(added):
             message.reply("Added users (%s) at level %s" % (",".join(added),access))
-        if len(added) and access >= Config.getint("Access","member"):
-            message.privmsg("adduser %s %s 399" %(Config.get("Channels","home"), ",".join(added),), "P")
-    
+        # P access with netgamers.org (set up to adduser with access 100 to your Home channel from merlin.cfg)
+        if len(added) and access == Config.getint("Access","member"):
+            message.privmsg("adduser %s %s 100" %(Config.get("Channels","home"), ",".join(added),), "P")
+            message.reply("Added users (%s) to %s with lvl 100 access" % (",".join(added), Config.get("Channels","home")))
+        if len(added) and access >= Config.getint("Access","core"):
+            message.privmsg("adduser %s %s 150" %(Config.get("Channels","home"), ",".join(added),), "P")
+            message.reply("Added users (%s) to %s with lvl 150 access" % (",".join(added), Config.get("Channels","home")))
+            message.privmsg("adduser %s %s 150" %(Config.get("Channels","core"), ",".join(added),), "P")
+            message.reply("Added users (%s) to %s with lvl 150 access" % (",".join(added), Config.get("Channels","core")))
+
     def check_access(self, message, user=None, channel=None):
         try:
             user = loadable.check_access(self, message, user, channel)

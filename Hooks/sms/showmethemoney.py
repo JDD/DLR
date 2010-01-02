@@ -14,21 +14,21 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
- 
+
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
 from urllib import urlencode
 from urllib2 import urlopen
 from Core.config import Config
 from Core.loadable import loadable
 
 @loadable.module("member")
-class showmethemoney(loadable):
-    
+class balance(loadable):
+
     def execute(self, message, user, params):
-        
+
         username = Config.get("clickatell", "user")
         password = Config.get("clickatell", "pass")
         api_id = Config.get("clickatell", "api")
@@ -37,15 +37,15 @@ class showmethemoney(loadable):
                          "password": Config.get("clickatell", "pass"),
                          "api_id": Config.get("clickatell", "api"),
                         })
-        
+
         status, msg = urlopen("https://api.clickatell.com/http/getbalance", get).read().split(":")
-        
+
         if status in ("Credit",):
             balance = float(msg.strip())
             if not balance:
                 message.reply("Help me help you. I need the kwan. SHOW ME THE MONEY")
             else:
-                message.reply("Current kwan balance: %d"%(balance,))
+                message.reply("Current credit balance: %d"%(balance,))
         elif status in ("ERR",):
             message.reply("Error sending message: %s" % (msg.strip(),))
         else:

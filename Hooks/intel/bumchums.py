@@ -26,7 +26,7 @@ from Core.maps import Galaxy, Planet, Alliance, Intel
 from Core.loadable import loadable
 
 @loadable.module("member")
-class bumchums(loadable):
+class fortress(loadable):
     """Pies"""
     usage = " alliance number"
     paramre = re.compile(r"\s(\S+)(?:\s(\d+))?")
@@ -47,10 +47,10 @@ class bumchums(loadable):
         Q = Q.having(count() >= bums)
         result = Q.all()
         if len(result) < 1:
-            message.reply("No galaxies with at least %s bumchums from %s"%(bums,alliance.name,))
+            message.reply("No galaxies with at least %s members from %s"%(bums,alliance.name,))
             return
         prev=[]
         for x, y, chums in result:
             prev.append("%s:%s (%s)"%(x, y, chums))
-        reply="Galaxies with at least %s bums from %s: "%(bums,alliance.name)+ ' | '.join(prev)
+        reply="Galaxies with at least %s members from %s: "%(bums,alliance.name)+ ' | '.join(prev)
         message.reply(reply)

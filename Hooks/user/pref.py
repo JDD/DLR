@@ -28,7 +28,7 @@ from Core.loadable import loadable
 @loadable.module()
 class pref(loadable):
     """Set your planet, password for the webby, email and phone number; order doesn't matter"""
-    usage = " [planet=x.y.z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F]"
+    usage = " [planet=x:y:z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F]"
     paramre = re.compile(r"\s(.+)")
     
     @loadable.require_user
@@ -52,9 +52,6 @@ class pref(loadable):
                         else:
                             planet.intel.nick = user.name
                             planet.intel.alliance = alliance
-                elif val in self.nulls:
-                    user.planet = None
-                    reply += " planet=None"
             if opt == "password":
                 user.passwd = val
                 reply += " password=%s"%(val)

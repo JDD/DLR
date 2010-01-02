@@ -25,7 +25,7 @@ from Core.maps import Alliance
 from Core.loadable import loadable
 
 @loadable.module()
-class apenis(loadable):
+class agrowth(loadable):
     """Schlong"""
     usage = " alliance"
     paramre = re.compile(r"(?:\s(\S+))?")
@@ -52,8 +52,8 @@ class apenis(loadable):
         
         penis = alliance.apenis
         if penis is None:
-            message.alert("No apenis stats matching %s" % (alliance.name,))
+            message.alert("No growth stats matching %s" % (alliance.name,))
             return
         
-        message.reply("apenis for %s is %s score long. This makes %s rank: %s apenis. The average peon is sporting a %s score epenis." % (
+        message.reply("Growth for %s is %s score long. This makes %s rank: %s in growth. The average peon is sporting a %s score growth." % (
                         alliance.name, penis.penis, alliance.name, penis.rank, int(penis.penis/alliance.members),))

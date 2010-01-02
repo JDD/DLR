@@ -25,7 +25,7 @@ from Core.maps import User
 from Core.loadable import loadable
 
 @loadable.module("member")
-class epenis(loadable):
+class growth(loadable):
     """Penis"""
     usage = " user"
     paramre = re.compile(r"(?:\s(\S+))?")
@@ -46,13 +46,13 @@ class epenis(loadable):
             else:
                 message.reply("%s is too embarrassed about his tiny penis that he won't let me tell you how small it is." % (penis.name,))
             return
-        
+
         if penis.epenis is None:
             if user == penis:
-                message.reply("Wait for the tick, bitch.")
+                message.reply("Growth data will be available at tick 72.")
             else:
-                message.reply("That freak %s doesn't have a penis!" % (penis.name,))
+                message.reply("No growth data available for %s, or it is not tick 72 yet" % (penis.name,))
             return
         
-        message.reply("epenis for %s is %s score long. This makes %s rank: %s for epenis in %s!" % (
+        message.reply("Growth for %s is %s score long. This makes %s rank: %s for growth in %s!" % (
                         penis.name, penis.epenis.penis, penis.name, penis.epenis.rank, Config.get("Alliance","name"),))

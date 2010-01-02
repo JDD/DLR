@@ -609,7 +609,7 @@ class Request(Base):
     scantype = Column(String(1))
     dists = Column(Integer)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='set null'))
-    
+
     @staticmethod
     def load(id):
         Q = session.query(Request)
@@ -714,7 +714,7 @@ class DevScan(Base):
         if level==2:
             return "Blow up roids"
         if level==3:
-            return "Blow up shits"
+            return "Blow up ships"
         if level==4:
             return "Blow up Amps/Dists"
         if level==5:
@@ -727,7 +727,7 @@ class DevScan(Base):
         if level==0:
             return "50 roids"
         if level==1:
-            return "100 roids (scanner!)"
+            return "100 roids"
         if level==2:
             return "200 roids"
         if level==3:
@@ -737,13 +737,13 @@ class DevScan(Base):
         if level==5:
             return "750 roids"
         if level==6:
-            return "1k roids"
+            return "1000 roids"
         if level==7:
             return "1250 roids"
         if level==8:
             return "1500 roids"
         if level==9:
-            return "Jan 1. 1900"
+            return "2000 roids"
         if level==10:
             return "2500 roids"
         if level==11:
@@ -769,7 +769,7 @@ class DevScan(Base):
         return total
         
     def __str__(self):
-        reply = " Travel: %s, Infrajerome: %s, Hulls: %s," % (self.travel,self.infra_str(),self.hulls_str(),)
+        reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel,self.infra_str(),self.hulls_str(),)
         reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core,self.covop_str(),self.mining_str(),)
         reply+= "\n"
         reply+= "Structures: LFac: %s, MFac: %s, HFac: %s, Amp: %s," % (self.light_factory,self.medium_factory,self.heavy_factory,self.wave_amplifier,)

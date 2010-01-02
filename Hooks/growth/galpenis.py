@@ -23,7 +23,7 @@ from Core.maps import Galaxy
 from Core.loadable import loadable
 
 @loadable.module()
-class galpenis(loadable):
+class galgrowth(loadable):
     """Cock"""
     usage = " x:y"
     paramre = loadable.coordre
@@ -37,8 +37,8 @@ class galpenis(loadable):
         
         penis = galaxy.galpenis
         if penis is None:
-            message.alert("No galpenis stats matching %s:%s" % params.group(1,2))
+            message.alert("No galaxy growth stats matching %s:%s" % params.group(1,2))
             return
         
-        message.reply("galpenis for '%s' is %s score long. This makes %s:%s rank: %s for galpenis in the universe!" % (
+        message.reply("Galaxy growth for '%s' is %s score long. This makes %s:%s rank: %s for growth in the universe!" % (
                         galaxy.name, penis.penis, galaxy.x, galaxy.y, penis.rank,))

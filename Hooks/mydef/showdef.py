@@ -45,7 +45,7 @@ class showdef(loadable):
         ships = u.fleets.all()
         
         if len(ships) < 1:
-            message.reply("%s is either a lazy pile of shit that hasn't entered any ships for def, or a popular whore who's already turned their tricks."%(u.name,))
+            message.reply("%s is either a lazy and hasn't entered any ships for def, or is popular and already sent thier ships on defence."%(u.name,))
             return
         
         tick = Updates.current_tick()

@@ -72,7 +72,6 @@ class prod(loadable):
         reply += " %s"%(PA.get(gov,"name"),) if gov else ""
         reply += " %s"%(PA.get(race,"name"),) if race else ""
         reply += " planet" if race or gov else ""
-        reply += " with %s%% population"%(pop,) if pop else ""
         message.reply(reply)
 
     def calc_ticks(self, cost, num, bonus, factories):

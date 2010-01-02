@@ -26,15 +26,15 @@ from Core.db import session
 from Core.maps import Channel
 from Core.loadable import loadable
 
-@loadable.module("member")
+@loadable.module("admin")
 class remchan(loadable):
     """"""
     usage = " <chan>"
     paramre = re.compile(r"\s+(#\S+)")
-    
+
     @loadable.require_user
     def execute(self, message, user, params):
-        
+
         channel = params.group(1)
         chan = Channel.load(channel)
         if chan is None:

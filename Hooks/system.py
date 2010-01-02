@@ -25,7 +25,6 @@ from traceback import format_exc
 from merlin import Merlin
 from Core.exceptions_ import Quit, Reboot, Reload
 from Core.config import Config
-from Core.robocop import RoboCop
 from Core.chanusertracker import CUT
 from Core.callbacks import Callbacks
 from Core.loadable import loadable
@@ -52,7 +51,6 @@ def reboot(message):
 def reload(message):
     """Dynamically reload the Core and Hooks"""
     msg = message.get_msg().split(None,1)
-    message.reply("It's Morphin' Time!")
     if len(msg) > 1:
         raise Reload(msg[1])
     else:

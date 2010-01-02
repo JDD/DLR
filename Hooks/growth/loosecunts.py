@@ -26,7 +26,7 @@ from Core.maps import Alliance, User, epenis
 from Core.loadable import loadable
 
 @loadable.module("member")
-class loosecunts(loadable):
+class lowscorers(loadable):
     
     def execute(self, message, user, params):
         
@@ -40,11 +40,11 @@ class loosecunts(loadable):
         result = Q[:5]
         
         if len(result) < 1:
-            message.alert("There is no penis")
+            message.alert("There is no Growth available yet.")
             return
         
         prev = []
         for user, penis in result:
             prev.append("%d:%s (%s)"%(penis.rank, user.name, self.num2short(penis.penis)))
-        reply="Loose cunts: " + ", ".join(prev)
+        reply="Low Scorers: " + ", ".join(prev)
         message.reply(reply)

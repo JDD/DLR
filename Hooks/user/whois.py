@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
 
 import re
 from Core.config import Config
@@ -48,9 +48,9 @@ class whois(loadable):
 
         reply=""
         if whore == user:
-            reply+="You are %s. Your sponsor is %s. You have alias %s."
+            reply+="You are %s. Your access is %s. Your alias: is %s. Your planet is: %s. Your Email is: %s. Your phone number is in the system: %s."
         else:
-            reply+="Information about %s: Their sponsor is %s. They have alias %s."
-        reply=reply%(whore.name,whore.sponsor,whore.alias,)
+            reply+="Information about %s: Thier access is %s. Thier alias is: %s. Their planet is: %s. Thier Email is: %s. Thier phone number is in the system: %s."
+        reply=reply%(whore.name,whore.access,whore.alias,whore.planet_id,whore.email,whore.pubphone,)
 
         message.reply(reply)

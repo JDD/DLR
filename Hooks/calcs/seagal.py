@@ -25,7 +25,7 @@ from Core.maps import Planet
 from Core.loadable import loadable
 
 @loadable.module()
-class seagal(loadable):
+class hack(loadable):
     usage = " <x:y:z> [sum]"
     paramre = re.compile(loadable.planet_coordre.pattern+r"(?:\s+(\d+))?")
     
@@ -39,7 +39,7 @@ class seagal(loadable):
         
         sum=params.group(4)
         res=user.planet.resources_per_agent(p)
-        reply="Your Seagals will ninja %s resources from %s:%s:%s - 13: %s, 35: %s."%(res,p.x,p.y,p.z,self.num2short(res*13),self.num2short(res*35))
+        reply="Your hack will ninja %s resources from %s:%s:%s - 13: %s, 35: %s."%(res,p.x,p.y,p.z,self.num2short(res*13),self.num2short(res*35))
         if sum:
-            reply+=" You need %s Seagals to ninja %sk res."%(int(math.ceil((float(sum)*1000)/res)),sum)
+            reply+=" You need %s agents to ninja %sk res."%(int(math.ceil((float(sum)*1000)/res)),sum)
         message.reply(reply)
