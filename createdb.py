@@ -64,6 +64,22 @@ finally:
 
 Base.metadata.create_all()
 
+## Remove # from this section to set up initial database ##
+#print "Setting up default channels"
+#userlevel = Config.get("Access", "member")
+#maxlevel = Config.get("Access", "admin")
+#for chan, name in Config.items("Channels"):
+#    try:
+#        session.add(Channel(name=name,userlevel=userlevel,maxlevel=maxlevel))
+#        session.flush()
+#    except IntegrityError:
+#        print "Channel '%s' already exists" % (name,)
+#        session.rollback()
+#    else:
+#        print "Created '%s' with access (%s|%s)" % (name, userlevel, maxlevel,)
+#        session.commit()
+#session.close()
+
 if round:
     print "Migrating users/friends"
     session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date) SELECT id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date FROM %s.users;" % (round,)))
@@ -78,6 +94,7 @@ if round:
     session.execute(text("SELECT setval('proposal_id_seq',(SELECT max(id) FROM (SELECT id FROM invite_proposal UNION SELECT id FROM kick_proposal) AS proposals));"))
     session.execute(text("INSERT INTO prop_vote (vote,carebears,prop_id,voter_id) SELECT vote,carebears,prop_id,voter_id FROM %s.prop_vote;" % (round,)))
     session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
+## Add # to the following 2 lines for initial database setup
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
     print "Migrating Channels"
