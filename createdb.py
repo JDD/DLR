@@ -95,8 +95,11 @@ if round:
     session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
+    print "Migrating Channels"
+    session.execute(text("ISERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel;" % (round,)))
     session.commit()
     session.close()
+
 
 print "Inserting ship stats"
 shipstats.main()
