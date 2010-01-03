@@ -98,7 +98,7 @@ if round:
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
     print "Migrating Channels"
-    session.execute(text("INSERT INTO channels (name,userlevel,maxlevel) SELECT name,userlevel,maxlevel FROM %s.channels;" % (round,)))
+    session.execute(text("ISERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel;" % (round,)))
     session.commit()
     session.close()
 
