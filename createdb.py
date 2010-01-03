@@ -64,21 +64,6 @@ finally:
 
 Base.metadata.create_all()
 
-print "Setting up default channels"
-userlevel = Config.get("Access", "member")
-maxlevel = Config.get("Access", "admin")
-for chan, name in Config.items("Channels"):
-    try:
-        session.add(Channel(name=name,userlevel=userlevel,maxlevel=maxlevel))
-        session.flush()
-    except IntegrityError:
-        print "Channel '%s' already exists" % (name,)
-        session.rollback()
-    else:
-        print "Created '%s' with access (%s|%s)" % (name, userlevel, maxlevel,)
-        session.commit()
-session.close()
-
 if round:
     print "Migrating users/friends"
     session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date) SELECT id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date FROM %s.users;" % (round,)))
@@ -95,8 +80,11 @@ if round:
     session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
+    print "Migrating Channels"
+    session.execute(text("INSERT INTO channels (name,userlevel,maxlevel) SELECT name,userlevel,maxlevel FROM %s.channels;" % (round,)))
     session.commit()
     session.close()
+
 
 print "Inserting ship stats"
 shipstats.main()
