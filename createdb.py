@@ -94,9 +94,9 @@ if round:
     session.execute(text("SELECT setval('proposal_id_seq',(SELECT max(id) FROM (SELECT id FROM invite_proposal UNION SELECT id FROM kick_proposal) AS proposals));"))
     session.execute(text("INSERT INTO prop_vote (vote,carebears,prop_id,voter_id) SELECT vote,carebears,prop_id,voter_id FROM %s.prop_vote;" % (round,)))
     session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
-## Add # to the following 2 lines for initial database setup
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
+## Add # to the following 2 lines for initial database setup
     print "Migrating Channels"
     session.execute(text("ISERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel;" % (round,)))
     session.commit()
