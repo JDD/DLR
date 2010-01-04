@@ -27,7 +27,7 @@ from Core.loadable import loadable
 
 @loadable.module("admin")
 class demote(loadable):
-    """Remove sponsorship of a member. Their access will be reduced to "galmate" level. Anyone is free to sponsor the person back under the usual conditions. This isn't a kick and it's not final.""" 
+    """Removes access of a member. Their access will be reduced to "galmate" level.""" 
     usage = " pnick"
     paramre = re.compile(r"\s(\S+)")
     
