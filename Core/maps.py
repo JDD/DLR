@@ -343,11 +343,11 @@ class User(Base):
     emailre = re.compile(r"^([\w.-]+@[\w.-]+)")
     phone = Column(String(48))
     pubphone = Column(Boolean, default=False) # Asc
-    sponsor = Column(String(15)) # Asc
-    quits = Column(Integer, default=0) # Asc
-    available_cookies = Column(Integer, default=0)
-    carebears = Column(Integer, default=0)
-    last_cookie_date = Column(DateTime)
+#    sponsor = Column(String(15)) # Asc
+#    quits = Column(Integer, default=0) # Asc
+#    available_cookies = Column(Integer, default=0)
+#    carebears = Column(Integer, default=0)
+#    last_cookie_date = Column(DateTime)
     fleetcount = Column(Integer, default=0)
     fleetcomment = Column(String(512))
     fleetupdated = Column(Integer, default=0)
@@ -392,17 +392,17 @@ class User(Base):
             user = user if user.passwd == User.hasher(passwd) else None
         return user
     
-    def has_ancestor(self, possible_ancestor):
-        ancestor = User.load(name=self.sponsor, access="member")
-        if ancestor is not None:
-            if ancestor.name.lower() == possible_ancestor.lower():
-                return True
-            else:
-                return ancestor.has_ancestor(possible_ancestor)
-        elif self.sponsor == Config.get("Connection", "nick"):
-            return False
-        else:
-            return None
+#    def has_ancestor(self, possible_ancestor):
+#        ancestor = User.load(name=self.sponsor, access="member")
+#        if ancestor is not None:
+#            if ancestor.name.lower() == possible_ancestor.lower():
+#                return True
+#            else:
+#                return ancestor.has_ancestor(possible_ancestor)
+#        elif self.sponsor == Config.get("Connection", "nick"):
+#            return False
+#        else:
+#            return None
 Planet.user = relation(User, uselist=False, backref="planet")
 def user_access_function(num):
     # Function generator for access check
@@ -432,7 +432,7 @@ class Channel(Base):
     name = Column(String(150), unique=True)
     userlevel = Column(Integer)
     maxlevel = Column(Integer)
-    
+
     @staticmethod
     def load(name):
         Q = session.query(Channel)
@@ -459,7 +459,7 @@ class Intel(Base):
     reportchan = Column(String(30))
     comment = Column(String(512))
     def __str__(self):
-        ret = "" 
+        ret = ""
         if self.nick:
             ret += " nick=%s" % (self.nick,)
         if self.alliance is not None:
@@ -496,16 +496,16 @@ Alliance.planets = relation(Planet, Intel.__table__, order_by=(Planet.x, Planet.
 # #############################    BOOKINGS    ############################## #
 # ########################################################################### #
 
-class Target(Base):
-    __tablename__ = 'target'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
-    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
-    tick = Column(Integer)
-    unique = UniqueConstraint('planet_id','tick')
-User.bookings = dynamic_loader(Target, backref="user")
-Planet.bookings = dynamic_loader(Target, backref="planet")
-Galaxy.bookings = dynamic_loader(Target, Planet.__table__)
+#class Target(Base):
+#   __tablename__ = 'target'
+#    id = Column(Integer, primary_key=True)
+#    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
+#    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
+#    tick = Column(Integer)
+#    unique = UniqueConstraint('planet_id','tick')
+#User.bookings = dynamic_loader(Target, backref="user")
+#Planet.bookings = dynamic_loader(Target, backref="planet")
+#Galaxy.bookings = dynamic_loader(Target, Planet.__table__)
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
 
 # ########################################################################### #
@@ -531,7 +531,7 @@ class Ship(Base):
     eonium = Column(Integer)
     total_cost = Column(Integer)
     race = Column(String(10))
-    
+
     @staticmethod
     def load(name=None, id=None):
         assert id or name
@@ -547,7 +547,7 @@ class Ship(Base):
             if ship is None and name[-3:].lower()=="ies":
                 ship = Q.filter(Ship.name.ilike("%"+name[:-3]+"%")).first()
         return ship
-    
+
     def __str__(self):
         reply="%s (%s) is class %s | Target 1: %s |"%(self.name,self.race[:3],self.class_,self.t1)
         if self.t2:
@@ -576,18 +576,18 @@ class Scan(Base):
     pa_id = Column(String(32), index=True, unique=True)
     group_id = Column(String(32))
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    
+
     def __str__(self):
         p = self.planet
         ph = p.history(self.tick)
-        
+
         head = "%s on %s:%s:%s " % (PA.get(self.scantype,"name"),p.x,p.y,p.z,)
         if self.scantype in ("P","D","J","N",):
             id_tick = "(id: %s, pt: %s)" % (self.pa_id,self.tick,)
         if self.scantype in ("U","A",):
             vdiff = p.value-ph.value if ph else None
             id_age_value = "(id: %s, age: %s, value diff: %s)" % (self.pa_id,Updates.current_tick()-self.tick,vdiff)
-        
+
         if self.scantype in ("P",):
             return head + id_tick + str(self.planetscan)
         if self.scantype in ("D",):
@@ -676,7 +676,7 @@ class DevScan(Base):
             return "100 constructions"
         if level==4:
             return "150 constructions"
-    
+
     def hulls_str(self):
         level = self.hulls
         if level==1:
@@ -685,7 +685,7 @@ class DevScan(Base):
             return "FR/DE"
         if level==3:
             return "CR/BS"
-    
+
     def waves_str(self):
         level = self.waves
         if level==0:
@@ -704,7 +704,7 @@ class DevScan(Base):
             return "JGP"
         if level==7:
             return "Advanced Unit"
-    
+
     def covop_str(self):
         level = self.covert_op
         if level==0:
@@ -721,7 +721,7 @@ class DevScan(Base):
             return "Resource hacking (OMG!)"
         if level==6:
             return "Blow up Strucs"
-    
+
     def mining_str(self):
         level = self.mining+1
         if level==0:
@@ -760,14 +760,14 @@ class DevScan(Base):
             return "8000 roids"
         if level==17:
             return "top10 or dumb"
-    
+
     def total(self):
         total = self.light_factory+self.medium_factory+self.heavy_factory
         total+= self.wave_amplifier+self.wave_distorter
         total+= self.metal_refinery+self.crystal_refinery+self.eonium_refinery
         total+= self.research_lab+self.finance_centre+self.security_centre
         return total
-        
+
     def __str__(self):
         reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel,self.infra_str(),self.hulls_str(),)
         reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core,self.covop_str(),self.mining_str(),)
@@ -901,56 +901,56 @@ FleetLog.user = relation(User, primaryjoin=FleetLog.user_id==User.id)
 # #########################    PROPS AND COOKIES    ######################### #
 # ########################################################################### #
 
-class Cookie(Base):
-    __tablename__ = 'cookie_log'
-    id = Column(Integer, primary_key=True)
-    log_time = Column(DateTime, default=current_timestamp())
-    year = Column(Integer)
-    week = Column(Integer)
-    howmany = Column(Integer)
-    giver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    receiver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-User.cookies = dynamic_loader(Cookie, primaryjoin=User.id==Cookie.receiver_id, backref="receiver")
-Cookie.giver = relation(User, primaryjoin=Cookie.giver_id==User.id)
+#class Cookie(Base):
+#    __tablename__ = 'cookie_log'
+#    id = Column(Integer, primary_key=True)
+#    log_time = Column(DateTime, default=current_timestamp())
+#    year = Column(Integer)
+#    week = Column(Integer)
+#    howmany = Column(Integer)
+#    giver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#    receiver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#User.cookies = dynamic_loader(Cookie, primaryjoin=User.id==Cookie.receiver_id, backref="receiver")
+#Cookie.giver = relation(User, primaryjoin=Cookie.giver_id==User.id)
 
-class Invite(Base):
-    __tablename__ = 'invite_proposal'
-    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
-    active = Column(Boolean, default=True)
-    proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    person = Column(String(15))
-    created = Column(DateTime, default=current_timestamp())
-    closed = Column(DateTime)
-    vote_result = Column(String(7))
-    comment_text = Column(Text)
-    type = "invite"
-Invite.proposer = relation(User)
+#class Invite(Base):
+#    __tablename__ = 'invite_proposal'
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    active = Column(Boolean, default=True)
+#    proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#    person = Column(String(15))
+#    created = Column(DateTime, default=current_timestamp())
+#    closed = Column(DateTime)
+#    vote_result = Column(String(7))
+#    comment_text = Column(Text)
+#    type = "invite"
+#Invite.proposer = relation(User)
 
-class Kick(Base):
-    __tablename__ = 'kick_proposal'
-    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
-    active = Column(Boolean, default=True)
-    proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    person_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    created = Column(DateTime, default=current_timestamp())
-    closed = Column(DateTime)
-    vote_result = Column(String(7))
-    comment_text = Column(Text)
-    type = "kick"
-Kick.proposer = relation(User, primaryjoin=Kick.proposer_id==User.id)
-Kick.kicked = relation(User, primaryjoin=Kick.person_id==User.id)
-Kick.person = association_proxy("kicked", "name")
+#class Kick(Base):
+#    __tablename__ = 'kick_proposal'
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    active = Column(Boolean, default=True)
+#    proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#    person_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#    created = Column(DateTime, default=current_timestamp())
+#    closed = Column(DateTime)
+#    vote_result = Column(String(7))
+#    comment_text = Column(Text)
+#    type = "kick"
+#Kick.proposer = relation(User, primaryjoin=Kick.proposer_id==User.id)
+#Kick.kicked = relation(User, primaryjoin=Kick.person_id==User.id)
+#Kick.person = association_proxy("kicked", "name")
 
-class Vote(Base):
-    __tablename__ = 'prop_vote'
-    id = Column(Integer, primary_key=True)
-    vote = Column(String(7))
-    carebears = Column(Integer)
-    prop_id = Column(Integer)
-    voter_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-User.votes = dynamic_loader(Vote, backref="voter")
-Invite.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Invite.id==Vote.prop_id)
-Kick.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Kick.id==Vote.prop_id)
+#class Vote(Base):
+#    __tablename__ = 'prop_vote'
+#    id = Column(Integer, primary_key=True)
+#    vote = Column(String(7))
+#    carebears = Column(Integer)
+#    prop_id = Column(Integer)
+#    voter_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#User.votes = dynamic_loader(Vote, backref="voter")
+#Invite.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Invite.id==Vote.prop_id)
+#Kick.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Kick.id==Vote.prop_id)
 
 # ########################################################################### #
 # ################################    LOGS    ############################### #

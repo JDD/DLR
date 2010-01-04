@@ -82,23 +82,23 @@ Base.metadata.create_all()
 
 if round:
     print "Migrating users/friends"
-    session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date) SELECT id, name, alias, passwd, active, access, email, phone, pubphone, sponsor, quits, available_cookies, carebears, last_cookie_date FROM %s.users;" % (round,)))
+    session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone) SELECT id, name, alias, passwd, active, access, email, phone, pubphone FROM %s.users;" % (round,)))
     session.execute(text("SELECT setval('users_id_seq',(SELECT max(id) FROM users));"))
     session.execute(text("INSERT INTO phonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.phonefriends;" % (round,)))
     print "Migrating slogans/quotes"
     session.execute(text("INSERT INTO slogans (text) SELECT text FROM %s.slogans;" % (round,)))
     session.execute(text("INSERT INTO quotes (text) SELECT text FROM %s.quotes;" % (round,)))
-    print "Migrating props/votes/cookies"
-    session.execute(text("INSERT INTO invite_proposal (id,active,proposer_id,person,created,closed,vote_result,comment_text) SELECT id,active,proposer_id,person,created,closed,vote_result,comment_text FROM %s.invite_proposal;" % (round,)))
-    session.execute(text("INSERT INTO kick_proposal (id,active,proposer_id,person_id,created,closed,vote_result,comment_text) SELECT id,active,proposer_id,person_id,created,closed,vote_result,comment_text FROM %s.kick_proposal;" % (round,)))
-    session.execute(text("SELECT setval('proposal_id_seq',(SELECT max(id) FROM (SELECT id FROM invite_proposal UNION SELECT id FROM kick_proposal) AS proposals));"))
-    session.execute(text("INSERT INTO prop_vote (vote,carebears,prop_id,voter_id) SELECT vote,carebears,prop_id,voter_id FROM %s.prop_vote;" % (round,)))
-    session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
+#    print "Migrating props/votes/cookies"
+#    session.execute(text("INSERT INTO invite_proposal (id,active,proposer_id,person,created,closed,vote_result,comment_text) SELECT id,active,proposer_id,person,created,closed,vote_result,comment_text FROM %s.invite_proposal;" % (round,)))
+#    session.execute(text("INSERT INTO kick_proposal (id,active,proposer_id,person_id,created,closed,vote_result,comment_text) SELECT id,active,proposer_id,person_id,created,closed,vote_result,comment_text FROM %s.kick_proposal;" % (round,)))
+#    session.execute(text("SELECT setval('proposal_id_seq',(SELECT max(id) FROM (SELECT id FROM invite_proposal UNION SELECT id FROM kick_proposal) AS proposals));"))
+#    session.execute(text("INSERT INTO prop_vote (vote,carebears,prop_id,voter_id) SELECT vote,carebears,prop_id,voter_id FROM %s.prop_vote;" % (round,)))
+#    session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text) SELECT sender_id,receiver_id,phone,sms_text FROM %s.sms_log;" % (round,)))
 ## Add # to the following 2 lines for initial database setup
     print "Migrating Channels"
-    session.execute(text("ISERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel;" % (round,)))
+    session.execute(text("INSERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel FROM %s.channels;" % (round,)))
     session.commit()
     session.close()
 
