@@ -343,7 +343,7 @@ class User(Base):
     emailre = re.compile(r"^([\w.-]+@[\w.-]+)")
     phone = Column(String(48))
     pubphone = Column(Boolean, default=False) # Asc
-#    sponsor = Column(String(15)) # Asc
+    sponsor = Column(String(15)) # Asc
 #    quits = Column(Integer, default=0) # Asc
 #    available_cookies = Column(Integer, default=0)
 #    carebears = Column(Integer, default=0)
@@ -351,7 +351,7 @@ class User(Base):
     fleetcount = Column(Integer, default=0)
     fleetcomment = Column(String(512))
     fleetupdated = Column(Integer, default=0)
-    
+
     @validates('passwd')
     def valid_passwd(self, key, passwd):
         return User.hasher(passwd)
@@ -359,13 +359,13 @@ class User(Base):
     def valid_email(self, key, email):
         assert self.emailre.match(email)
         return email
-    
+
     @staticmethod
     def hasher(passwd):
         # *Every* user password operation should go through this function
         # This can be easily adapted to use SHA1 instead, or add salts
         return hashlib.md5(passwd).hexdigest()
-    
+
     @staticmethod
     def load(name=None, id=None, passwd=None, exact=True, active=True, access=0):
         assert id or name
@@ -391,7 +391,7 @@ class User(Base):
         if passwd is not None:
             user = user if user.passwd == User.hasher(passwd) else None
         return user
-    
+
 #    def has_ancestor(self, possible_ancestor):
 #        ancestor = User.load(name=self.sponsor, access="member")
 #        if ancestor is not None:
