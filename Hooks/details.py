@@ -68,8 +68,9 @@ class details(loadable):
         
         if len(result) < 1:
             replies.append("No scans available on %s:%s:%s" % (target.x,target.y,target.z,))
+            message.reply("\n".join(replies))
             return
-        
+
         prev=[]
         for type, latest, number in result:
             prev.append("(%d %s, latest pt%s)" % (number,type,latest,))
