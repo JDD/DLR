@@ -21,7 +21,7 @@
 
 from sqlalchemy.sql.functions import count, max
 from Core.db import session
-from Core.maps import Updates, Planet, Scan
+from Core.maps import Updates, Planet, Scan, Intel
 from Core.loadable import loadable
 
 @loadable.module("member")
