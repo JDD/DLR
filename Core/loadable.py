@@ -39,6 +39,7 @@ class loadable(object):
     ""
     usage = ""
     paramre = re.compile("")
+    robocop = None
     PParseError = "You need to login and set mode +x to use this command"
     AccessError = "You don't have access to this command"
     PrefError = "You must set your planet with !pref to use this command"
@@ -153,7 +154,7 @@ class loadable(object):
         if user.planet is None:
             return False
         return user.planet.active
-
+    
     def get_user_planet(self, user):
         if not self.is_user(user):
             raise PNickParseError
@@ -219,6 +220,13 @@ class loadable(object):
             callback.__name__ = hook.__name__
             return callback
         return wrapper
+    
+    @staticmethod
+    def robohci(hook):
+        def robocop(self, message):
+            hook(self, message, **self.split_opts(message.get_msg()))
+            message.alert(True)
+        return robocop
     
     def check_access(self, message, user=None, channel=None):
         if message.in_chan():
