@@ -41,7 +41,9 @@ class roidsave(loadable):
         cost=self.num2short(ticks*roids*mining/100)
         reply="In %s ticks (%s days) %s roids with %s%% bonus will mine %s value" % (ticks,ticks/24,roids,bonus,cost)
 
-        cost=self.num2short(ticks*roids*mining/100*(1/(1+PA.getfloat("feud","prodcost"))))
-        reply+=" Feudalism: %s value" % (cost)
+        costdemo=self.num2short(ticks*roids*mining/100*(1/(1+PA.getfloat("demo","prodcost"))))
+        costtotal=self.num2short(ticks*roids*mining/100*(1/(1+PA.getfloat("total","prodcost"))))
+        reply+=" Democracy: %s value" % (costdemo)
+        reply+=" Totalitarianism: %s value" % (costtotal)
 
         message.reply(reply)
