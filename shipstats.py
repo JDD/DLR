@@ -27,9 +27,9 @@ from Core.config import Config
 from Core.db import true, false, session
 from Core.maps import Ship
 
-regex = r'^<tr class="(Ter|Cat|Xan|Zik|Etd)">.+?(\w+)</td>' # race & name
+regex = r'^<tr class="(Ter|Cat|Xan|Zik|Etd)">.+?>([^<]+)</td>' # race & name
 regex += r'<td>(\w+)</td>' # class
-regex += r'<td>(\w\w|\-)</td>'*3 # t1,t2,t3
+regex += r'<td>(\w\w|\-)</td>'*1 # t1,t2,t3
 regex += r'<td>(\w+)</td>' # type
 regex += r'.+?(\d+|\-)</td>'*8 # some numbers
 regex += r'.+?</tr>$' # end of the line
@@ -49,7 +49,7 @@ mapping = { "Fi": "Fighter",
             "Zik": "Zikonian",
             "Xan": "Xandathrii"}
 
-keys = ['race', 'name', 'class_', 't1', 't2', 't3', 'type', 'init',
+keys = ['race', 'name', 'class_', 't1', 'type', 'init',
         'guns', 'armor', 'damage', 'empres', 'metal', 'crystal', 'eonium']
 
 def main(url = Config.get("URL", "ships"), debug=False):
