@@ -19,27 +19,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = ["system",
-           "chanusertracker",
-           "auth",
-           "help",
-           "user",
-#           "propsandcookies",
-           "sms",
-           "lookup",
-           "details",
-           "intel",
-           "growth",
-#           "target",
-           "mydef",
-           "victim",
-           "calcs",
-           "scans",
-           "ships",
-           "quotes",
-           "bcalc",
-           "galstatus",
-           "game",
-           "forums",
-           ]
+from Core.loadable import loadable
+
+@loadable.module()
+class game(loadable):
+    
+    def execute(self, message, user, params):
+        
+        game = ["http://game.planetarion.com (prefered)",
+                "http://87.124.126.17 (only use if game.pa isnt working)"
+                ]
+        
+        message.reply("PA urls: "+" | ".join(game))

@@ -19,27 +19,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = ["system",
-           "chanusertracker",
-           "auth",
-           "help",
-           "user",
-#           "propsandcookies",
-           "sms",
-           "lookup",
-           "details",
-           "intel",
-           "growth",
-#           "target",
-           "mydef",
-           "victim",
-           "calcs",
-           "scans",
-           "ships",
-           "quotes",
-           "bcalc",
-           "galstatus",
-           "game",
-           "forums",
-           ]
+from Core.loadable import loadable
+
+@loadable.module()
+class forums(loadable):
+    
+    def execute(self, message, user, params):
+        
+        forums = ["http://progression-uk.com/DLR/forum/index.php"]
+
+        message.reply("Forums: "+" | ".join(forums))
