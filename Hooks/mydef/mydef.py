@@ -60,13 +60,14 @@ class mydef(loadable):
         if len(ships) > 0 or reset_ships:
             self.update_fleets(user,ships)
         session.commit()
-    
+
     def update_fleets(self,user,ships):
         user.fleets.delete()
-        
+
         for ship, count in ships.items():
-            user.fleets.append(UserFleet(ship=ship, ship_count=count))
-    
+            s = Ship.load(ship)
+            user.fleets.append(UserFleet(ship_id=s.id, ship_count=count))
+
     def update_comment_and_fleetcount(self,user,fleetcount,comment):
         user.fleetcount = fleetcount
         if comment != "":
