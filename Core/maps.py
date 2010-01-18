@@ -881,7 +881,7 @@ class UserFleet(Base):
     __tablename__ = 'user_fleet'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    ship = Column(String(30))
+    ship_id = Column(Integer, ForeignKey(Ship.id, ondelete='cascade'))
     ship_count = Column(Integer)
 User.fleets = dynamic_loader(UserFleet, backref="user")
 
@@ -891,7 +891,7 @@ class FleetLog(Base):
     taker_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     ship = Column(String(30))
-    ship_count = Column(Integer)
+    ship_id = Column(Integer, ForeignKey(Ship.id, ondelete='cascade'))
     tick = Column(Integer)
 FleetLog.taker = relation(User, primaryjoin=FleetLog.taker_id==User.id)
 User.fleetlogs = dynamic_loader(FleetLog, backref="user", primaryjoin=User.id==FleetLog.user_id, order_by=desc(FleetLog.id))
