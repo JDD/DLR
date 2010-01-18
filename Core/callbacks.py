@@ -26,18 +26,18 @@ import socket
 import sys
 import time
 import traceback
-from Core.exceptions_ import Quit, Reboot, Reload
+from Core.exceptions_ import MerlinSystemCall
 from Core.config import Config
 from Core.loader import Loader
 from Core.db import session
 from Core.loadable import loadable
 
-
 class callbacks(object):
     use_init_all = True
     # Modules/Callbacks/Hooks controller
-    callbacks = {}
     modules = []
+    callbacks = {}
+    robocops = {}
     
     def init(self):
         # Load in everything in /Hooks/
@@ -48,7 +48,7 @@ class callbacks(object):
         #Loader.backup(*self.modules)
     
     def load_package(self, path):
-       if self.use_init_all:
+        if self.use_init_all:
         # Using __init__'s __all__ to detect module list
             # Load the current module/package
             package = self.load_module(path)
@@ -60,8 +60,8 @@ class callbacks(object):
             else:
                 # Search the module for callbacks to hook in
                 self.hook_module(package)
-       else:
-       # Loading everything available, for future use
+        else:
+        # Loading everything available, for future use
             # Generate an iterator with all file contents of /Hooks/
             for package, subpackages, modules in os.walk(path):
             # Cycle through each directory
@@ -95,6 +95,11 @@ class callbacks(object):
             self.callbacks[event]+= [callback,]
         else:
             self.callbacks[event] = [callback,]
+        
+        # Store the callback again for RoboCop if
+        #  it has an executable robocop method
+        if callable(callback.robocop):
+            self.robocops[callback.name] = callback
     
     def callback(self, message):
         # Call back a hooked module
@@ -106,16 +111,40 @@ class callbacks(object):
                 # and call each one, passing in the message
                 try:
                     callback(message)
-                except (Reload, Reboot, socket.error, Quit):
+                except (MerlinSystemCall, socket.error):
                     raise
                 except Exception, e:
                     # Error while executing a callback/mod/hook
                     message.alert("Error in module '%s'. Please report the command you used to the bot owner as soon as possible." % (callback.name,))
-                    open(Config.get("Misc","errorlog"), "a").write("\n\n\n%s - Error: %s\nArguments that caused error: %s\n" % (time.asctime(),e.__str__(),message,))
-                    open(Config.get("Misc","errorlog"), "a").write(traceback.format_exc())
+                    with open(Config.get("Misc","errorlog"), "a") as errorlog:
+                        errorlog.write("%s - IRC Callback Error: %s\n%s\n\n" % (time.asctime(),e.__str__(),message,))
+                        errorlog.write(traceback.format_exc())
+                        errorlog.write("\n\n\n")
                 finally:
                     # Remove any uncommitted or unrolled-back state
                     session.remove()
+    
+    def robocop(self, message):
+        # Call back a hooked robocop module
+        command = message.get_command()
+        # Check we have a callback stored for this command,
+        if self.robocops.has_key(command):
+            callback = self.robocops[command]
+            # and call it, passing in the message
+            try:
+                callback.robocop(message)
+            except (MerlinSystemCall, socket.error):
+                raise
+            except Exception, e:
+                # Error while executing a callback/mod/hook
+                message.alert(False)
+                with open(Config.get("Misc","errorlog"), "a") as errorlog:
+                    errorlog.write("%s - RoboCop Callback Error: %s\n%s\n\n" % (time.asctime(),e.__str__(),message,))
+                    errorlog.write(traceback.format_exc())
+                    errorlog.write("\n\n\n")
+            finally:
+                # Remove any uncommitted or unrolled-back state
+                session.remove()
 
 Callbacks = callbacks()
 Callbacks.init()
