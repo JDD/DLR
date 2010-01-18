@@ -39,7 +39,7 @@ class router(object):
         
         # If we've been asked to reload, report if it didn't work
         if self.message is not None:
-            self.message.alert("I detect a sudden weakness in the Morphing Grid.")
+            self.message.alert("Error reloading the core.")
         
         # Operation loop
         #   Loop to parse every line received over the connections
