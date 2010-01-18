@@ -31,7 +31,7 @@ class searchdef(loadable):
     """"""
     usage = " <number> <ship>"
     paramre = re.compile(r"\s+(\d+(?:\.\d+)?[mk]?)\s+(\S+)")
-    
+
     def execute(self, message, user, params):
         
         count = self.short2num(params.group(1))

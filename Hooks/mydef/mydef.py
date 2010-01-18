@@ -65,8 +65,7 @@ class mydef(loadable):
         user.fleets.delete()
 
         for ship, count in ships.items():
-            s = Ship.load(ship)
-            user.fleets.append(UserFleet(ship_id=s.id, ship_count=count))
+            user.fleets.append(UserFleet(ship=ship, ship_count=count))
 
     def update_comment_and_fleetcount(self,user,fleetcount,comment):
         user.fleetcount = fleetcount
@@ -88,13 +87,10 @@ class mydef(loadable):
             count=self.short2num(mc.group(1))
             ship=ms.group(1)
             
-            s = Ship.load(name=ship)
-            
-            if s is not None:
-                ship=s.name
-            else:
+            ship = Ship.load(name=ship)
+            if ship is None:
                 break
-            
+
             ships[ship]=count
             
             parts.pop(0)
