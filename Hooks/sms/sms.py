@@ -46,6 +46,7 @@ class sms(loadable):
 #        if receiver.name.lower() == 'savior':
 #            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
 
+
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
             return
@@ -59,25 +60,29 @@ class sms(loadable):
             message.reply("Max length for a text is 160 characters. Your text was %i characters long. Super secret message not sent." % (len(text),))
             return
 
-        get = urlencode({"user": Config.get("clickatell", "user"),
-                         "password": Config.get("clickatell", "pass"),
-                         "api_id": Config.get("clickatell", "api"),
-                         "to": phone,
-                         "text": text,
-                        })
-        
-        try:
-            status, msg = urlopen("https://api.clickatell.com/http/sendmsg", get, 5).read().split(":")
-        except URLError, e:
-            status, msg = "ERR", str(e)
-        
-        if status in ("OK","ID",):
+        error = self.send_clickatell(user, receiver, public_text, phone, text)
+        if error is None:
             message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
-            self.log_message(user,receiver,phone, public_text, "clickatell")
-        elif status in ("ERR",):
-            message.reply("Error sending message: %s" % (msg.strip(),))
         else:
-            message.reply("That wasn't supposed to happen. I don't really know what wrong. Maybe your mother dropped you.")
+            message.reply(error or "That wasn't supposed to happen. I don't really know what went wrong. Maybe your mother dropped you.")
+
+    def send_clickatell(self, user, receiver, public_text, phone, message):
+        post = urlencode({"user"    : Config.get("clickatell", "user"),
+                          "password": Config.get("clickatell", "pass"),
+                          "api_id"  : Config.get("clickatell", "api"),
+                          "to"      : phone,
+                          "text"    : message,
+                        })
+        try:
+            status, msg = urlopen("https://api.clickatell.com/http/sendmsg", post, 5).read().split(":")
+            if status in ("OK","ID",):
+                self.log_message(user, receiver, phone, public_text, "clickatell")
+            elif status in ("ERR",):
+                return "Error sending message: %s" % (msg.strip(),)
+            else:
+                return ""
+        except URLError, e:
+            return "Error sending message: %s" % (str(e),)
     
     def prepare_phone_number(self,text):
         if not text:
