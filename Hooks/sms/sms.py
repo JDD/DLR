@@ -43,16 +43,8 @@ class sms(loadable):
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return
-        if receiver.name.lower() == 'savior':
-            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
-            message.reply("You can also use !whois Savior and email him.  He receives emails on his phone.")
-            return
-        if receiver.name.lower() == 'zeb':
-            message.reply("FOR EMERGENCY ONLY!!!! Zeb only has a land line so only rings will work.  Use !phone show Zeb to get his phone number.")
-            return
-        if receiver.name.lower() == 'carbone':
-            message.reply("I refuse to talk to that Norwegian wanker. Use !phone show CaRbone and send it using your own phone.")
-            return
+#        if receiver.name.lower() == 'savior':
+#            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
 
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
@@ -81,7 +73,7 @@ class sms(loadable):
         
         if status in ("OK","ID",):
             message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
-            self.log_message(user,receiver,phone, public_text)
+            self.log_message(user,receiver,phone, public_text, "clickatell")
         elif status in ("ERR",):
             message.reply("Error sending message: %s" % (msg.strip(),))
         else:
@@ -93,6 +85,6 @@ class sms(loadable):
         s = "".join([c for c in text if c.isdigit()])
         return s.lstrip("00")
 
-    def log_message(self,sender,receiver,phone,text):
-        session.add(SMS(sender=sender,receiver=receiver,phone=phone,sms_text=text))
+    def log_message(self,sender,receiver,phone,text,mode):
+        session.add(SMS(sender=sender,receiver=receiver,phone=phone,sms_text=text,mode=mode))
         session.commit()
