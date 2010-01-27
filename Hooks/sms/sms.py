@@ -47,6 +47,7 @@ class sms(loadable):
 #        if receiver.name.lower() == 'savior':
 #            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
 
+
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
             return
@@ -60,7 +61,14 @@ class sms(loadable):
             message.reply("Max length for a text is 160 characters. Your text was %i characters long. Super secret message not sent." % (len(text),))
             return
 
-        error = self.send_clickatell(user, receiver, public_text, phone, text)
+        mode = Config.get("Misc", "sms")
+        error = ""
+
+        if mode == "googlevoice" or mode == "combined":
+            error = self.send_googlevoice(user, receiver, public_text, phone, text)
+        if mode == "clickatell" or (mode == "combined" and error is not None):
+            error = self.send_clickatell(user, receiver, public_text, phone, text)
+
         if error is None:
             message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
         else:
