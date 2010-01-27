@@ -46,7 +46,7 @@ class cost(loadable):
                 self.num2short(ship.metal*num),
                 self.num2short(ship.crystal*num),
                 self.num2short(ship.eonium*num))
-        reply+=" Feudalism: %s metal, %s crystal and %s eonium."%(
+        reply+=" Democracy: %s metal, %s crystal and %s eonium."%(
                 self.num2short(ship.metal*(1+demo)*num),
                 self.num2short(ship.crystal*(1+demo)*num),
                 self.num2short(ship.eonium*(1+demo)*num))
