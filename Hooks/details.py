@@ -29,12 +29,12 @@ class details(loadable):
     """This command basically collates lookup, xp, intel and status into one simple to use command. Neat, huh?"""
     usage = " x.y.z"
     paramre = loadable.planet_coordre
-    
+
     def execute(self, message, user, params):
-        
-        target = Planet.load(*params.groups())
+
+        target = Planet.load(*params.group(1,3,5))
         if target is None:
-            message.reply("No planet matching '%s:%s:%s' found"%params.groups())
+            message.reply("No planet matching '%s:%s:%s' found"%params.group(1,3,5))
             return
         replies = [str(target)]
 
