@@ -45,7 +45,7 @@ class smslog(loadable):
         else:
             last_ten = self.get_last_ten()
             reply="Last 10 SMSes: "
-            reply+=", ".join(map(lambda x: "id: %s (%s -> %s)"%(x.id,x.sender.name,x.receiver.name),last_ten))
+            reply+=", ".join(map(lambda x: "id: %s [%s] (%s -> %s)"%(x.id,x.mode[:1].upper(),x.sender.name,x.receiver.name),last_ten))
             message.reply(reply)
     
     def get_sms(self, id):
