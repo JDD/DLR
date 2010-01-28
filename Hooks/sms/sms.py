@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 import re
+import time
 from urllib import urlencode
 from urllib2 import urlopen, URLError
 from Core.exceptions_ import LoadableError
@@ -46,7 +47,6 @@ class sms(loadable):
             return
 #        if receiver.name.lower() == 'savior':
 #            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
-
 
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
@@ -118,6 +118,8 @@ class sms(loadable):
             text = urlopen("https://www.google.com/voice/sms/send/", post, 5).read()
             if text != '{"ok":true,"data":{"code":0}}':
                 raise SMSError("success code not returned")
+
+            time.sleep(5)
 
             get = urlencode({"auth"         : auth,
                            })
