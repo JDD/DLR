@@ -44,7 +44,7 @@ class hostiles(loadable):
         # Planet or Galaxy
         if len(params.groups()) == 5:
             # Planet
-            if params.group(3) is not None:
+            if params.group(5) is not None:
                 planet = Planet.load(*params.group(1,3,5))
                 if planet is None:
                     message.reply("No planet with coords %s:%s:%s found" % params.group(1,3,5))
