@@ -45,8 +45,12 @@ class sms(loadable):
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return
-#        if receiver.name.lower() == 'savior':
-#            message.reply("I refuse to talk to that Canadian clown. Use !phone show Savior and send it using your own phone.")
+        if receiver.name.lower() == 'cybdev':
+            message.reply("I refuse to talk to that Norwegian clown. Use !phone show CybDev and send it using your own phone.")
+            return
+        if receiver.name.lower() == 'zeb':
+            message.reply("FOR EMERGENCY ONLY!!!! Zeb only has a land line so only rings will work.  Use !phone show Zeb to get his phone number.")
+            return
 
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
