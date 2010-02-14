@@ -27,7 +27,7 @@ from Core.loadable import loadable
 
 @loadable.module("admin")
 class demote(loadable):
-    """Removes access of a member. Their access will be reduced to "galmate" level.""" 
+    """Removes access of a member. Their access will be reduced to "galmate" level."""
     usage = " pnick"
     paramre = re.compile(r"\s(\S+)")
     
@@ -48,8 +48,8 @@ class demote(loadable):
         else:
             idiot.access = 0
         
-        if user.planet is not None and user.planet.intel is not None:
-            intel = user.planet.intel
+        if idiot.planet is not None and idiot.planet.intel is not None:
+            intel = idiot.planet.intel
             alliance = Alliance.load(Config.get("Alliance","name"))
             if intel.alliance == alliance:
                 intel.alliance = None
