@@ -49,7 +49,7 @@ class growth(loadable):
 
         if penis.epenis is None:
             if user == penis:
-                message.reply("Growth data will be available at tick 72.")
+                message.reply("Growth data will be available after 72 ticks of setting your planet in !pref.")
             else:
                 message.reply("No growth data available for %s, or it is not tick 72 yet" % (penis.name,))
             return
