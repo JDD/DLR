@@ -68,9 +68,9 @@ class sms(loadable):
 
         mode = Config.get("Misc", "sms")
         if mode == "combined":
-            if user.googlevoice == True:
+            if receiver.googlevoice == True:
                 mode = "googlevoice"
-            if user.googlevoice == False:
+            if receiver.googlevoice == False:
                 mode = "clickatell"
         error = ""
 
@@ -97,7 +97,7 @@ class sms(loadable):
                             })
             # Send the SMS
             status, msg = urlopen("https://api.clickatell.com/http/sendmsg", post, 5).read().split(":")
-            
+
             # Check returned status for error messages
             if status in ("OK","ID",):
                 self.log_message(user, receiver, phone, public_text, "clickatell")
