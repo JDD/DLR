@@ -79,11 +79,13 @@ class sms(loadable):
         
         if mode == "googlevoice" or mode == "combined":
             error = self.send_googlevoice(user, receiver, public_text, phone, text)
+            sent = "Google Voice"
         if mode == "clickatell" or (mode == "combined" and error is not None):
             error = self.send_clickatell(user, receiver, public_text, phone, text)
-        
+            sent = "Clickatell"
+
         if error is None:
-            message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
+            message.reply("%s successfully processed message to: %s saying: %s" % (sent,receiver.name,text))
         else:
             message.reply(error or "That wasn't supposed to happen. I don't really know what went wrong. Maybe your mother dropped you.")
     
