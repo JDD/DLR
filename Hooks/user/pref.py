@@ -30,10 +30,10 @@ class pref(loadable):
     """Set your planet, password for the webby, email and phone number; order doesn't matter"""
     usage = " [planet=x:y:z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F] [smsmode=clickatell|google]"
     paramre = re.compile(r"\s(.+)")
-    
+
     @loadable.require_user
     def execute(self, message, user, params):
-        
+    
         params = self.split_opts(params.group(1))
         reply = ""
         for opt, val in params.items():
