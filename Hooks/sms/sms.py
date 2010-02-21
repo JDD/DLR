@@ -76,22 +76,20 @@ class sms(loadable):
             if receiver.googlevoice == False:
                 mode = "clickatell"
         error = ""
-
+        
         if mode == "googlevoice" or mode == "combined":
             error = self.send_googlevoice(user, receiver, public_text, phone, text)
-            sent = "Google Voice"
         if mode == "clickatell" or (mode == "combined" and error is not None):
             error = self.send_clickatell(user, receiver, public_text, phone, text)
-            sent = "Clickatell"
-
+        
         if error is None:
-            message.reply("%s successfully processed message to: %s saying: %s" % (sent,receiver.name,text))
+            message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
         else:
             message.reply(error or "That wasn't supposed to happen. I don't really know what went wrong. Maybe your mother dropped you.")
-
+    
     def send_clickatell(self, user, receiver, public_text, phone, message):
         try:
-            #HTTP POST
+            # HTTP POST
             post = urlencode({"user"        : Config.get("clickatell", "user"),
                               "password"    : Config.get("clickatell", "pass"),
                               "api_id"      : Config.get("clickatell", "api"),
@@ -100,7 +98,7 @@ class sms(loadable):
                             })
             # Send the SMS
             status, msg = urlopen("https://api.clickatell.com/http/sendmsg", post, 5).read().split(":")
-
+            
             # Check returned status for error messages
             if status in ("OK","ID",):
                 self.log_message(user, receiver, phone, public_text, "clickatell")
@@ -109,10 +107,10 @@ class sms(loadable):
                 raise SMSError(msg.strip())
             else:
                 return ""
-
+            
         except (URLError, SMSError) as e:
             return "Error sending message: %s" % (str(e),)
-
+    
     def send_googlevoice(self, user, receiver, public_text, phone, message):
         try:
             # HTTP POST
@@ -128,7 +126,7 @@ class sms(loadable):
             if m is None:
                 raise SMSError("unable to authenticate")
             auth = m.group(1)
-
+            
             # HTTP POST
             post = urlencode({"id"          : '',
                               "phoneNumber" : phone,
@@ -140,15 +138,16 @@ class sms(loadable):
             text = urlopen("https://www.google.com/voice/sms/send/", post, 5).read()
             if text != '{"ok":true,"data":{"code":0}}':
                 raise SMSError("success code not returned")
-
+            
             # Allow a small amount of time for the request to be processed
             time.sleep(5)
-
+            
+            # HTTP GET
             get = urlencode({"auth"         : auth,
                            })
             # Request the SMS inbox feed
             text = urlopen("https://www.google.com/voice/inbox/recent/sms/?"+get, None, 5).read()
-
+            
             # Parse the feed and extract JSON data
             m = re.search(self.googlevoice_regex_json(), text)
             if m is None:
@@ -160,44 +159,41 @@ class sms(loadable):
                 if conversation['phoneNumber'] == phone:
                     id = conversation['id']
                     read = conversation['isRead']
-
+                    
                     # Parse the feed and extract the relevant conversation
                     m = re.search(self.googlevoice_regex_conversation(id, read), text, re.S)
                     if m is None:
                         raise SMSError("conversation not found in SMS history")
-
+                    
                     # Parse the conversation and extract the message
                     m = re.search(self.googlevoice_regex_message(message), m.group(1))
                     if m is None:
                         #raise SMSError("message not found in conversation")
                         continue
-
+                    
                     # Check the message for error replies
                     if m.group(4) is None:
                         self.log_message(user, receiver, phone, public_text, "googlevoice")
                         return None
                     else:
                         return m.group(4)
+                    
             else:
                 raise SMSError("message not found in any of the matching conversations")
-                self.log_message(user, receiver, phone, public_text, "googlevoice")
-                return None
-            else:
-                return m.group(4)
-
+            
         except (URLError, SMSError) as e:
             return "Error sending message: %s" % (str(e),)
-
+    
     def googlevoice_regex_json(self):
         regex = r'<json><!\[CDATA\[(.*?)\]\]></json>'
         return regex
-
+    
     def googlevoice_regex_conversation(self, id, read):
         regex = r'<div id="'+id+'"\s*class="goog-flat-button gc-message gc-message-'+ ('read' if read else 'sms') +'">'
         regex+= r'(.*?)'
         regex+= r'(?:class="goog-flat-button gc-message|$)'
         return regex
-
+    
     def googlevoice_regex_message(self, message):
         message = re.escape(message)
         regex = r'<div class="gc-message-sms-row">\s*'
@@ -225,7 +221,7 @@ class sms(loadable):
         regex+= r'</div>\s*'
         regex+= r')?'
         return regex
-
+    
     def prepare_phone_number(self,text):
         if not text:
             return text
