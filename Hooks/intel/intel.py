@@ -26,7 +26,7 @@ from Core.loadable import loadable
 
 options = ['alliance', 'nick', 'fakenick', 'defwhore', 'covop', 'scanner', 'dists', 'bg', 'gov', 'relay', 'reportchan', 'comment']
 
-@loadable.module("member")
+@loadable.module("half")
 class intel(loadable):
     """View or set intel for a planet. Valid options: """
     __doc__ += ", ".join(options)
@@ -63,44 +63,45 @@ class intel(loadable):
             else:
                 message.reply("No information stored for %s:%s" % (galaxy.x, galaxy.y,))
             return
-        
+
         planet = Planet.load(*params.group(1,3,5))
         if planet is None:
             message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
             return
-        
-        if planet.intel is None:
-            planet.intel = Intel()
-        
-        params = self.split_opts(message.get_msg())
-        for opt, val in params.items():
-            if opt == "alliance":
-                if val in self.nulls:
-                    planet.intel.alliance = None
+
+        if user.is_member():
+            if planet.intel is None:
+                planet.intel = Intel()
+
+            params = self.split_opts(message.get_msg())
+            for opt, val in params.items():
+                if opt == "alliance":
+                    if val in self.nulls:
+                        planet.intel.alliance = None
+                        continue
+                    alliance = Alliance.load(val)
+                    if alliance is None:
+                        message.alert("No alliances match %s" % (val,))
+                        continue
+                    planet.intel.alliance = alliance
+                if (opt in options) and (val in self.nulls):
+                    setattr(planet.intel, opt, None)
                     continue
-                alliance = Alliance.load(val)
-                if alliance is None:
-                    message.alert("No alliances match %s" % (val,))
-                    continue
-                planet.intel.alliance = alliance
-            if (opt in options) and (val in self.nulls):
-                setattr(planet.intel, opt, None)
-                continue
-            if opt in ("nick","fakenick","bg","gov","reportchan"):
-                setattr(planet.intel, opt, val)
-            if opt in ("defwhore","covop","scanner","relay"):
-                if val.lower() in self.true:
-                    setattr(planet.intel, opt, True)
-                if val.lower() in self.false:
-                    setattr(planet.intel, opt, False)
-            if opt == "dists":
-                try:
-                    planet.intel.dists = int(val)
-                except ValueError:
-                    pass
-            if opt == "comment":
-                planet.intel.comment = message.get_msg().split("comment=")[1]
-        session.commit()
+                if opt in ("nick","fakenick","bg","gov","reportchan"):
+                    setattr(planet.intel, opt, val)
+                if opt in ("defwhore","covop","scanner","relay"):
+                    if val.lower() in self.true:
+                        setattr(planet.intel, opt, True)
+                    if val.lower() in self.false:
+                        setattr(planet.intel, opt, False)
+                if opt == "dists":
+                    try:
+                        planet.intel.dists = int(val)
+                    except ValueError:
+                        pass
+                if opt == "comment":
+                    planet.intel.comment = message.get_msg().split("comment=")[1]
+            session.commit()
         if planet.intel:
             message.reply("Information stored for %s:%s:%s -%s"% (planet.x, planet.y, planet.z, str(planet.intel),))
         else:
