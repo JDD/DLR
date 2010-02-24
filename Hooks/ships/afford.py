@@ -78,5 +78,5 @@ class afford(loadable):
             max_prod_modifier=prod_modifier_table[factory_usage]
             buildable_from_prod = buildable + max_prod_modifier*prod_res/total_cost
             reply+=" Counting %s res in prod at %s usage:" % (self.num2short(prod_res),factory_usage)
-            reply+=" %s | Demo: %s | Total: %s "%(int(buildable_from_prod), int(buildable_from_prod*demo),int(buildable_from_prod*total))
+            reply+=" %s | Demo: %s | Total: %s "%(int(buildable_from_prod), int(buildable_from_prod*demo_modifier),int(buildable_from_prod*total_modifier))
         message.reply(reply)
