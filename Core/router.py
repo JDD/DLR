@@ -116,7 +116,8 @@ class router(object):
         
         except socket.error as exc:
             connection.disconnect()
-        except Exception:
+        except MerlinSystemCall:
+            raise        except Exception:
             # Error while executing a callback/mod/hook
             self.message.alert()
             raise
