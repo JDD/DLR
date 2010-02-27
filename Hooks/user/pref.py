@@ -23,74 +23,93 @@ import re
 from Core.config import Config
 from Core.db import session
 from Core.maps import Planet, Alliance, User, Intel
-from Core.loadable import loadable
+from Core.loadable import loadable, route, require_user
 
-@loadable.module()
 class pref(loadable):
     """Set your planet, password for the webby, email and phone number; order doesn't matter"""
-    usage = " [planet=x:y:z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F] [smsmode=clickatell|google]"
-    paramre = re.compile(r"(?:\s(\S+))?")
+    usage = " [planet=x.y.z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F] [smsmode=clickatell|google]"
     planet_coordre = re.compile(loadable.planet_coord)
     
-    @loadable.require_user
-    def execute(self, message, user, params):
-
-        if params.group(1) is None:
-            message.reply("Your Preferance settings are Alias=%s, Planet_id=%s, Email=%s, Phone=%s, PubPhone=%s, Google Voice default=%s" % (user.alias, user.planet_id, user.email, user.phone, user.pubphone, user.googlevoice,))
-            return
+    @route(r"\s*$")
+    @require_user
+    def show_prefs(self, message, user, params):
+        reply = ""
+        if user.planet is not None:
+            reply += " planet=%s:%s:%s" % (user.planet.x,user.planet.y,user.planet.z,)
+        if user.email:
+            reply += " email=%s" % (user.email,)
+        if user.phone:
+            reply += " phone=%s pubphone=%s" % (user.phone, str(user.pubphone)[0],)
+            if Config.get("Misc", "sms") == "combined" and user.googlevoice is not None:
+                reply += " smsmode=%s" % ("Googel Voice" if user.googlevoice else "Clickatell",)
+        if len(reply) > 0:
+            message.reply("Your preferences are:" + reply)
         else:
-            params = self.split_opts(params.group(1))
-            reply = ""
-            for opt, val in params.items():
-                if opt == "planet":
-                    m = self.planet_coordre.match(val)
-                    if m:
-                        planet = Planet.load(*m.group(1,3,5))
-                        if planet is None:
-                            continue
-                        user.planet = planet
-                        reply += " planet=%s:%s:%s"%(planet.x,planet.y,planet.z)
-                        if user.is_member():
-                            alliance = Alliance.load(Config.get("Alliance","name"))
-                            if planet.intel is None:
-                                planet.intel = Intel(nick=user.name, alliance=alliance)
-                            else:
-                                planet.intel.nick = user.name
-                                planet.intel.alliance = alliance
-                if opt == "password":
-                    user.passwd = val
-                    reply += " password=%s"%(val)
-                if opt == "email":
-                    try:
-                        user.email = val
-                    except AssertionError:
-                        pass
-                    else:
-                        reply += " email=%s"%(val)
-                if opt == "phone":
+            message.reply("You haven't set any preferences, use !help pref to view the options")
+    
+    @route(r"\s+(.+)")
+    @require_user
+    def set_prefs(self, message, user, params):
+        
+        params = self.split_opts(params.group(1))
+        reply = ""
+        for opt, val in params.items():
+            if opt == "planet":
+                m = self.planet_coordre.match(val)
+                if m:
+                    planet = Planet.load(*m.group(1,3,5))
+                    if planet is None:
+                        continue
+                    user.planet = planet
+                    reply += " planet=%s:%s:%s"%(planet.x,planet.y,planet.z)
+                    if user.is_member():
+                        alliance = Alliance.load(Config.get("Alliance","name"))
+                        if planet.intel is None:
+                            planet.intel = Intel(nick=user.name, alliance=alliance)
+                        else:
+                            planet.intel.nick = user.name
+                            planet.intel.alliance = alliance
+                elif val in self.nulls:
+                    user.planet = None
+                    reply += " planet=None"
+            if opt == "password":
+                user.passwd = val
+                reply += " password=%s"%(val)
+            if opt == "email":
+                try:
+                    user.email = val
+                except AssertionError:
+                    pass
+                else:
+                    reply += " email=%s"%(val)
+            if opt == "phone":
+                if val in self.nulls:
+                    user.phone = ""
+                    reply += " phone=None"
+                else:
                     user.phone = val
                     reply += " phone=%s"%(val)
-                if opt == "pubphone":
-                    if val.lower() in self.true:
-                        user.pubphone = True
-                        reply += " pubphone=%s"%(True)
-                    elif val.lower() in self.false:
-                        user.pubphone = False
-                        reply += " pubphone=%s"%(False)
-                if opt == "smsmode":
-                    if Config.get("Misc", "sms") != "combined":
-                        message.alert("Your alliance doesn't support SMS mode switching")
-                        continue
-                    if val[:1].lower() == "c":
-                        user.googlevoice = False
-                        reply += " smsmode=clickatell"
-                    elif val[:1].lower() == "g":
-                        user.googlevoice = True
-                        reply += " smsmode=googlevoice"
-                    elif val in self.nulls:
-                        user.googlevoice = None
-                        reply += " smsmode=None"
-
-            session.commit()
-            if len(reply) > 0:
-                message.reply("Updated your preferences:"+reply)
+            if opt == "pubphone":
+                if val.lower() in self.true:
+                    user.pubphone = True
+                    reply += " pubphone=%s"%(True)
+                elif val.lower() in self.false:
+                    user.pubphone = False
+                    reply += " pubphone=%s"%(False)
+            if opt == "smsmode":
+                if Config.get("Misc", "sms") != "combined":
+                    message.alert("Your alliance doesn't support SMS mode switching")
+                    continue
+                if val[:1].lower() == "c":
+                    user.googlevoice = False
+                    reply += " smsmode=clickatell"
+                elif val[:1].lower() == "g":
+                    user.googlevoice = True
+                    reply += " smsmode=googlevoice"
+                elif val in self.nulls:
+                    user.googlevoice = None
+                    reply += " smsmode=None"
+        
+        session.commit()
+        if len(reply) > 0:
+            message.reply("Updated your preferences:"+reply)
