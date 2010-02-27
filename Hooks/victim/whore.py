@@ -37,7 +37,7 @@ class whore(loadable):
     clusterre=re.compile(r"c(\d+)",re.I)
 
     @route(r"(.+)", access = "member")
-    @loadable.require_planet
+    @require_planet
     def execute(self, message, user, params):
 
         alliance=Alliance()

@@ -27,7 +27,6 @@ from Core.loadable import loadable, route, require_user
 class demote(loadable):
     """Removes access of a member. Their access will be reduced to "galmate" level."""
     usage = " pnick"
-    paramre = re.compile(r"\s(\S+)")
     
     @route(r"(\S+)", access = "admin")
     @require_user

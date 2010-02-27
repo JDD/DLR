@@ -26,7 +26,7 @@ from Core.loadable import loadable, route, require_planet
 class basher(loadable):
     usage = " <x:y:z>"
 
-   @route(loadable.planet_coord)
+    @route(loadable.planet_coord)
     def planet(self, message, user, params):
         planet = Planet.load(*params.group(1,3,5))
         if planet is None:

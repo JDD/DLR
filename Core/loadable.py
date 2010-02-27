@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -63,14 +63,14 @@ class loadable(object):
         
         self.routes = self.routes or []
         self.routes.extend([(name, route._ROUTE, route._ACCESS,) for name, route in cls.__dict__.items() if hasattr(route, "_ROUTE") and hasattr(route, "_ACCESS")])
-
+        
         if cls.access in Config.options("Access"):
             self.access = Config.getint("Access", cls.access)
         elif type(cls.access) is int:
             self.access = cls.access
         else:
             self.access = min([route._ACCESS for route in cls.__dict__.values() if hasattr(route, "_ROUTE") and hasattr(route, "_ACCESS")])
-
+        
         return self
     
     def __init__(self):
@@ -270,7 +270,7 @@ def system(trigger, command=False, admin=False, robocop=False):
 # ########################################################################### #
 
 def route(regex=None, access=0):
-
+    
     if regex is None:
         param = re.compile(loadable.param, re.I)
     elif type(regex) is str:
