@@ -31,16 +31,13 @@ from Core.paconf import PA
 from Core.db import session
 from Core.maps import Updates, Planet, User, Intel, Ship, Scan, Request
 from Core.maps import PlanetScan, DevScan, UnitScan, FleetScan, CovOp
-from Core.loadable import loadable
-
-'''
-from .Core.robocop import push
-'''
+from Core.loadable import system
+from Core.robocop import push
 
 scanre=re.compile("http://[^/]+/showscan.pl\?scan_id=([0-9a-zA-Z]+)")
 scangrpre=re.compile("http://[^/]+/showscan.pl\?scan_grp=([0-9a-zA-Z]+)")
 
-@loadable.system('PRIVMSG')
+@system('PRIVMSG')
 def catcher(message):
     try:
         user = User.load(name=message.get_pnick())
@@ -85,6 +82,7 @@ class parse(Thread):
     
     def scan(self, uid, pa_id, gid=None):
         page = urlopen(Config.get("URL","viewscan")%(pa_id,)).read()
+        page = unicode(page, encoding='latin-1') # Encode the page
         
         m = re.search('>([^>]+) on (\d+)\:(\d+)\:(\d+) in tick (\d+)', page)
         if not m:
@@ -127,9 +125,8 @@ class parse(Thread):
             users.append(request.user.name)
         session.commit()
         
-        '''
-        push("!scans %s %s %s" % (scantype, pa_id, " ".join(users),))
-        '''
+        if len(users) > 0:
+            push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users))
     
     def parse_P(self, scan_id, scan, page):
         planetscan = scan.planetscan = PlanetScan()

@@ -22,33 +22,39 @@
 from sqlalchemy.sql.functions import count, max
 from Core.db import session
 from Core.maps import Planet, Scan
-from Core.loadable import loadable
+from Core.loadable import loadable, route, robohci
 
-@loadable.module("half")
 class scans(loadable):
-    """"""
     usage = " <x:y:z>"
-    paramre = loadable.planet_coordre
-    
+
+    @route(loadable.planet_coord, access = "half")
     def execute(self, message, user, params):
-        
+
         planet = Planet.load(*params.group(1,3,5))
         if planet is None:
             message.reply("No planet with coords %s:%s:%s found" % params.group(1,3,5))
             return
-        
+
         Q = session.query(Scan.scantype, max(Scan.tick), count())
         Q = Q.filter(Scan.planet == planet)
         Q = Q.group_by(Scan.scantype)
         result = Q.all()
-        
+
         if len(result) < 1:
             message.reply("No scans available on %s:%s:%s" % (planet.x,planet.y,planet.z,))
             return
-        
+
         prev=[]
         for type, latest, number in result:
             prev.append("(%d %s, latest pt%s)" % (number,type,latest,))
-        
+
         reply="scans for %s:%s:%s - " % (planet.x,planet.y,planet.z) + ", ".join(prev)
         message.reply(reply)
+        
+    @robohci
+    def robocop(self, message, scantype, pa_id, x, y, z, names):
+        reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
+        reply+= Config.get("URL","viewscan") % (pa_id,)
+        for name in names.split(","):
+            for nick in CUT.list_user_nicks(name):
+                message.privmsg(reply, nick)
