@@ -18,19 +18,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
-import re
+
 from sqlalchemy import and_, or_
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
-from Core.loadable import loadable
+from Core.loadable import loadable, route
 
-@loadable.module("member")
 class search(loadable):
     """Search for a planet by alliance or nick."""
-    usage = " alliance|nick"
-    paramre = re.compile(r"\s(\S+)")
-    
+    usage = " [alliance|nick]"
+
+    @route(r"\s+(\S+)", access = "member")    
     def execute(self, message, user, params):
         
         param = "%"+params.group(1)+"%"
