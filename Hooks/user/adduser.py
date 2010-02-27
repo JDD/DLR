@@ -24,15 +24,15 @@ from Core.exceptions_ import UserError
 from Core.config import Config
 from Core.db import session
 from Core.maps import User
-from Core.loadable import loadable
+from Core.loadable import loadable, route, require_user
 
-@loadable.module("admin")
+#@loadable.module("admin")
 class adduser(loadable):
     """Used to add new users with the specified pnick and access level"""
     usage = " pnick access"
-    paramre = re.compile(r"\s+(.+)\s+(\S+)")
-    
-    @loadable.require_user
+
+    @route(r"\s+(.+)\s+(\S+)", access = "admin")
+    @require_user
     def execute(self, message, user, params):
         
         pnicks = params.group(1)
@@ -85,9 +85,9 @@ class adduser(loadable):
             message.privmsg("adduser %s %s 150" %(Config.get("Channels","core"), ",".join(added),), "P")
             message.reply("Added users (%s) to %s with lvl 150 access" % (",".join(added), Config.get("Channels","core")))
 
-    def check_access(self, message, user=None, channel=None):
+    def check_access(self, message, access=None, channel=None):
         try:
-            user = loadable.check_access(self, message, user, channel)
+            user = loadable.check_access(self, message, access, channel)
             if not self.is_user(user):
                 raise UserError
             else:
