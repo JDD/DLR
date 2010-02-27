@@ -29,7 +29,7 @@ class demote(loadable):
     usage = " pnick"
     paramre = re.compile(r"\s(\S+)")
     
-    @route(r"\s+(\S+)", access = "admin")
+    @route(r"(\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):
 

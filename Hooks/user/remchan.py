@@ -28,7 +28,7 @@ from Core.loadable import loadable, route, require_user
 class remchan(loadable):
     usage = " <chan>"
 
-    @route(r"\s+(#\S+)", access = "admin")
+    @route(r"(#\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):
 
