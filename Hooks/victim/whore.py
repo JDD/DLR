@@ -25,22 +25,21 @@ from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import max, min
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
-from Core.loadable import loadable
+from Core.loadable import loadable, route, require_planet
 from Core.paconf import PA
 
-@loadable.module("member")
 class whore(loadable):
     """Target search, ordered by xp gain"""
     usage = "  [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
-    paramre = re.compile(r"\s+(.+)")
     alliancere=re.compile(r"(\S+)")
     rangere=re.compile(r"(<|>)?(\d+)")
     bashre=re.compile(r"(bash)",re.I)
     clusterre=re.compile(r"c(\d+)",re.I)
-    
+
+    @route(r"\s+(.+)", access = "member")
     @loadable.require_planet
     def execute(self, message, user, params):
-        
+
         alliance=Alliance()
         race=None
         size_mod=None
