@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008-2009 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -26,7 +26,7 @@ from Core.loadable import loadable, route, require_user
 class usedef(loadable):
     usage = " <pnick> <ship>"
 
-    @route(r"(\S+)\s+(.*)", access = "member")    
+    @route(r"(\S+)\s+(.*)", access = "member")
     @require_user
     def execute(self, message, user, params):
         

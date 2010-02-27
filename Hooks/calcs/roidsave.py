@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008-2009 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -26,7 +26,7 @@ class roidsave(loadable):
     """Tells you how much value will be mined by a number of roids in that many ticks."""
     usage = " <roids> <ticks> [mining_bonus]"
 
-+    @route(r"(\d+)\s+(\d+)(?:\s+(\d+))?")    
++    @route(r"(\d+)\s+(\d+)(?:\s+(\d+))?")
     def execute(self, message, user, params):
         
         roids=int(params.group(1))

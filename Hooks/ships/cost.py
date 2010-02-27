@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008-2009 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -27,7 +27,7 @@ class cost(loadable):
     """Calculates the cost of producing the specified number of ships"""
     usage = " <number> <ship>"
 
-    @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)")    
+    @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)")
     def execute(self, message, user, params):
         
         num, name = params.groups()
