@@ -18,20 +18,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
-import re
+
 from Core.config import Config
 from Core.maps import Alliance
-from Core.loadable import loadable
+from Core.loadable import loadable, route
 
-@loadable.module()
 class agrowth(loadable):
-    """Schlong"""
-    usage = " alliance"
-    paramre = re.compile(r"(?:\s(\S+))?")
-    
+    """Alliance Growth"""
+    usage = " [alliance]"
+
+    @route(r"(?:\s+(\S+))?")    
     def execute(self, message, user, params):
-        
+
         if params.group(1) is not None:
             alliance = Alliance.load(params.group(1))
             if alliance is None:
