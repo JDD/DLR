@@ -8,7 +8,6 @@ http://www.sqlalchemy.org/trac/ticket/1638 (unicode/noerr)
 | Merlin.nick            | unlikely       | unknown/low    |
 
 exception model refactor
-loadable platform update: multiple execute routes
 rewrite CLI or integrate as an extra IO stream
 rewrite Connection.write and Action.write to use detached threaded system
 
