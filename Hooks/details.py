@@ -22,14 +22,13 @@
 from sqlalchemy.sql.functions import count, max
 from Core.db import session
 from Core.maps import Updates, Planet, Scan, Intel
-from Core.loadable import loadable
+from Core.loadable import loadable, route
 
-@loadable.module("member")
 class details(loadable):
     """This command basically collates lookup, xp, intel and status into one simple to use command. Neat, huh?"""
-    usage = " x.y.z"
-    paramre = loadable.planet_coordre
+    usage = " <x.y.z>"
 
+    @route(loadable.planet_coord, access = "member")
     def execute(self, message, user, params):
 
         target = Planet.load(*params.group(1,3,5))
