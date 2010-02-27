@@ -18,20 +18,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
-import re
+
 from sqlalchemy.sql import desc
 from Core.config import Config
 from Core.db import session
 from Core.maps import Updates, User, Ship, UserFleet
-from Core.loadable import loadable
+from Core.loadable import loadable, route
 
-@loadable.module("member")
 class searchdef(loadable):
-    """"""
     usage = " <number> <ship>"
-    paramre = re.compile(r"\s+(\d+(?:\.\d+)?[mk]?)\s+(\S+)")
 
+    @route(r"\s+(\d+(?:\.\d+)?[mk]?)\s+(\S+)", access = "member")
     def execute(self, message, user, params):
         
         count = self.short2num(params.group(1))
