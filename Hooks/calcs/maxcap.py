@@ -18,22 +18,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
-import re
-from Core.maps import Planet
-from Core.loadable import loadable
 
-@loadable.module()
+from Core.maps import Planet
+from Core.loadable import loadable, route
+
 class maxcap(loadable):
     usage = " (<total roids>|<x:y:z> [a:b:c])"
-    paramre = (re.compile(r"%s(?:\s+%s)?"%((loadable.planet_coordre.pattern,)*2)), re.compile(r"\s+(\d+)"),)
-    
-    def execute(self, message, user, params):
-        
-        if len(params.groups()) == 1:
-            target = Planet(size=int(params.group(1)))
-            attacker = None
-        elif params.group(6) is None:
+
+    @route(r"\s+(\d+)\s*$")
+    def size(self, message, user, params):
+        target = Planet(size=int(params.group(1)))
+        attacker = None
+        self.execute(message, target, attacker)
+
+    @route(r"%s(?:\s+%s)?"%((loadable.planet_coord,)*2))
+    def planet(self, message, user, params):
+        if params.group(6) is None:
             target = Planet.load(*params.group(1,3,5))
             if target is None:
                 message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
@@ -51,7 +51,10 @@ class maxcap(loadable):
             if attacker is None:
                 message.alert("No planet with coords %s:%s:%s" % params.group(6,8,10))
                 return
-        
+
+        self.execute(message, target, attacker)
+
+    def execute(self, message, target, attacker):
         reply = ""
         total = 0
         for i in range(1,5):
