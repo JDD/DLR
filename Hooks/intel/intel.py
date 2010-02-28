@@ -31,7 +31,7 @@ class intel(loadable):
     __doc__ += ", ".join(options)
     usage = " <x.y[.z]> [option=value]+"
     
-    @route(loadable.coord+r"\s*$", access = "half")
+    @route(loadable.coord, access = "half")
     def view_intel(self, message, user, params):
         
         if params.group(5) is None:
