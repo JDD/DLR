@@ -26,7 +26,7 @@ class ship(loadable):
     """Returns the stats of the specified ship"""
     usage = " <ship>"
 
-    @route(r"(\w+")
+    @route(r"(\w+)")
     def execute(self, message, user, params):
         
         name = params.group(1)
