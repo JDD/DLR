@@ -25,7 +25,7 @@ from Core.loadable import loadable, route, require_planet
 class xp(loadable):
     usage = " <x:y:z> [a:b:c]"
 
-    @route(r"%s(?:\s+%s)?"%((loadable.planet_coord,)*2))
+    @route(r"%s\s+%s"%((loadable.planet_coord,)*2))
     def planet(self, message, user, params):
         target = Planet.load(*params.group(1,3,5))
         if target is None:
