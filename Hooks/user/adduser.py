@@ -84,9 +84,9 @@ class adduser(loadable):
             message.privmsg("adduser %s %s 150" %(Config.get("Channels","core"), ",".join(added),), "P")
             message.reply("Added users (%s) to %s with lvl 150 access" % (",".join(added), Config.get("Channels","core")))
 
-    def check_access(self, message, access=None, channel=None):
+    def check_access(self, message, access=None, user=None, channel=None):
         try:
-            user = loadable.check_access(self, message, access, channel)
+            user = loadable.check_access(self, message, access, user, channel)
             if not self.is_user(user):
                 raise UserError
             else:
