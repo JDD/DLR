@@ -47,9 +47,9 @@ class whois(loadable):
 
         reply=""
         if whore == user:
-            reply+="You are %s. Your access is %s. Your alias: is %s. Your planet id is: %s. Your Email is: %s. Your phone number is in the system: %s. Your number is sms'd through Google Voice: %s"
+            reply+="You are %s. Your access is %s. Your alias: is %s. Your planet id is: %s. Your Email is: %s. Your phone number is set to public: %s. Your number is sms'd through Google Voice: %s"
         else:
-            reply+="Information about %s: Thier access is %s. Thier alias is: %s. Their planet id is: %s. Thier Email is: %s. Thier phone number is in the system: %s. Your number is sms'd through Google Voice: %s"
+            reply+="Information about %s: Thier access is %s. Thier alias is: %s. Their planet id is: %s. Thier Email is: %s. Thier phone number is set to public: %s. Your number is sms'd through Google Voice: %s"
         reply=reply%(whore.name,whore.access,whore.alias,whore.planet_id,whore.email,whore.pubphone,whore.googlevoice,)
 
         message.reply(reply)
