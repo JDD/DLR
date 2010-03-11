@@ -66,7 +66,8 @@ class Galaxy(Base):
     score_rank = Column(Integer)
     value_rank = Column(Integer)
     xp_rank = Column(Integer)
-    
+    private = Column(Boolean)
+        
     def history(self, tick):
         return self.history_loader.filter_by(tick=tick).first()
     
