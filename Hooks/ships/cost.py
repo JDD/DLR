@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from Core.paconf import PA
 from Core.maps import Ship
 from Core.loadable import loadable, route
@@ -26,7 +26,7 @@ from Core.loadable import loadable, route
 class cost(loadable):
     """Calculates the cost of producing the specified number of ships"""
     usage = " <number> <ship>"
-
+    
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)")
     def execute(self, message, user, params):
         
@@ -37,20 +37,22 @@ class cost(loadable):
             message.alert("No Ship called: %s" % (name,))
             return
         
-        demo = PA.getfloat("demo","prodcost")
-        total = PA.getfloat("total","prodcost")
         num = self.short2num(num)
         reply="Buying %s %s will cost %s metal, %s crystal and %s eonium."%(num,ship.name,
                 self.num2short(ship.metal*num),
                 self.num2short(ship.crystal*num),
                 self.num2short(ship.eonium*num))
-        reply+=" Democracy: %s metal, %s crystal and %s eonium."%(
-                self.num2short(ship.metal*(1+demo)*num),
-                self.num2short(ship.crystal*(1+demo)*num),
-                self.num2short(ship.eonium*(1+demo)*num))
-        reply+=" Totalitarianism: %s metal, %s crystal and %s eonium."%(
-                self.num2short(ship.metal*(1+total)*num),
-                self.num2short(ship.crystal*(1+total)*num),
-                self.num2short(ship.eonium*(1+total)*num))
+        
+        for gov in PA.options("govs"):
+            bonus = PA.getfloat(gov, "prodcost")
+            if bonus == 0:
+                continue
+            
+            reply += " %s: %s metal, %s crystal and %s eonium."%(
+                        PA.get(gov, "name"),
+                        self.num2short(ship.metal*(1+bonus)*num),
+                        self.num2short(ship.crystal*(1+bonus)*num),
+                        self.num2short(ship.eonium*(1+bonus)*num))
+        
         reply+=" It will add %s value"%(self.num2short(ship.total_cost*num/100),)
         message.reply(reply)
