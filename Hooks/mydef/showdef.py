@@ -45,7 +45,7 @@ class showdef(loadable):
         ships = u.fleets.all()
         
         if len(ships) < 1:
-            message.reply("That lazy pile of shit %s hasn't updated their def since tick %s. (comment: %s)"%(u.name,u.fleetupdated,u.fleetcomment))
+            message.reply("%s hasn't updated their def since tick %s. (comment: %s)"%(u.name,u.fleetupdated,u.fleetcomment))
         else:
             reply = "%s def info: fleetcount %s, updated: %s (%s), ships: " %(u.name,u.fleetcount,u.fleetupdated,u.fleetupdated-tick)
             reply+= ", ".join(map(lambda x:"%s %s" %(self.num2short(x.ship_count),x.ship.name),ships))
