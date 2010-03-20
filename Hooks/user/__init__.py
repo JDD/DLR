@@ -35,4 +35,5 @@ __all__ = [
            "galchan",
            "remchan",
            "alias",
+           "email",
            ]
