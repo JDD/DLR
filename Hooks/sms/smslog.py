@@ -41,7 +41,7 @@ class smslog(loadable):
         id = params.group(1)
         sms = session.query(SMS).filter_by(id=id).first()
         if sms:
-            reply = "SMS with ID %s (%s) sent by %s to %s with text: %s"%(sms.id,sms.mode[:2].upper(),sms.sender.name,sms.receiver.name,sms.sms_text)
+            reply = "SMS with ID %s (%s) sent by %s to %s with text: %s"%(sms.id,sms.mode,sms.sender.name,sms.receiver.name,sms.sms_text)
         else:
             reply = "There was no SMS sent with ID %s"%(id,)
         message.reply(reply)
