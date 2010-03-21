@@ -23,7 +23,7 @@ from Core.paconf import PA
 from Core.loadable import loadable, route
 
 class roidsave(loadable):
-    """Tells you how much value will be mined by a number of roids in that many ticks."""
+    """Tells you how much value will be mined by a number of roids in that many ticks. When entering Mining bonus you should enter the total amount for FC's, population, and government."""
     usage = " <roids> <ticks> [mining_bonus]"
     
     @route(r"(\d+)\s+(\d+)(?:\s+(\d+))?")
@@ -43,7 +43,7 @@ class roidsave(loadable):
             bonus = PA.getfloat(gov, "prodcost")
             if bonus == 0:
                 continue
-            cost_b = cost/(1+bonus)
+            cost_b = cost*(1+bonus)
             reply += " %s: %s value" % (PA.get(gov, "name"), self.num2short(cost_b))
 
         message.reply(reply)

@@ -23,7 +23,7 @@ from Core.paconf import PA
 from Core.loadable import loadable, route
 
 class roidcost(loadable):
-    """Calculate how long it will take to repay a value loss capping roids."""
+    """Calculate how long it will take to repay a value loss capping roids. When entering Mining bonus you should enter the total amount for FC's, population, and government."""
     usage = " <roids> <value_cost> [mining_bonus]"
     
     @route(r"(\d+)\s+(\d+(?:\.\d+)?[km]?)(?:\s+(\d+))?")
@@ -43,10 +43,10 @@ class roidcost(loadable):
         reply = "Capping %s roids at %s value with %s%% bonus will repay in %s ticks (%s days)" % (roids,self.num2short(cost),bonus,int(repay),int(repay/24))
         
         for gov in PA.options("govs"):
-            bonus = PA.getfloat(gov, "mining")
+            bonus = PA.getfloat(gov, "prodcost")
             if bonus == 0:
                 continue
-            repay_b = repay/(1+bonus)
+            repay_b = repay*(1+bonus)
             reply += " %s: %s ticks (%s days)" % (PA.get(gov, "name"), int(repay_b), int(repay_b/24))
         
         message.reply(reply)
