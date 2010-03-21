@@ -24,7 +24,7 @@ from Core.loadable import loadable, route
 
 class roidcost(loadable):
     """Calculate how long it will take to repay a value loss capping roids. When entering Mining bonus you should enter the total amount for FC's, population, and government."""
-    usage = " <roids> <value_cost> [mining_bonus] "
+    usage = " <roids> <value_cost> [mining_bonus]"
     
     @route(r"(\d+)\s+(\d+(?:\.\d+)?[km]?)(?:\s+(\d+))?")
     def execute(self, message, user, params):
