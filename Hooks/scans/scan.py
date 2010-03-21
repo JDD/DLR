@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from sqlalchemy.sql import desc
 from Core.config import Config
 from Core.paconf import PA
@@ -40,7 +40,7 @@ class scan(object):
             return
         
         # List of last 10 scans
-        if params.group(6) == "o":
+        if params.group(6) == "old":
             scans = planet.scans.filter_by(scantype=self.type).order_by(desc(Scan.id))[:10]
             if len(scans) < 1:
                 message.reply("No %s Scans of %s:%s:%s found"%(PA.get(self.type,"name"),planet.x,planet.y,planet.z))
@@ -59,7 +59,7 @@ class scan(object):
             return
         
         # Link to scan
-        if params.group(7) == "l":
+        if params.group(7) == "link":
             reply = "%s on %s:%s:%s " % (PA.get(self.type,"name"),planet.x,planet.y,planet.z,)
             reply+= Config.get("URL","viewscan") % (scan.pa_id,)
             message.reply(reply)

@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -119,7 +119,7 @@ class parse(Thread):
         Q = Q.filter(Request.scan==None)
         Q = Q.filter(Request.active==True)
         result = Q.all()
-
+        
         users = []
         for request in result:
             request.scan_id = scan_id
@@ -246,7 +246,7 @@ class parse(Thread):
             if ship is None:
                 print "No such unit %s" % (m.group(1),)
                 continue
-            scan.units.append(UnitScan(ship=ship, amount=m.group(2)))
+            scan.units.append(UnitScan(ship=ship, amount=m.group(2).replace(',', '')))
 
         session.commit()
 
