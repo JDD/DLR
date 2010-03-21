@@ -43,7 +43,7 @@ class roidcost(loadable):
         reply = "Capping %s roids at %s value with %s%% bonus will repay in %s ticks (%s days)" % (roids,self.num2short(cost),bonus,int(repay),int(repay/24))
         
         for gov in PA.options("govs"):
-            bonus = PA.getfloat(gov, "prodcost")
+            bonus = PA.getfloat(gov, "mining")
             if bonus == 0:
                 continue
             repay_b = repay/(1+bonus)
