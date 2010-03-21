@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -96,7 +96,7 @@ class client(object):
     
     def __repr__(self):
         return super(client, self).__repr__().replace("client", "client (%s)"%(self.host(),))
-
+    
     def disconnect(self):
         # Cleanly close sockets
         print "%s <<< :%s DISCONNECT" % (time.asctime(),self.host(),)

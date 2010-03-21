@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -27,10 +27,9 @@ import traceback
 from Core.exceptions_ import MerlinSystemCall, Reboot, Call999
 from Core.config import Config
 from Core.connection import Connection
-from Core.db import session
 from Core.actions import Action
-from Core.callbacks import Callbacks
 from Core.robocop import RoboCop, EmergencyCall
+from Core.callbacks import Callbacks
 
 class router(object):
     message = None
@@ -66,12 +65,11 @@ class router(object):
                 except MerlinSystemCall:
                     raise
                 except Exception, e:
+                    print "%s Routing error logged." % (time.asctime(),)
                     with open(Config.get("Misc","errorlog"), "a") as errorlog:
-                        errorlog.write("\n\n\n%s - Error: %s\nUNKNOWN ERROR\n" % (time.asctime(),e.__str__(),))
+                        errorlog.write("%s - Routing Error: %s\n%s\n\n" % (time.asctime(),e.__str__(),connection,))
                         errorlog.write(traceback.format_exc())
-                finally:
-                    # Remove any uncommitted or unrolled-back state
-                    session.remove()
+                        errorlog.write("\n\n\n")
     
     def irc(self):
         # Read, parse and evaluate an IRC line
@@ -120,7 +118,7 @@ class router(object):
             raise
         except Exception:
             # Error while executing a callback/mod/hook
-            self.message.alert()
+            self.message.alert(False)
             raise
 
 Router = router()

@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -97,6 +97,13 @@ class ChanUserTracker(object):
             for nick in self.Pusers[pnick].nicks:
                 nick.puser = None
             del self.Pusers[pnick]
+    
+    def list_user_nicks(self, pnick):
+        # Return a list of nicks that are currently logged in with the pnick
+        if self.Pusers.has_key(pnick):
+            return map(lambda nick: nick.name, self.Pusers[pnick].nicks)
+        else:
+            return []
     
     def auth_user(self, name, pnickf, username, password):
         # Trying to authenticate with !letmein or !auth

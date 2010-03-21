@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -21,7 +21,6 @@
  
 # This determines what the bot can send to the server, and is basically the IRC-API for plugin writers
 
-from merlin import Merlin
 from Core.connection import Connection
 from Core.chanusertracker import CUT
 from Core.messages import Message, PUBLIC_REPLY, PRIVATE_REPLY, NOTICE_REPLY
@@ -54,6 +53,8 @@ class Action(Message):
             self.write("NOTICE %s :%s" % (target or self.get_nick(), text))
     
     def reply(self, text):
+        if self.get_command() != "PRIVMSG":
+            return
         # Always reply to a PM with a PM, otherwise only ! replies with privmsg
         # Always reply to an @command with a PM
         reply = self.reply_type()
@@ -65,6 +66,8 @@ class Action(Message):
             self.notice(text)
     
     def alert(self, text):
+        if self.get_command() != "PRIVMSG":
+            return
         # Notice the user, unless it was a PM
         if self.in_chan():
             self.notice(text)
@@ -104,3 +107,4 @@ class Action(Message):
             self.write("KICK %s %s :%s" % (channel, target, message))
         else:
             self.write("KICK %s %s" % (channel, target))
+    

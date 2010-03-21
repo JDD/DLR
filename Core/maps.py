@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -67,7 +67,7 @@ class Galaxy(Base):
     value_rank = Column(Integer)
     xp_rank = Column(Integer)
     private = Column(Boolean)
-        
+    
     def history(self, tick):
         return self.history_loader.filter_by(tick=tick).first()
     
@@ -356,7 +356,7 @@ class User(Base):
     fleetcount = Column(Integer, default=0)
     fleetcomment = Column(String(512))
     fleetupdated = Column(Integer, default=0)
-
+    
     @validates('passwd')
     def valid_passwd(self, key, passwd):
         return User.hasher(passwd)
@@ -364,13 +364,13 @@ class User(Base):
     def valid_email(self, key, email):
         assert self.emailre.match(email)
         return email
-
+    
     @staticmethod
     def hasher(passwd):
         # *Every* user password operation should go through this function
         # This can be easily adapted to use SHA1 instead, or add salts
         return hashlib.md5(passwd).hexdigest()
-
+    
     @staticmethod
     def load(name=None, id=None, passwd=None, exact=True, active=True, access=0):
         assert id or name
@@ -396,7 +396,7 @@ class User(Base):
         if passwd is not None:
             user = user if user.passwd == User.hasher(passwd) else None
         return user
-
+    
 #    def has_ancestor(self, possible_ancestor):
 #        ancestor = User.load(name=self.sponsor, access="member")
 #        if ancestor is not None:
@@ -437,7 +437,7 @@ class Channel(Base):
     name = Column(String(150), unique=True)
     userlevel = Column(Integer)
     maxlevel = Column(Integer)
-
+    
     @staticmethod
     def load(name):
         Q = session.query(Channel)
@@ -464,7 +464,7 @@ class Intel(Base):
     reportchan = Column(String(30))
     comment = Column(String(512))
     def __str__(self):
-        ret = ""
+        ret = "" 
         if self.nick:
             ret += " nick=%s" % (self.nick,)
         if self.alliance is not None:
@@ -502,7 +502,7 @@ Alliance.planets = relation(Planet, Intel.__table__, order_by=(asc(Planet.x), as
 # ########################################################################### #
 
 #class Target(Base):
-#   __tablename__ = 'target'
+#    __tablename__ = 'target'
 #    id = Column(Integer, primary_key=True)
 #    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
 #    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
@@ -587,18 +587,18 @@ class Scan(Base):
     pa_id = Column(String(32), index=True, unique=True)
     group_id = Column(String(32))
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-
+    
     def __str__(self):
         p = self.planet
         ph = p.history(self.tick)
-
+        
         head = "%s on %s:%s:%s " % (PA.get(self.scantype,"name"),p.x,p.y,p.z,)
         if self.scantype in ("P","D","J","N",):
             id_tick = "(id: %s, pt: %s)" % (self.pa_id,self.tick,)
         if self.scantype in ("U","A",):
             vdiff = p.value-ph.value if ph else None
             id_age_value = "(id: %s, age: %s, value diff: %s)" % (self.pa_id,Updates.current_tick()-self.tick,vdiff)
-
+        
         if self.scantype in ("P",):
             return head + id_tick + str(self.planetscan)
         if self.scantype in ("D",):
@@ -621,7 +621,7 @@ class Request(Base):
     dists = Column(Integer)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='set null'))
     active = Column(Boolean, default=True)
-
+    
     @staticmethod
     def load(id):
         Q = session.query(Request)
@@ -688,7 +688,7 @@ class DevScan(Base):
             return "100 constructions"
         if level==4:
             return "150 constructions"
-
+    
     def hulls_str(self):
         level = self.hulls
         if level==1:
@@ -697,7 +697,7 @@ class DevScan(Base):
             return "FR/DE"
         if level==3:
             return "CR/BS"
-
+    
     def waves_str(self):
         level = self.waves
         if level==0:
@@ -716,7 +716,7 @@ class DevScan(Base):
             return "JGP"
         if level==7:
             return "Advanced Unit"
-
+    
     def covop_str(self):
         level = self.covert_op
         if level==0:
@@ -733,7 +733,7 @@ class DevScan(Base):
             return "Resource hacking (OMG!)"
         if level==6:
             return "Blow up Strucs"
-
+    
     def mining_str(self):
         level = self.mining+1
         if level==0:
@@ -749,13 +749,13 @@ class DevScan(Base):
         if level==5:
             return "750 roids"
         if level==6:
-            return "1000 roids"
+            return "1k roids"
         if level==7:
             return "1250 roids"
         if level==8:
             return "1500 roids"
         if level==9:
-            return "2000 roids"
+            return "2k roids"
         if level==10:
             return "2500 roids"
         if level==11:
@@ -772,14 +772,14 @@ class DevScan(Base):
             return "8000 roids"
         if level==17:
             return "top10 or dumb"
-
+    
     def total(self):
         total = self.light_factory+self.medium_factory+self.heavy_factory
         total+= self.wave_amplifier+self.wave_distorter
         total+= self.metal_refinery+self.crystal_refinery+self.eonium_refinery
         total+= self.research_lab+self.finance_centre+self.security_centre
         return total
-
+        
     def __str__(self):
         reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel,self.infra_str(),self.hulls_str(),)
         reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core,self.covop_str(),self.mining_str(),)
