@@ -46,7 +46,7 @@ class sms(loadable):
             message.reply("Who exactly is %s?" % (rec,))
             return
         if receiver.name.lower() == 'cybdev':
-            message.reply("CybDev cellphone provider sucks donkey balls send him an email and it will goto his phone.  Use !whois CybDev to get his email address.")
+            message.reply("CybDev cellphone provider sucks donkey balls send him a sms using your own phone.  Use !phone show CybDev to get his phone number.")
             return
         if receiver.name.lower() == 'zeb':
             message.reply("FOR EMERGENCY ONLY!!!! Zeb only has a land line so only rings will work.  Use !phone show Zeb to get his phone number.")
