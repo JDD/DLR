@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -26,10 +26,9 @@ from Core.maps import Galaxy, Planet
 from Core.loadable import loadable, route
 
 class exile(loadable):
-
     @route()
     def execute(self, message, user, params):
-
+        
         Q = session.query(Planet.x, Planet.y, count().label('planets'))
         Q = Q.join(Planet.galaxy)
         Q = Q.filter(Planet.active == True)

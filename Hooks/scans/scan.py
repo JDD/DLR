@@ -30,7 +30,7 @@ class scan(object):
     usage = " (<x:y:z> [old] [link] | <id>)"
     access = "half"
     type = ""
-    planetre = loadable.planet_coord+r"(?:\s+(o))?(?:\s+(l))?"
+    planetre = loadable.planet_coord+r"(?:\s+(o)\S*)?(?:\s+(l)\S*)?"
     idre = r"(\w+)"
     
     def planet(self, message, user, params):
@@ -40,7 +40,7 @@ class scan(object):
             return
         
         # List of last 10 scans
-        if params.group(6) == "old":
+        if params.group(6) == "o":
             scans = planet.scans.filter_by(scantype=self.type).order_by(desc(Scan.id))[:10]
             if len(scans) < 1:
                 message.reply("No %s Scans of %s:%s:%s found"%(PA.get(self.type,"name"),planet.x,planet.y,planet.z))
@@ -59,7 +59,7 @@ class scan(object):
             return
         
         # Link to scan
-        if params.group(7) == "link":
+        if params.group(7) == "l":
             reply = "%s on %s:%s:%s " % (PA.get(self.type,"name"),planet.x,planet.y,planet.z,)
             reply+= Config.get("URL","viewscan") % (scan.pa_id,)
             message.reply(reply)
