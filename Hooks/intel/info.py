@@ -51,7 +51,7 @@ class info(loadable):
         
         value, score, size, xp, members = result
         if members <= 60:
-            reply="%s Members: %s, Value: %s, Avg: %s," % (alliance.name,members,self.num2short(value),self.num2short(value/members))
+            reply="%s Members: %s/%s, Value: %s, Avg: %s," % (alliance.name,members,alliance.members,self.num2short(value),self.num2short(value/members))
             reply+=" Score: %s, Avg: %s," % (self.num2short(score),self.num2short(score/members))
             reply+=" Size: %s, Avg: %s, XP: %s, Avg: %s" % (self.num2short(size),self.num2short(size/members),self.num2short(xp),self.num2short(xp/members))
             message.reply(reply)
@@ -72,7 +72,7 @@ class info(loadable):
         ts_result = Q.first()
         
         ts_value, ts_score, ts_size, ts_xp, ts_members = ts_result
-        reply="%s Members: %s (%s)" % (alliance.name,members,ts_members)
+        reply="%s Members: %s/%s (%s)" % (alliance.name,members,alliance.members,ts_members)
         reply+=", Value: %s (%s), Avg: %s (%s)" % (self.num2short(value),self.num2short(ts_value),self.num2short(value/members),self.num2short(ts_value/ts_members))
         reply+=", Score: %s (%s), Avg: %s (%s)" % (self.num2short(score),self.num2short(ts_score),self.num2short(score/members),self.num2short(ts_score/ts_members))
         reply+=", Size: %s (%s), Avg: %s (%s)" % (self.num2short(size),self.num2short(ts_size),self.num2short(size/members),self.num2short(ts_size/ts_members))
