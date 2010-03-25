@@ -21,6 +21,7 @@
 
 from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import count, sum
+from Core.paconf import PA
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
 from Core.loadable import loadable, route
@@ -32,6 +33,8 @@ class info(loadable):
     @route(r"(\S+)", access = "member")
     def execute(self, message, user, params):
         
+        tag_count = PA.getint("numbers", "tag_count")
+
         alliance = Alliance.load(params.group(1))
         if alliance is None:
             message.reply("No alliance matching '%s' found"%(params.group(1),))
@@ -50,7 +53,7 @@ class info(loadable):
             return
         
         value, score, size, xp, members = result
-        if members <= 60:
+        if members <= tag_count:
             reply="%s Members: %s/%s, Value: %s, Avg: %s," % (alliance.name,members,alliance.members,self.num2short(value),self.num2short(value/members))
             reply+=" Score: %s, Avg: %s," % (self.num2short(score),self.num2short(score/members))
             reply+=" Size: %s, Avg: %s, XP: %s, Avg: %s" % (self.num2short(size),self.num2short(size/members),self.num2short(xp),self.num2short(xp/members))
@@ -64,7 +67,7 @@ class info(loadable):
         Q = Q.filter(Planet.active == True)
         Q = Q.filter(Intel.alliance==alliance)
         Q = Q.order_by(desc(Planet.score))
-        Q = Q.limit(60)
+        Q = Q.limit(tag_count)
         Q = Q.from_self(sum(Planet.value), sum(Planet.score),
                         sum(Planet.size), sum(Planet.xp),
                         count())

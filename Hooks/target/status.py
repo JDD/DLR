@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -21,6 +21,7 @@
  
 from sqlalchemy.sql import asc
 from Core.exceptions_ import PNickParseError
+from Core.paconf import PA
 from Core.db import session
 from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel, Target
 from Core.loadable import loadable, route
@@ -29,12 +30,12 @@ class status(loadable):
     """List of targets booked by user, or list of bookings for a given galaxy or planet"""
     usage = " [x:y[:z]|user|alliance] [tick]"
     access = "half"
-
+    
     @route(loadable.coord+r"(?:\s+(\d+))?")
     def planet_galaxy(self, message, user, params):
         tick = Updates.current_tick()
         when = int(params.group(6) or 0)
-        if when and when < 32:
+        if when and when < PA.getint("numbers", "protection"):
             when += tick
         elif when and when <= tick:
             message.alert("Can not check status on the past. You wanted tick %s, but current tick is %s." % (when, tick,))
