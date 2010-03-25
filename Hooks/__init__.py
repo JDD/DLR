@@ -23,7 +23,7 @@
 __all__ = ["system",
            "chanusertracker",
            "auth",
-           "commandlog"
+           "commandlog",
            "help",
            "user",
 #           "propsandcookies",
