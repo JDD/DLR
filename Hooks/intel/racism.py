@@ -22,21 +22,43 @@
 from sqlalchemy.sql import asc
 from sqlalchemy.sql.functions import count, sum
 from Core.db import session
-from Core.maps import Planet, Alliance, Intel
+from Core.maps import Galaxy, Planet, Alliance, Intel
 from Core.loadable import loadable, route
 
 class racism(loadable):
-    """Shows averages for each race matching a given alliance in intel."""
+    """Shows averages for each race matching a given alliance in intel or for a galaxy."""
     usage = " [alliance]"
 
     @route(r"(\S+)", access = "member")
-    def execute(self, message, user, params):
+    def intel_alliance(self, message, user, params):
         
         alliance = Alliance.load(params.group(1))
         if alliance is None:
             message.reply("No alliance matching '%s' found"%(params.group(1),))
             return
-        
+
+        self.execute(message, alliance.name, result)
+
+    @route(loadable.coord, access = "member")
+    def galaxy(self, message, user, params):
+        galaxy = Galaxy.load(*params.group(1,3))
+        if galaxy is None:
+            message.alert("No galaxy with coords %s:%s" % params.group(1,3))
+            return
+
+        Q = session.query(sum(Planet.value), sum(Planet.score),
+                          sum(Planet.size), sum(Planet.xp),
+                          count(), Planet.race)
+        Q = Q.filter(Planet.galaxy == galaxy)
+        Q = Q.filter(Planet.active == True)
+        Q = Q.group_by(Planet.race)
+        Q = Q.order_by(asc(Planet.race))
+        result = Q.all()
+
+        self.execute(message, "%s:%s" % (galaxy.x, galaxy.y,), result)
+
+    def execute(self, message, target, result):
+
         Q = session.query(sum(Planet.value), sum(Planet.score),
                           sum(Planet.size), sum(Planet.xp),
                           count(), Planet.race)
@@ -55,5 +77,5 @@ class racism(loadable):
             reply+=" Score(%s)" % (self.num2short(score/members),)
             reply+=" Size(%s) XP(%s)" % (size/members,self.num2short(xp/members),)
             prev.append(reply)
-        reply="Demographics for %s: "%(alliance.name,)+ ' | '.join(prev)
+        reply="Demographics for %s: "%(target,)+ ' | '.join(prev)
         message.reply(reply)
