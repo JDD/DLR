@@ -24,10 +24,13 @@ Basic Commands
 -------------------------
 
 !lookup <x:y:z/nick/alliance> - Shows basic information on planets/alliances. Leave blank to use your co ords, nick only works for those who have set !pref planet
-
 !intel <x:y:z> - Shows intel for a planet. Add nick=, alliance= or comment= to the end of the line to modify intel.
-
 !search <nick/alliance> - Searches intel for a phrase.
+!Forums - Links you to our forums.
+!bcalc - links you to the PA bcalc
+!stats - links you to the current rounds stats.
+!betastats - links you to the beta server stats.
+!details - collates lookup, xp, intel and status into one simple to use command.
 
 
 -------------------------
@@ -71,7 +74,7 @@ Defence
 
 !mydef <# of fleets>x <ship count> <ship name> <comment> - Use this to update what you have free for defence.
 
-!searchdef <minimum ship count> <ship name> - Use this to search for available ships and fleets.
+!searchdef <ship name> - Use this to search for available ships and fleets.
 
 !showdef <pnick> - Show a user's available ships and fleets.
 
