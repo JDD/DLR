@@ -80,10 +80,10 @@ class ialliances(loadable):
         Q = Q.group_by(Alliance.id, Alliance.name)
         
         count_ = Q.count()
-        pages = count_/50 + int(count_%50 > 0)
+        pages = count_/100 + int(count_%100 > 0)
         pages = range(1, 1+pages)
         
         for o in order:
             Q = Q.order_by(o)
-        Q = Q.limit(50).offset(offset)
+        Q = Q.limit(100).offset(offset)
         return render("ialliances.tpl", request, alliances=Q.all(), title="Alliance listing (intel)", offset=offset, pages=pages, page=page, sort=sort)

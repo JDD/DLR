@@ -63,10 +63,10 @@ class alliance(loadable):
             race = "all"
         
         count = Q.count()
-        pages = count/50 + int(count%50 > 0)
+        pages = count/100 + int(count%100 > 0)
         pages = range(1, 1+pages)
         
         for o in order:
             Q = Q.order_by(o)
-        Q = Q.limit(50).offset(offset)
+        Q = Q.limit(100).offset(offset)
         return render("planets.tpl", request, planets=Q.all(), title=alliance.name, alliance=alliance, intel=user.is_member(), offset=offset, pages=pages, page=page, sort=sort, race=race)
