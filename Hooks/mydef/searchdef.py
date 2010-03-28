@@ -55,5 +55,5 @@ class searchdef(loadable):
         
         tick = Updates.current_tick()
         reply = "Fleets matching query: "
-        reply+= ", ".join(map(lambda (u, x): "%s(%s) %s: %s %s"%(u.name,u.fleetupdated-tick,u.fleetcount,self.num2short(x.ship_count),ship.name),result))
+        reply+= " || ".join(map(lambda (u, x): "%s(%s) %s: %s %s"%(u.name,u.fleetupdated-tick,u.fleetcount,self.num2short(x.ship_count),ship.name),result))
         message.reply(reply)
