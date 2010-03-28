@@ -29,10 +29,10 @@ class _menu(object):
     heads = []
     content = {}
     
-    def __call__(self, head, sub=None):
+    def __call__(self, head, sub=None, prefix="", suffix=""):
         
         def wrapper(hook):
-            url = "/" + hook.__name__ + "/"
+            url = ("/%s/%s/%s/"%(prefix,hook.name,suffix,)).replace("//","/")
             hook = hook()
             if head is False:
                 return hook
