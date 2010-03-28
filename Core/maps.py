@@ -57,7 +57,7 @@ class Updates(Base):
         d1 = datetime(now.year, now.month, now.day, now.hour)
         d2 = datetime(now.year, now.month, now.day)
         hours = (d1-d2).seconds/60/60
-        tick = Updates.current_tick() - hours
+        tick = Updates.current_tick() - hours -5
         return tick
 
 class Galaxy(Base):
