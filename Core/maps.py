@@ -53,11 +53,11 @@ class Updates(Base):
 
     @staticmethod
     def midnight_tick():
-        now = datetime.now()
+        now = datetime.utcnow()
         d1 = datetime(now.year, now.month, now.day, now.hour)
         d2 = datetime(now.year, now.month, now.day)
         hours = (d1-d2).seconds/60/60
-        tick = Updates.current_tick() - hours -5
+        tick = Updates.current_tick() - hours
         return tick
 
 class Galaxy(Base):

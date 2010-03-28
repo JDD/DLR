@@ -33,9 +33,6 @@ class _menu(object):
         
         def wrapper(hook):
             url = ("/%s/%s/%s/"%(prefix,hook.name,suffix,)).replace("//","/")
-            hook = hook()
-            if head is False:
-                return hook
             
             if head not in self.heads:
                 self.heads.append(head)

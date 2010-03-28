@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -35,7 +35,7 @@ def growth(present, past):
     else:
         ret += '"yellow"'
     ret += ' title="' + str(diff) + ' points">'
-    ret += str(round((float(diff) / past * 100),2))
+    ret += str(round((float(diff) / past * 100),2) if past else present)
     ret += '%</span>'
     return mark_safe(ret)
 
@@ -50,7 +50,7 @@ def growth_roid(present, past):
     else:
         ret += '"yellow"'
     ret += ' title="' + str(diff) + ' roids">'
-    ret += str(round((float(diff) / past * 100),2))
+    ret += str(round((float(diff) / past * 100),2) if past else present)
     ret += '%</span>'
     return mark_safe(ret)
 
