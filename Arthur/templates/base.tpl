@@ -3,7 +3,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>{{ slogan }}</title>
+    <title>{{ name }}</title>
     <link rel="stylesheet" href="/static/style.css" />
 
     {% if menu %}
@@ -19,7 +19,17 @@
 
 <body>
 <div id="wrapper">
+<center>
+<table cellspacing="1" cellpadding="3">
+    <tr class="datahigh">
+        <th colspan="2">{{ slogan }}</th>
+    </tr>
+</table>
+</center>
     {% if menu %}
+    <table cellspacing="1" cellpadding="3">
+        <tr class="header">
+            <td>
     <ul class="menulist" id="listMenuRoot">
         {% for drop in menu %}
         <li>
@@ -34,6 +44,14 @@
         </li>
         {% endfor %}
     </ul>
+            </td>
+<form method="post" action="/lookup/">
+            <th>Lookup:</th>
+            <td><input type="text" name="lookup" size="8"/></td>
+            <td><input type="submit" value="!"/></td>
+</form>
+        </tr>
+    </table>
     {% endif %}
 
     <div style="clear: both; height: 2em"></div>

@@ -24,6 +24,7 @@ from django.http import HttpResponseRedirect
 from Core.config import Config
 from Core.maps import Updates
 from Arthur.context import menu, render
+from Arthur.errors import page_not_found
 from Arthur.loadable import loadable, load
 
 handler404 = 'Arthur.errors.page_not_found'
@@ -34,6 +35,7 @@ urlpatterns = patterns('',
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Code/Git/merlin/Arthur/static/'}),
     (r'^guide/$', 'Arthur.guide'),
     (r'^links/(?P<link>\w+)/$', 'Arthur.links'),
+    (r'', include('Arthur.lookup')),
     (r'', include('Arthur.rankings')),
 )
 
@@ -48,6 +50,7 @@ class home(loadable):
             planets = ()
         return render("index.tpl", request, planets=planets, title="Your planet")
 
+@menu("Planetarion", "Parser",      suffix = "parser")
 @menu("Planetarion", "BCalc",       suffix = "bcalc")
 @menu("Planetarion", "Sandmans",    suffix = "sandmans")
 @menu("Planetarion", "PA Forums",      suffix = "pa_forums")
@@ -60,6 +63,7 @@ class links(loadable):
              "sandmans"    : "http://sandmans.co.uk",
              "bcalc"       : "http://game.planetarion.com/bcalc.pl",
              "dlr_forums"  : "http://progression-uk.com/DLR/forum/index.php",
+             "parser"      : "http://parser.5th-element.org/",
             }
     def execute(self, request, user, link):
         link = self.links.get(link)
