@@ -26,16 +26,19 @@ from Core.maps import Updates
 from Arthur.context import menu, render
 from Arthur.errors import page_not_found
 from Arthur.loadable import loadable, load
+bot = Config.get("Connection","nick")
+name = Config.get("Alliance", "name")
 
 handler404 = 'Arthur.errors.page_not_found'
 handler500 = 'Arthur.errors.server_error'
 
 urlpatterns = patterns('',
     (r'^(?:home/)?$', 'Arthur.home'),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/Code/Git/merlin/Arthur/static/'}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'C:/merlin/Arthur/static/'}),
     (r'^guide/$', 'Arthur.guide'),
     (r'^links/(?P<link>\w+)/$', 'Arthur.links'),
     (r'', include('Arthur.lookup')),
+    (r'', include('Arthur.alliance')),
     (r'', include('Arthur.rankings')),
 )
 
@@ -50,20 +53,22 @@ class home(loadable):
             planets = ()
         return render("index.tpl", request, planets=planets, title="Your planet")
 
+@menu(name,                         suffix = name)
 @menu("Planetarion", "Parser",      suffix = "parser")
 @menu("Planetarion", "BCalc",       suffix = "bcalc")
 @menu("Planetarion", "Sandmans",    suffix = "sandmans")
-@menu("Planetarion", "PA Forums",      suffix = "pa_forums")
+@menu("Planetarion", "PA Forums",      suffix = "forums")
 @menu("Planetarion", "Game",        suffix = "game")
-@menu("DLR", "DLR Forums",          suffix = "dlr_forums")
+@menu(name, "DLR Forums",           suffix = "dlr_forums")
 @load
 class links(loadable):
     links = {"game"        : "http://game.planetarion.com",
-             "pa_forums"   : "http://pirate.planetarion.com",
+             "forums"      : "http://pirate.planetarion.com",
              "sandmans"    : "http://sandmans.co.uk",
              "bcalc"       : "http://game.planetarion.com/bcalc.pl",
-             "dlr_forums"  : "http://progression-uk.com/DLR/forum/index.php",
              "parser"      : "http://parser.5th-element.org/",
+             name          : "/alliance/%s/" % (name,),
+             "dlr_forums"  : "http://progression-uk.com/DLR/forum/index.php",
             }
     def execute(self, request, user, link):
         link = self.links.get(link)
@@ -71,10 +76,11 @@ class links(loadable):
             return page_not_found(request)
         return HttpResponseRedirect(link)
 
-@menu("Guide to %s"%(Config.get("Connection","nick"),))
+@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
 @load
 class guide(loadable):
     def execute(self, request, user):
-        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=Config.get("Alliance", "name"))
+        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
+#from Arthur import alliance
 from Arthur import rankings

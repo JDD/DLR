@@ -14,3 +14,8 @@ rewrite Connection.write and Action.write to use detached threaded system
 Remove use of django.views.static.serve (configure for apache, etc)
 
 Arthur scan request interface
+!attack command, creates arthur page with scans and ability to book in the web
+
+/planets/
+    shows incoming/outgoing fleets (froglet)
+    links to scans
