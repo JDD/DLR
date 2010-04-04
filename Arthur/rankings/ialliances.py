@@ -32,7 +32,7 @@ class ialliances(loadable):
     access = "member"
     def execute(self, request, user, page="1", sort="score"):
         page = int(page)
-        offset = (page - 1)*50
+        offset = (page - 1)*100
         order =  {"members" : (desc("members"),),
                   "size"  : (desc("size"),),
                   "value" : (desc("value"),),

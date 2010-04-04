@@ -33,7 +33,7 @@ class alliance(loadable):
     access = "member"
     def execute(self, request, user, name, page="1", sort="score", race="all"):
         page = int(page)
-        offset = (page - 1)*50
+        offset = (page - 1)*100
         order =  {"score" : (asc(Planet.score_rank),),
                   "value" : (asc(Planet.value_rank),),
                   "size"  : (asc(Planet.size_rank),),
