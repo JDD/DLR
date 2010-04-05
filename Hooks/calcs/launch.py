@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -32,8 +32,8 @@ class launch(loadable):
                  "de": 9,
                  "cr": 10,
                  "bs": 10}
-
-    @route(r"(\S+)\s+(d+)")
+    
+    @route(r"(\S+)\s+(\d+)")
     def execute(self, message, user, params):
         
         eta, land_tick = params.groups()
