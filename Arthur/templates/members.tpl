@@ -6,7 +6,7 @@
 <td>
 <table cellspacing="1" cellpadding="3" width="100%">
     <tr class="datahigh">
-        <th colspan="6">
+        <th colspan="5">
             {{ level|capfirst }}s
         </th>
     </tr>
