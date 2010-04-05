@@ -32,21 +32,19 @@ bot = Config.get("Connection","nick")
 class members(loadable):
     access = "admin"
     def execute(self, request, user, sort=None):
-
-        levels = sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True)
+        
+        levels = [].extend(User.levels)
         if sort is not None:
             levels = [("All member", levels[-1][1],),]
-
+        
         order =  {"name"  : (asc(User.name),),
-                  "access" : (desc(User.access),),
+                  "access" : (desc(User.access),asc(User.name),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
-                  "mydef" : (asc(User.fleetupdated),),
-                  "phone" : (asc(User.phone),),
                   }
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
-
+        
         members = []
         for level in levels:
             Q = session.query(User.name, User.alias, User.access, Planet, User.fleetupdated,
@@ -57,7 +55,7 @@ class members(loadable):
             Q = Q.filter(User.access < levels[levels.index(level)-1][1]) if levels.index(level) > 0 else Q
             for o in order:
                 Q = Q.order_by(o)
-
+            
             members.append((level[0], Q.all(),))
         
         return render("members.tpl", request, accesslist=members, tick=Updates.current_tick()*-1)
@@ -68,7 +66,7 @@ class galmates(loadable):
     access = "admin"
     def execute(self, request, user, sort=None):
         
-        levels = sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True)
+        levels = [].extend(User.levels)
         
         order =  {"name"  : (asc(User.name),),
                   "access" : (desc(User.access),),
@@ -83,7 +81,7 @@ class galmates(loadable):
                           User.phone, User.pubphone, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user)))
         Q = Q.outerjoin(User.planet)
         Q = Q.filter(User.active == True)
-        Q = Q.filter(User.access == 0)
+        Q = Q.filter(User.access < levels[-1][1])
         for o in order:
             Q = Q.order_by(o)
         
@@ -92,10 +90,10 @@ class galmates(loadable):
 @menu(bot, "Channels")
 @load
 class channels(loadable):
-    access = "member"
+    access = "admin"
     def execute(self, request, user, sort=None):
         
-        levels = sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True)
+        levels = [].extend(User.levels)
         if sort is not None:
             levels = [("All", 0,),]
         else:
