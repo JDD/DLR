@@ -30,10 +30,10 @@ bot = Config.get("Connection","nick")
 @menu(bot, "Members")
 @load
 class members(loadable):
-    access = "admin"
+    access = "member"
     def execute(self, request, user, sort=None):
         
-        levels = [].extend(User.levels)
+        levels = [] + User.levels
         if sort is not None:
             levels = [("All member", levels[-1][1],),]
         
@@ -63,10 +63,10 @@ class members(loadable):
 @menu(bot, "Galmates")
 @load
 class galmates(loadable):
-    access = "admin"
+    access = "member"
     def execute(self, request, user, sort=None):
         
-        levels = [].extend(User.levels)
+        levels = [] + User.levels
         
         order =  {"name"  : (asc(User.name),),
                   "access" : (desc(User.access),),
@@ -90,10 +90,10 @@ class galmates(loadable):
 @menu(bot, "Channels")
 @load
 class channels(loadable):
-    access = "admin"
+    access = "member"
     def execute(self, request, user, sort=None):
         
-        levels = [].extend(User.levels)
+        levels = [] + User.levels
         if sort is not None:
             levels = [("All", 0,),]
         else:

@@ -366,7 +366,7 @@ class User(Base):
     fleetcomment = Column(String(512))
     fleetupdated = Column(Integer, default=0)
     levels = sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True)
-    
+
     @property
     def level(self):
         if not self.active:
@@ -382,6 +382,7 @@ class User(Base):
             self.active = value
         else:
             self.access = Config.getint("Access", value)
+            
     @validates('passwd')
     def valid_passwd(self, key, passwd):
         return User.hasher(passwd)
