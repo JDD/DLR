@@ -23,7 +23,7 @@ from Core.maps import Galaxy
 from Core.loadable import loadable, route
 
 class galgrowth(loadable):
-    """Cock"""
+    """Score Growth for galaxies over the past 72 ticks."""
     usage = " <x:y>"
 
     @route(loadable.coord)

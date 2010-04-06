@@ -24,7 +24,7 @@ from Core.maps import Alliance
 from Core.loadable import loadable, route
 
 class agrowth(loadable):
-    """Alliance Growth"""
+    """Alliance Growth over the past 72 ticks."""
     usage = " [alliance]"
 
     @route(r"(\S+)?")
