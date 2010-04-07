@@ -45,5 +45,5 @@ __all__ = ["system",
            "forums",
            "stats",
            "betastats",
-           "dlrranking",
+           "webby",
            ]

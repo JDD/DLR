@@ -21,11 +21,11 @@
  
 from Core.loadable import loadable, route
 
-class dlrrankings(loadable):
+class webby(loadable):
 
     @route()
     def execute(self, message, user, params):
         
         ranking = ["http://www.darklordsrising.co.nr/"]
 
-        message.reply("DLR ranks website: "+" | ".join(ranking))
+        message.reply("DLR website: "+" | ".join(ranking))
