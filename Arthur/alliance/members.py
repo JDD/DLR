@@ -34,6 +34,7 @@ class members(loadable):
     def execute(self, request, user, sort=None):
         
         levels = [] + User.levels
+
         if sort is not None:
             levels = [("All member", levels[-1][1],),]
         
@@ -94,11 +95,14 @@ class channels(loadable):
     def execute(self, request, user, sort=None):
         
         levels = [] + User.levels
-        if sort is not None:
-            levels = [("All", 0,),]
+        if "galmate" in Config.options("Access"):
+            levels.append(("Galaxy", Config.getint("Access","galmate"),))
         else:
             levels.append(("Galaxy", 0,))
         
+        if sort is not None:
+            levels = [("All", 0,),]
+
         order =  {"name"  : (asc(Channel.name),),
                   "userlevel" : (asc(Channel.userlevel),),
                   "maxlevel" : (desc(Channel.maxlevel),),
