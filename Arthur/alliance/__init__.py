@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from django.conf.urls.defaults import include, patterns, url
-from Arthur.alliance import members, equeens
+from Arthur.alliance import members, growth
 
 urlpatterns = patterns('Arthur.alliance',
     url(r'^members/$', 'members.members'),
@@ -29,5 +29,5 @@ urlpatterns = patterns('Arthur.alliance',
     url(r'^galmates/(?P<sort>\w+)/$', 'members.galmates', name="galmates"),
     url(r'^channels/$', 'members.channels'),
     url(r'^channels/(?P<sort>\w+)/$', 'members.channels', name="channels"),
-    url(r'^equeens/$', 'equeens.equeens'),
+    url(r'^growth/$', 'growth.growth'),
 )

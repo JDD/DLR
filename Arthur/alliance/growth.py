@@ -29,12 +29,12 @@ name = Config.get("Alliance", "name")
 
 @menu(name, "Growth")
 @load
-class equeens(loadable):
+class growth(loadable):
     access = "member"
     def execute(self, request, user):
-        
+
         Q = session.query(User, Planet, epenis)
         Q = Q.join(User.planet)
         Q = Q.join(User.epenis)
         Q = Q.order_by(asc(epenis.rank))
-        return render("equeens.tpl", request, queens=Q.all())
+        return render("growth.tpl", request, queens=Q.all())
