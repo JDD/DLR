@@ -24,7 +24,7 @@ from Core.maps import User
 from Core.loadable import loadable, route, require_user
 
 class dist(loadable):
-    """Lookup a user's details"""
+    """Lookup a user's distorters"""
     usage = " <pnick>"
 
     @route(r"(\S+)", access = "member")
