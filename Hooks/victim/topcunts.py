@@ -113,6 +113,6 @@ class tophostiles(loadable):
             reply+=" alliance %s"%(alliance.name,)
         reply+=" are (total: %s) "%(sum([attacks for x,y,z, attacks in result]),)
         prev = []
-        for x, y, z, attacks in result[:5]:
+        for x, y, z, attacks in result[:8]:
             prev.append("%s:%s:%s - %s"%(x,y,z,attacks))
         message.reply(reply+" | ".join(prev))
