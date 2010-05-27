@@ -40,7 +40,7 @@ class whois(loadable):
             message.reply("I am %s. Hear me roar." % (Config.get("Connection","nick"),))
             return
 
-        whore = User.load(name=search, exact=False, access="member")
+        whore = User.load(name=search, exact=False, access="galmate")
         if whore is None:
             message.reply("No users matching '%s'"%(search,))
             return
@@ -49,7 +49,7 @@ class whois(loadable):
         if whore == user:
             reply+="You are %s. Your access is %s. Your alias: is %s. Your planet id is: %s. Your Email is: %s. Your phone number is set to public: %s. Your number is sms'd through Google Voice: %s"
         else:
-            reply+="Information about %s: Thier access is %s. Thier alias is: %s. Their planet id is: %s. Thier Email is: %s. Thier phone number is set to public: %s. Your number is sms'd through Google Voice: %s"
+            reply+="Information about %s: Thier access is %s. Thier alias is: %s. Their planet id is: %s. Thier Email is: %s. Thier phone number is set to public: %s. Their number is sms'd through Google Voice: %s"
         reply=reply%(whore.name,whore.access,whore.alias,whore.planet_id,whore.email,whore.pubphone,whore.googlevoice,)
 
         message.reply(reply)
