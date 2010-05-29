@@ -54,9 +54,6 @@ class sms(loadable):
         if receiver.name.lower() == 'cormik':
             message.reply("Cormik has no mobile, but usually responds to emails.  Use !whois Cormik to get his email address.")
             return
-        if receiver.name.lower() == 'm0rph3us':
-            message.reply("m0rph3us only has a land line, you must ring him, he does not receive sms's.  Use !phone show m0rph3us to get his phone number.")
-            return
         if receiver.name.lower() == 'richards':
             message.reply("SMS does not work, richards is Deaf(no really, he can't hear).")
             return
