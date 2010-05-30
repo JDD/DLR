@@ -33,7 +33,7 @@ from Core.loadable import loadable, route, require_user
 class sms(loadable):
     """Sends an SMS to the specified user. Your username will be appended to the end of each sms. The user must have their phone correctly added and you must have access to their number."""
     usage = " <nick> <message>"
-
+    
     @route(r"(\S+)\s+(.+)", access = "member")
     @require_user
     def execute(self, message, user, params):
