@@ -139,7 +139,8 @@ class loadable(object):
                                 hostname = message.get_hostmask(),
                                 target = message.get_chan() if message.in_chan() else message.get_nick(),))
             session.commit()
-            
+            session.close()
+                        
         except UnicodeEncodeError:
             message.alert("Speak English, please.")
         except PNickParseError:

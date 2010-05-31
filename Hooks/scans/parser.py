@@ -70,7 +70,8 @@ class parse(Thread):
             print "Exception in scan: "+e.__str__()
             traceback.print_exc()
         print time()
-    
+        session.close()
+
     def group(self, uid, gid):
         page = urlopen(Config.get("URL","viewgroup")%(gid,)).read()
         for m in re.finditer('scan_id=([0-9a-zA-Z]+)',page):
