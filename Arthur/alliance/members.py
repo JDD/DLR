@@ -41,6 +41,7 @@ class members(loadable):
         order =  {"name"  : (asc(User.name),),
                   "access" : (desc(User.access),asc(User.name),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
+                  "defage" : (asc(User.fleetupdated),),                  
                   }
         if sort not in order.keys():
             sort = "name"
