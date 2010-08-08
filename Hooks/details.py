@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.db import session
-from Core.maps import Updates, Planet, Target
+from Core.maps import Updates, Planet
 from Core.loadable import loadable, route
 
 class details(loadable):
@@ -56,16 +56,16 @@ class details(loadable):
             reply+="| Roids: %s | XP: %s | Score: %s" % (cap,xp,xp*60)
             replies.append(reply)
         
-        if target.intel is not None:
-            replies.append(("Information stored for %s:%s:%s -"+str(target.intel) if str(target.intel) else "No information stored for %s:%s:%s") % (target.x, target.y, target.z,))
-        
-        bookings = target.bookings.filter(Target.tick > Updates.current_tick()).all()
-        if len(bookings) < 1:
-            replies.append("No bookings matching planet %s:%s:%s" % (target.x, target.y, target.z,))
-        else:
-            prev = []
-            for booking in bookings:
-                prev.append("(%s user:%s)" % (booking.tick,booking.user.name))
-            replies.append("Status for %s:%s:%s - " % (target.x, target.y, target.z,) + ", ".join(prev))
+#        if target.intel is not None:
+#            replies.append(("Information stored for %s:%s:%s -"+str(target.intel) if str(target.intel) else "No information stored for %s:%s:%s") % (target.x, target.y, target.z,))
+
+#        bookings = target.bookings.filter(Target.tick > Updates.current_tick()).all()
+#        if len(bookings) < 1:
+#            replies.append("No bookings matching planet %s:%s:%s" % (target.x, target.y, target.z,))
+#        else:
+#            prev = []
+#            for booking in bookings:
+#                prev.append("(%s user:%s)" % (booking.tick,booking.user.name))
+ #           replies.append("Status for %s:%s:%s - " % (target.x, target.y, target.z,) + ", ".join(prev))
         
         message.reply("\n".join(replies))

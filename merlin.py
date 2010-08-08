@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
+import os
 import sys
 sys.stderr = sys.stdout
 
@@ -27,6 +28,9 @@ if not 2.6 <= float(sys.version[:3]) < 2.7:
 
 if __name__ == "__main__":
     # Start the bot here, if we're the main module.
+    fd = os.open("log.txt", os.O_RDWR | os.O_APPEND | os.O_CREAT)
+    os.dup2(fd,1)
+    os.dup2(fd,2)
     state = ()
     
     while True:

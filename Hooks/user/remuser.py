@@ -50,7 +50,7 @@ class remuser(loadable):
         if member.active and member.access >= mbraxx:
             message.privmsg("remuser %s %s"%(home, member.name,), "P")
         if member.active and member.access >= coraxx:
-            message.privmsg("remuser %s %s"%(core, member.name,). "P")
+            message.privmsg("remuser %s %s"%(core, member.name,), "P")
         session.delete(member)
         session.commit()
         message.reply("Removed user %s" % (member.name,))
