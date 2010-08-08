@@ -75,6 +75,8 @@
     <div id="push"></div>
 </div>
 <div id="footer" align="center">
+    Free Domain Hosting from <a href="http://www.freedomain.co.nr/">http://www.freedomain.co.nr/</a>
+    <br />
     Uses <a href="http://www.twinhelix.com/">DHTML / JavaScript Menu &copy; by TwinHelix Designs</a>
     <br />
     All your base are belong to us. Codez &copy; 2009-2010 Elliot Rosemarine.

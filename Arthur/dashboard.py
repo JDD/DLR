@@ -41,9 +41,9 @@ class dashboard(loadable):
         else:
             ph = None
         
-        gimps = dashuser.gimps
-        mums = dashuser.mums
+#        gimps = dashuser.gimps
+#        mums = dashuser.mums
         ships = dashuser.fleets.all()
         phonefriend = user == dashuser or user in dashuser.phonefriends
-        
-        return render("dashboard.tpl", request, dashuser=dashuser, planet=dashuser.planet, ph=ph, gimps=gimps, mums=mums, ships=ships, phonefriend=phonefriend)
+
+        return render("dashboard.tpl", request, dashuser=dashuser, planet=dashuser.planet, ph=ph)
