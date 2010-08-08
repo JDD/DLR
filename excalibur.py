@@ -192,7 +192,7 @@ while True:
         # Galaxies with 8 or less planets are private, random
         #  galaxies should start with a minimum of 12. (R36)
         session.execute(text("""INSERT INTO galaxy (x, y, active, private)
-                                SELECT g.x, g.y, :true, count(p) <= 8 OR (g.x = 1 AND g.y = 1)
+                                SELECT g.x, g.y, :true, count(p) <= PA.getint("numbers", "private_gal") OR (g.x = 1 AND g.y = 1)
                                 FROM
                                   galaxy_temp as g,
                                   (SELECT x, y FROM planet_temp) as p
