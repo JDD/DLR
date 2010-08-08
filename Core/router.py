@@ -22,10 +22,11 @@
 import select
 import socket
 import time
-import traceback
 
 from Core.exceptions_ import MerlinSystemCall, Reboot, Call999
 from Core.config import Config
+from Core.loader import Loader
+from Core.string import log
 from Core.connection import Connection
 from Core.actions import Action
 from Core.robocop import RoboCop, EmergencyCall
@@ -37,8 +38,8 @@ class router(object):
     def run(self):
         
         # If we've been asked to reload, report if it didn't work
-        if self.message is not None:
-            self.message.alert("Error reloading the core.")
+        if Loader.success is False and self.message is not None:
+            self.message.alert("I detect a sudden weakness in the Morphing Grid.")
         
         # Operation loop
         #   Loop to parse every line received over the connections
@@ -66,10 +67,7 @@ class router(object):
                     raise
                 except Exception, e:
                     print "%s Routing error logged." % (time.asctime(),)
-                    with open(Config.get("Misc","errorlog"), "a") as errorlog:
-                        errorlog.write("%s - Routing Error: %s\n%s\n\n" % (time.asctime(),e.__str__(),connection,))
-                        errorlog.write(traceback.format_exc())
-                        errorlog.write("\n\n\n")
+                    log(Config.get("Misc","errorlog"), "%s - Routing Error: %s\n%s\n" % (time.asctime(),str(e),connection,))
     
     def irc(self):
         # Read, parse and evaluate an IRC line

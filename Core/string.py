@@ -19,20 +19,32 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from ConfigParser import ConfigParser as configparser
+from traceback import format_exc
 
-def load_config(path):
-    # Load and parse required config file
-    try:
-        config = configparser()
-        config.optionxform = str
-        if len(config.read(path)) != 1:
-            raise IOError
-    except StandardError:
-        # Either couldn't read/find the file, or couldn't parse it.
-        print "Warning! Could not load %s" % (path,)
-        raise ImportError
+CRLF = "\r\n"
+encoding = "latin1"
+
+def decode(text):
+    # Converts strings to Unicode
+    if type(text) is unicode:
+        return text
+    elif type(text) is str:
+        return text.decode(encoding)
     else:
-        return config
+        raise UnicodeDecodeError
 
-Config = load_config("merlin.cfg")
+def encode(text):
+    # Converts Unicode to strings
+    if type(text) is str:
+        return text
+    elif type(text) is unicode:
+        return text.encode(encoding)
+    else:
+        raise UnicodeEncodeError
+
+def log(file, log, traceback=True):
+    with open(file, "a") as file:
+        file.write(encode(log) + "\n")
+        if traceback is True:
+            file.write(format_exc() + "\n")
+        file.write("\n\n")

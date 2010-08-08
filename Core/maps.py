@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from datetime import datetime
 import hashlib
 from math import ceil
@@ -26,12 +26,13 @@ import re
 import sys
 from sqlalchemy import *
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import validates, relation, backref, dynamic_loader
-from sqlalchemy.sql.functions import current_timestamp, max as max_sql, random
+from sqlalchemy.orm import validates, relation, backref, dynamic_loader, aliased
+from sqlalchemy.sql.functions import coalesce, count, current_timestamp, random
 
 from Core.exceptions_ import LoadableError
 from Core.config import Config
 from Core.paconf import PA
+from Core.string import encode
 from Core.db import Base, session
 
 # ########################################################################### #
@@ -48,9 +49,10 @@ class Updates(Base):
     
     @staticmethod
     def current_tick():
-        tick = session.query(max_sql(Updates.id)).scalar() or 0
+        from sqlalchemy.sql.functions import max
+        tick = session.query(max(Updates.id)).scalar() or 0
         return tick
-
+    
     @staticmethod
     def midnight_tick():
         now = datetime.utcnow()
@@ -59,7 +61,7 @@ class Updates(Base):
         hours = (d1-d2).seconds/60/60
         tick = Updates.current_tick() - hours
         return tick
-
+    
     @staticmethod
     def week_tick():
         tick = Updates.current_tick() - (24 * 7)
@@ -103,6 +105,7 @@ class Galaxy(Base):
         retstr+="Value: %s (%s) " % (self.value,self.value_rank)
         retstr+="Size: %s (%s) " % (self.size,self.size_rank)
         retstr+="XP: %s (%s) " % (self.xp,self.xp_rank)
+        return encode(retstr)
         return retstr
 Galaxy._idx_x_y = Index('galaxy_x_y', Galaxy.x, Galaxy.y, unique=True)
 class GalaxyHistory(Base):
@@ -169,6 +172,7 @@ class Planet(Base):
         retstr+="Size: %s (%s) " % (self.size,self.size_rank)
         retstr+="XP: %s (%s) " % (self.xp,self.xp_rank)
         retstr+="Idle: %s " % (self.idle,)
+        return encode(retstr)
         return retstr
     
     def bravery(self, target):
@@ -238,9 +242,11 @@ class Alliance(Base):
     size = Column(Integer)
     members = Column(Integer)
     score = Column(Integer)
+    points = Column(Integer)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
     score_rank = Column(Integer)
+    points_rank = Column(Integer)
     size_avg = Column(Integer)
     score_avg = Column(Integer)
     size_avg_rank = Column(Integer)
@@ -255,21 +261,19 @@ class Alliance(Base):
         alliance = Q.filter(Alliance.name.ilike(name)).first()
         if alliance is None:
             alliance = Q.filter(Alliance.name.ilike(name+"%")).first()
-        if alliance is None:
-            alliance = Q.filter(Alliance.name.ilike("%"+name+"%")).first()
         if alliance is None and active == False:
             Q = session.query(Alliance)
             alliance = Q.filter(Alliance.name.ilike(name)).first()
             if alliance is None:
                 alliance = Q.filter(Alliance.name.ilike(name+"%")).first()
-            if alliance is None:
-                alliance = Q.filter(Alliance.name.ilike("%"+name+"%")).first()
         return alliance
     
     def __str__(self):
         retstr="'%s' Members: %s (%s) " % (self.name,self.members,self.members_rank)
         retstr+="Score: %s (%s) Avg: %s (%s) " % (self.score,self.score_rank,self.score_avg,self.score_avg_rank)
+        retstr+="Points: %s (%s) " % (self.points,self.points_rank)
         retstr+="Size: %s (%s) Avg: %s (%s)" % (self.size,self.size_rank,self.size_avg,self.size_avg_rank)
+        return encode(retstr)
         return retstr
 class AllianceHistory(Base):
     __tablename__ = 'alliance_history'
@@ -279,9 +283,11 @@ class AllianceHistory(Base):
     size = Column(Integer)
     members = Column(Integer)
     score = Column(Integer)
+    points = Column(Integer)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
     score_rank = Column(Integer)
+    points_rank = Column(Integer)
     size_avg = Column(Integer)
     score_avg = Column(Integer)
     size_avg_rank = Column(Integer)
@@ -319,6 +325,7 @@ alliance_temp = Table('alliance_temp', Base.metadata,
     Column('size', Integer),
     Column('members', Integer),
     Column('score', Integer),
+    Column('points', Integer),
     Column('score_rank', Integer),
     Column('size_avg', Integer),
     Column('score_avg', Integer))
@@ -362,9 +369,7 @@ class User(Base):
     phone = Column(String(48))
     pubphone = Column(Boolean, default=False) # Asc
     googlevoice = Column(Boolean, default=None)
-    dists = Column(String(15))
-    amps = Column(String(15))
-    sponsor = Column(String(15)) # Asc
+#    sponsor = Column(String(15)) # Asc
 #    quits = Column(Integer, default=0) # Asc
 #    available_cookies = Column(Integer, default=0)
 #    carebears = Column(Integer, default=0)
@@ -373,7 +378,7 @@ class User(Base):
     fleetcomment = Column(String(512))
     fleetupdated = Column(Integer, default=0)
     levels = filter(lambda lev: not lev[0] == "galmate", sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True))
-
+    
     @property
     def level(self):
         if not self.active:
@@ -382,14 +387,33 @@ class User(Base):
             if self.access >= int(access):
                 return level
         return "galmate"
-
+    
     @level.setter
     def level(self, value):
         if value in (True, False,):
-            self.active = value
+            self.active = bool(value)
         else:
             self.access = Config.getint("Access", value)
-            
+    
+    @property
+    def smsmode(self):
+        if Config.get("Misc", "sms") == "combined" and self.googlevoice is not None:
+            return ("Clickatell","Google",)[self.googlevoice]
+    
+    @property
+    def gimps(self):
+        return session.query(User.name).filter(User.sponsor == self.name).all()
+    
+    @property
+    def mums(self):
+        from sqlalchemy.sql.functions import sum
+        Q = session.query(User.name, sum(Cookie.howmany).label("gac"))
+        Q = Q.join(Cookie.giver)
+        Q = Q.filter(Cookie.receiver == self)
+        Q = Q.group_by(User.name)
+        Q = Q.order_by(desc("gac"))
+        return Q.all()
+    
     @validates('passwd')
     def valid_passwd(self, key, passwd):
         return User.hasher(passwd)
@@ -419,28 +443,32 @@ class User(Base):
         if id is not None:
             user = Q.filter(User.id == id).first()
         if name is not None:
-            user = Q.filter(User.name.ilike(name)).first()
-            if user is None and exact is not True:
-                user = Q.filter(User.name.ilike(name+"%")).first()
-            if user is None and exact is not True:
-                user = Q.filter(User.alias.ilike(name)).first()
-            if user is None and exact is not True:
-                user = Q.filter(User.alias.ilike(name+"%")).first()
+            for filter in (
+                            User.name.ilike(name),
+                            User.name.ilike(name+"%"),
+                            User.alias.ilike(name),
+                            User.alias.ilike(name+"%"),
+                            User.name.ilike("%"+name+"%"),
+                            User.alias.ilike("%"+name+"%"),
+                            ):
+                user = Q.filter(filter).first()
+                if user is not None or exact is True:
+                    break
         if (user and passwd) is not None:
             user = user if user.passwd == User.hasher(passwd) else None
         return user
     
-#    def has_ancestor(self, possible_ancestor):
-#        ancestor = User.load(name=self.sponsor, access="member")
-#        if ancestor is not None:
-#            if ancestor.name.lower() == possible_ancestor.lower():
-#                return True
-#            else:
-#                return ancestor.has_ancestor(possible_ancestor)
-#        elif self.sponsor == Config.get("Connection", "nick"):
-#            return False
-#        else:
-#            return None
+    def has_ancestor(self, possible_ancestor):
+        ancestor = User.load(name=self.sponsor, access="member")
+        if ancestor is not None:
+            if ancestor.name.lower() == possible_ancestor.lower():
+                return True
+            else:
+                return ancestor.has_ancestor(possible_ancestor)
+        elif self.sponsor == Config.get("Connection", "nick"):
+            return False
+        else:
+            return None
 Planet.user = relation(User, uselist=False, backref="planet")
 def user_access_function(num):
     # Function generator for access check
@@ -507,7 +535,7 @@ class Intel(Base):
     defwhore = Column(Boolean, default=False)
     covop = Column(Boolean, default=False)
     scanner = Column(Boolean, default=False)
-    dists = Column(Integer)
+    dists = Column(Integer, default=0)
     bg = Column(String(25))
     gov = Column(String(20))
     relay = Column(Boolean, default=False)
@@ -539,6 +567,7 @@ class Intel(Base):
             ret += " reportchan=%s"%(self.reportchan,)
         if self.comment:
             ret += " comment=%s"%(self.comment,)
+        return encode(ret)
         return ret
 Planet.intel = relation(Intel, uselist=False, backref="planet")
 Galaxy.intel = relation(Intel, Planet.__table__, order_by=asc(Planet.z))
@@ -559,9 +588,70 @@ Alliance.planets = relation(Planet, Intel.__table__, order_by=(asc(Planet.x), as
 #    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
 #    tick = Column(Integer)
 #User.bookings = dynamic_loader(Target, backref="user")
-#Planet.bookings = dynamic_loader(Target, backref="planet")
+#Planet.bookings = dynamic_loader(Target, backref="planet", order_by=(asc(Target.tick)))
 #Galaxy.bookings = dynamic_loader(Target, Planet.__table__)
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
+
+#class Attack(Base):
+#    __tablename__ = 'attack'
+#    id = Column(Integer, primary_key=True)
+#    landtick = Column(Integer)
+#    comment = Column(Text)
+#    _active_ticks = 12
+
+#    def addPlanet(self, planet):
+#        if planet in self.planets:
+#            return
+#        if planet.intel and planet.alliance and planet.alliance.name == Config.get("Alliance","name"):
+#            return
+#        self.planets.append(planet)
+#        return True
+
+#    def removePlanet(self, planet):
+#        if planet in self.planets:
+#            self.planets.remove(planet)
+#            return True
+
+#    def addGalaxy(self, galaxy):
+#        for planet in galaxy.planets:
+#            if planet.active:
+#                self.addPlanet(planet)
+
+#    def removeGalaxy(self, galaxy):
+#        for planet in galaxy.planets:
+#            if planet.active:
+#                self.removePlanet(planet)
+
+#    @staticmethod
+#    def load(id):
+#        Q = session.query(Attack)
+#        Q = Q.filter_by(id=id)
+#        attack = Q.first()
+#        return attack
+
+#    @property
+#    def link(self):
+#        return "%sattack/%d/" %(Config.get("URL","arthur"), self.id,)
+
+#    @property
+#    def active(self):
+#        return self.landtick >= Updates.current_tick() - Attack._active_ticks
+
+#    def __str__(self):
+#        reply = "Attack %d LT: %d %s | %s | Planets: "%(self.id,self.landtick,self.comment,self.link,)
+#        reply+= ", ".join(map(lambda p: "%s:%s:%s" %(p.x,p.y,p.z,), self.planets))
+#        return encode(reply)
+#        return reply
+
+
+#class AttackTarget(Base):
+#    __tablename__ = 'attack_target'
+#    id = Column(Integer, primary_key=True)
+#    attack_id = Column(Integer, ForeignKey(Attack.id, ondelete='cascade'))
+#    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'))
+#Attack.planets = relation(Planet, secondary=AttackTarget.__table__,
+#                                primaryjoin=AttackTarget.attack_id==Attack.id,
+#                              secondaryjoin=AttackTarget.planet_id==Planet.id, order_by=(asc(Planet.x), asc(Planet.y), asc(Planet.z)))
 
 # ########################################################################### #
 # #############################    SHIP TABLE    ############################ #
@@ -631,25 +721,125 @@ class Ship(Base):
 class Scan(Base):
     __tablename__ = 'scan'
     __table_args__ = (UniqueConstraint('pa_id','tick'), {})
+    _scan_types = sorted(PA.options("scans"), cmp=lambda x,y: cmp(PA.getint(x, "type"), PA.getint(y, "type")))
     id = Column(Integer, primary_key=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
-    scantype = Column(String(1))
+    scantype = Column(Enum(*_scan_types, name="scantype"))
     tick = Column(Integer)
     pa_id = Column(String(32), index=True)
-    group_id = Column(String(32))
+    group_id = Column(String(32), index=True)
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    
+
+    @property
+    def type(self):
+        return PA.get(self.scantype,"name")
+
+    @property
+    def link(self):
+        return Config.get("URL","viewscan") % (self.pa_id,)
+
+    def ship_count(self, cloak):
+        if self.scantype not in ("U","A",):
+            return
+
+        count = 0
+        for unitscan in self.units:
+            count += unitscan.amount if cloak else unitscan.visible
+
+        return count
+
+    def ship_value(self):
+        if self.scantype not in ("U","A",):
+            return
+
+        value = 0
+        for unitscan in self.units:
+            value += unitscan.amount * unitscan.ship.total_cost / 100
+
+        return value
+
+    def bcalc(self, target):
+        if self.scantype not in ("U","A",):
+            return
+
+        bcalc = Config.get("URL","bcalc")
+        for unitscan in self.units:
+            bcalc += "%s_1_%d=%d&" % (("att", "def",)[target], unitscan.ship_id - 1, unitscan.amount,)
+        bcalc += "%s_planet_value_1=%d&" % (("att", "def",)[target], self.planet.value,)
+        bcalc += "%s_planet_score_1=%d&" % (("att", "def",)[target], self.planet.score,)
+
+        if target:
+            pscan = self.planet.scan("P")
+            if pscan and pscan.planetscan.size == self.planet.size:
+                bcalc += "def_metal_asteroids=%d&" % (pscan.planetscan.roid_metal,)
+                bcalc += "def_crystal_asteroids=%d&" % (pscan.planetscan.roid_crystal,)
+                bcalc += "def_eonium_asteroids=%d&" % (pscan.planetscan.roid_eonium,)
+            else:
+                bcalc += "def_metal_asteroids=%d&" % (self.planet.size,)
+
+            dscan = self.planet.scan("D")
+            if dscan:
+                bcalc += "def_structures=%d&" % (dscan.devscan.total,)
+
+        return bcalc
+
+    @property
+    def total_hostile(self):
+        if self.scantype not in ("J",):
+            return
+        return sum([fleet.fleet_size for fleet in self.fleets if fleet.mission.lower() == "attack"])
+
+    @property
+    def total_hostile_fleets(self):
+        if self.scantype not in ("J",):
+            return
+        return len([fleet for fleet in self.fleets if fleet.mission.lower() == "attack"])
+
+    @property
+    def total_friendly(self):
+        if self.scantype not in ("J",):
+            return
+        return sum([fleet.fleet_size for fleet in self.fleets if fleet.mission.lower() == "defend"])
+
+    @property
+    def total_friendly_fleets(self):
+        if self.scantype not in ("J",):
+            return
+        return len([fleet for fleet in self.fleets if fleet.mission.lower() == "defend"])
+
+    def fleet_overview(self):
+        if self.scantype not in ("J",):
+            return
+
+        from sqlalchemy.sql.functions import min, sum
+        f=aliased(FleetScan)
+        a=aliased(FleetScan)
+        d=aliased(FleetScan)
+
+        Q = session.query(f.landing_tick, f.landing_tick - min(Scan.tick),
+                            count(a.id), coalesce(sum(a.fleet_size),0),
+                            count(d.id), coalesce(sum(d.fleet_size),0))
+        Q = Q.join(f.scan)
+        Q = Q.filter(f.scan == self)
+
+        Q = Q.outerjoin((a, and_(a.id==f.id, a.mission.ilike("Attack"))))
+        Q = Q.outerjoin((d, and_(d.id==f.id, d.mission.ilike("Defend"))))
+
+        Q = Q.group_by(f.landing_tick)
+        Q = Q.order_by(asc(f.landing_tick))
+        return Q.all()
+
     def __str__(self):
         p = self.planet
         ph = p.history(self.tick)
-        
-        head = "%s on %s:%s:%s " % (PA.get(self.scantype,"name"),p.x,p.y,p.z,)
-        if self.scantype in ("P","D","J","N",):
-            id_tick = "(id: %s, pt: %s)" % (self.pa_id,self.tick,)
-        if self.scantype in ("U","A",):
-            vdiff = p.value-ph.value if ph else None
-            id_age_value = "(id: %s, age: %s, value diff: %s)" % (self.pa_id,Updates.current_tick()-self.tick,vdiff)
-        
+
+        head = "%s on %s:%s:%s " % (self.type,p.x,p.y,p.z,)
+        pa_id = self.pa_id
+        pa_id = encode(self.pa_id)
+        id_tick = "(id: %s, pt: %s)" % (pa_id,self.tick,)
+        vdiff = p.value-ph.value if ph else None
+        id_age_value = "(id: %s, age: %s, value diff: %s)" % (pa_id,Updates.current_tick()-self.tick,vdiff)
+
         if self.scantype in ("P",):
             return head + id_tick + str(self.planetscan)
         if self.scantype in ("D",):
@@ -665,19 +855,30 @@ Scan.scanner = relation(User, backref="scans")
 
 class Request(Base):
     __tablename__ = 'request'
+    _requestable = [(type, PA.get(type, "name"),) for type in Scan._scan_types if PA.getboolean(type, "request")]
     id = Column(Integer, primary_key=True)
     requester_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
-    scantype = Column(String(1))
+    scantype = Column(Enum(*Scan._scan_types, name="scantype"))
     dists = Column(Integer)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='set null'))
     active = Column(Boolean, default=True)
-    
+    tick = Column(Integer,default=Updates.current_tick)
+
     @staticmethod
     def load(id):
         Q = session.query(Request)
         request = Q.filter_by(id = id, active = True).first()
         return request
+
+    @property
+    def link(self):
+        return Config.get("URL", "reqscan") % (PA.get(self.scantype, "type"), self.target.x, self.target.y, self.target.z,)
+
+    @property
+    def type(self):
+        return PA.get(self.scantype,"name")
+
 Request.user = relation(User, backref="requests")
 Request.target = relation(Planet)
 Request.scan = relation(Scan)
@@ -698,6 +899,11 @@ class PlanetScan(Base):
     prod_res = Column(Integer)
     agents = Column(Integer)
     guards = Column(Integer)
+
+    @property
+    def size(self):
+        return self.roid_metal + self.roid_crystal + self.roid_eonium
+
     def __str__(self):
         reply = " Roids: (m:%s, c:%s, e:%s) |" % (self.roid_metal,self.roid_crystal,self.roid_eonium,)
         reply+= " Resources: (m:%s, c:%s, e:%s) |" % (self.res_metal,self.res_crystal,self.res_eonium,)
@@ -727,6 +933,10 @@ class DevScan(Base):
     core = Column(Integer)
     covert_op = Column(Integer)
     mining = Column(Integer)
+
+    def travel_str(self):
+        return "eta -%s" %(self.travel,)
+
     def infra_str(self):
         level = self.infrastructure
         if level==0:
@@ -739,7 +949,7 @@ class DevScan(Base):
             return "150 constructions"
         if level==4:
             return "250 constructions"
-    
+
     def hulls_str(self):
         level = self.hulls
         if level==1:
@@ -748,7 +958,7 @@ class DevScan(Base):
             return "FR/DE"
         if level==3:
             return "CR/BS"
-    
+
     def waves_str(self):
         level = self.waves
         if level==0:
@@ -767,30 +977,33 @@ class DevScan(Base):
             return "JGP"
         if level==7:
             return "Advanced Unit"
-    
+
+    def core_str(self):
+        return ("1000","3500","6000","9000","12000")[self.core] + " ept"
+
     def covop_str(self):
         level = self.covert_op
         if level==0:
-            return "Research Hack"
+            return "Research hack"
         if level==1:
-            return "Raise Stealth"
+            return "Lower stealth"
         if level==2:
             return "Blow up roids"
         if level==3:
             return "Blow up ships"
         if level==4:
-            return "Kill Guards"
+            return "Blow up guards"
         if level==5:
             return "Blow up amps/dists"
         if level==6:
             return "Resource hacking (OMG!)"
         if level==7:
-            return "Blow up Strucs"
-    
+            return "Blow up strucs"
+
     def mining_str(self):
-        level = self.mining+1
+        level = self.mining
         if level==0:
-            return "100 roids"
+            return "100 roids (scanner!)"
         if level==1:
             return "200 roids"
         if level==2:
@@ -806,7 +1019,7 @@ class DevScan(Base):
         if level==7:
             return "1500 roids"
         if level==8:
-            return "2k roids"
+            return "2000 rpods"
         if level==9:
             return "2500 roids"
         if level==10:
@@ -822,22 +1035,23 @@ class DevScan(Base):
         if level==15:
             return "8000 roids"
         if level==16:
-            return "10000 roids"
-    
+            return "top10 or dumb"
+
+    @property
     def total(self):
         total = self.light_factory+self.medium_factory+self.heavy_factory
         total+= self.wave_amplifier+self.wave_distorter
         total+= self.metal_refinery+self.crystal_refinery+self.eonium_refinery
         total+= self.research_lab+self.finance_centre+self.security_centre
         return total
-        
+
     def __str__(self):
-        reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel,self.infra_str(),self.hulls_str(),)
-        reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core,self.covop_str(),self.mining_str(),)
+        reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel_str(),self.infra_str(),self.hulls_str(),)
+        reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core_str(),self.covop_str(),self.mining_str(),)
         reply+= "\n"
         reply+= "Structures: LFac: %s, MFac: %s, HFac: %s, Amp: %s," % (self.light_factory,self.medium_factory,self.heavy_factory,self.wave_amplifier,)
         reply+= " Dist: %s, MRef: %s, CRef: %s, ERef: %s," % (self.wave_distorter,self.metal_refinery,self.crystal_refinery,self.eonium_refinery,)
-        reply+= " ResLab: %s (%s%%), FC: %s, Sec: %s (%s%%)" % (self.research_lab,int(float(self.research_lab)/self.total()*100),self.finance_centre,self.security_centre,int(float(self.security_centre)/self.total()*100),)
+        reply+= " ResLab: %s (%s%%), FC: %s, Sec: %s (%s%%)" % (self.research_lab,int(float(self.research_lab)/self.total*100),self.finance_centre,self.security_centre,int(float(self.security_centre)/self.total*100),)
         return reply
 Scan.devscan = relation(DevScan, uselist=False, backref="scan")
 
@@ -847,9 +1061,14 @@ class UnitScan(Base):
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
     ship_id = Column(Integer, ForeignKey(Ship.id, ondelete='cascade'))
     amount = Column(Integer)
+    
+    @property
+    def visible(self):
+        return self.amount if self.ship.type.lower() != "cloak" else 0
+    
     def __str__(self):
         return "%s %s" % (self.ship.name, self.amount,)
-Scan.units = relation(UnitScan, backref="scan")
+Scan.units = relation(UnitScan, backref="scan", order_by=asc(UnitScan.ship_id))
 UnitScan.ship = relation(Ship)
 
 class FleetScan(Base):
@@ -864,9 +1083,15 @@ class FleetScan(Base):
     launch_tick = Column(Integer)
     landing_tick = Column(Integer)
     mission = Column(String(7))
+    
+    @property
+    def eta(self):
+        return self.landing_tick - self.scan.tick
+    
     def __str__(self):
         p = self.owner
-        return "(%s:%s:%s %s | %s %s %s)" % (p.x,p.y,p.z,self.fleet_name,self.fleet_size,self.mission,self.landing_tick-self.scan.tick,)
+        return encode("(%s:%s:%s %s | %s %s %s)" % (p.x,p.y,p.z,self.fleet_name,self.fleet_size,self.mission,self.eta,))
+        return "(%s:%s:%s %s | %s %s %s)" % (p.x,p.y,p.z,self.fleet_name,self.fleet_size,self.mission,self.eta,)
 Scan.fleets = relation(FleetScan, backref="scan", order_by=asc(FleetScan.landing_tick))
 FleetScan.owner = relation(Planet, primaryjoin=FleetScan.owner_id==Planet.id)
 FleetScan.target = relation(Planet, primaryjoin=FleetScan.target_id==Planet.id)
@@ -922,6 +1147,7 @@ class Slogan(Base):
         Q = Q.filter(Slogan.text.ilike("%"+text+"%")).order_by(random())
         return Q.first(), Q.count()
     def __str__(self):
+        return encode(self.text)
         return self.text
 
 class Quote(Base):
@@ -935,6 +1161,7 @@ class Quote(Base):
         Q = Q.filter(Quote.text.ilike("%"+text+"%")).order_by(random())
         return Q.first(), Q.count()
     def __str__(self):
+        return encode(self.text)
         return self.text
 
 # ########################################################################### #
@@ -1006,6 +1233,18 @@ FleetLog.ship = relation(Ship)
 #Kick.kicked = relation(User, primaryjoin=Kick.person_id==User.id)
 #Kick.person = association_proxy("kicked", "name")
 
+#class Suggestion(Base):
+#    __tablename__ = 'suggestion_proposal'
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    active = Column(Boolean, default=True)
+#    proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+#    created = Column(DateTime, default=current_timestamp())
+#    closed = Column(DateTime)
+#    vote_result = Column(String(7))
+#    comment_text = Column(Text)
+#    type = "suggestion"
+#Suggestion.proposer = relation(User)
+
 #class Vote(Base):
 #    __tablename__ = 'prop_vote'
 #    id = Column(Integer, primary_key=True)
@@ -1016,6 +1255,7 @@ FleetLog.ship = relation(Ship)
 #User.votes = dynamic_loader(Vote, backref="voter")
 #Invite.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Invite.id==Vote.prop_id)
 #Kick.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Kick.id==Vote.prop_id)
+#Suggestion.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoin=Suggestion.id==Vote.prop_id)
 
 # ########################################################################### #
 # ################################    LOGS    ############################### #

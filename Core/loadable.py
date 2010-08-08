@@ -140,9 +140,7 @@ class loadable(object):
                                 target = message.get_chan() if message.in_chan() else message.get_nick(),))
             session.commit()
             session.close()
-
-        except UnicodeEncodeError:
-            message.alert("Speak English, please.")
+            
         except PNickParseError:
             message.alert(self.PParseError)
         except UserError:
