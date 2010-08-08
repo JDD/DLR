@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -21,8 +21,7 @@
  
 # This module provides an entry point for system reboots or reloads
 
-from traceback import format_exc
-from merlin import Merlin
+from Core import Merlin
 from Core.exceptions_ import Quit, Reboot, Reload
 from Core.config import Config
 from Core.robocop import RoboCop
@@ -52,7 +51,7 @@ def reboot(message):
 def reload(message):
     """Dynamically reload the Core and Hooks"""
     msg = message.get_msg().split(None,1)
-    message.reply("Reloading Core.")
+    message.reply("It's Morphin' Time!")
     if len(msg) > 1:
         raise Reload(msg[1])
     else:
@@ -72,5 +71,5 @@ def debug(message):
     if len(msg) > 1:
         try:
             exec(msg[1])
-        except Exception:
-            message.alert(format_exc())
+        except Exception, e:
+            message.alert(str(e))

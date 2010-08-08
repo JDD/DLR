@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -29,16 +29,16 @@ from Core.paconf import PA
 
 class idler(loadable):
     """Target search, ordered by idle ticks"""
-    usage = "  [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
+    usage = " [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
     PrefError = "You must set your planet with !pref to use the bash option"
     alliancere=re.compile(r"(\S+)")
     rangere=re.compile(r"(<|>)?(\d+)")
     bashre=re.compile(r"(bash)",re.I)
     clusterre=re.compile(r"c(\d+)",re.I)
-
+    
     @route(r"(.+)", access = "member")
     def execute(self, message, user, params):
-
+        
         alliance=Alliance()
         race=None
         size_mod=None
@@ -105,7 +105,7 @@ class idler(loadable):
             Q = Q.filter(Planet.x == cluster)
         Q = Q.order_by(desc(Planet.idle))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:10]
+        result = Q[:6]
         
         if len(result) < 1:
             reply="No"
@@ -124,7 +124,7 @@ class idler(loadable):
             return
         
         replies = []
-        for planet, intel in result[:8]:
+        for planet, intel in result[:5]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s Idle: %s" % (planet.value,planet.size, planet.idle)
             if intel:
@@ -133,6 +133,6 @@ class idler(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 8:
+        if len(result) > 5:
             replies[-1]+=" (Too many results to list, please refine your search)"
         message.reply("\n".join(replies))

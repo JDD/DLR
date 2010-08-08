@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -24,13 +24,13 @@ from sqlalchemy.sql import asc, desc, literal, union
 from sqlalchemy.sql.functions import current_timestamp, sum
 from Core.config import Config
 from Core.db import session
-from Core.maps import Alliance, User, Invite, Kick, Vote
+from Core.maps import Alliance, User, Invite, Kick, Vote, Suggestion
 from Core.messages import PUBLIC_REPLY
 from Core.loadable import loadable, route, require_user, channel
 
 class prop(loadable):
     """A proposition is a vote to do something. For now, you can raise propositions to invite or kick someone. Once raised the proposition will stand until you expire it.  Make sure you give everyone time to have their say. Votes for and against a proposition are weighted by carebears. You must have at least 1 carebear to vote."""
-    usage = " [<invite|kick> <pnick> <comment>] | [list] | [vote <number> <yes|no|abstain>] | [expire <number>] | [show <number>] | [cancel <number>] | [recent] | [search <pnick>]"
+    usage = " [<invite|kick> <pnick> <comment>] | [list] | [vote <number> <yes|no|abstain>] | [expire <number>] | [show <number>] | [cancel <number>] | [recent] | [search <pnick>] | [suggest <decision to be made>]"
     access = "member"
     
     @route(r"show\s+(\d+)")
@@ -44,8 +44,12 @@ class prop(loadable):
         now = datetime.datetime.now()
         age = (now - prop.created).days
         reply = "proposition %s (%s days old):" %(prop.id,age,)
-        reply+= " %s %s." %(prop.type,prop.person,)
-        reply+= " %s commented '%s'." %(prop.proposer.name,prop.comment_text)
+        if prop.type == 'suggestion':
+            reply+= " %s by %s: "%(prop.type,prop.proposer.name)
+            reply+= " %s." %(prop.comment_text)
+        else:  
+            reply+= " %s %s." %(prop.type,prop.person,)
+            reply+= " %s commented '%s'." %(prop.proposer.name,prop.comment_text)
         
         if not prop.active:
             reply+= " This prop expired %d days ago."%((now-prop.closed).days,)
@@ -87,13 +91,16 @@ class prop(loadable):
             message.reply("You can't vote on prop %s, it's expired."%(id,))
             return
         if prop.proposer == user:
-            message.reply("Arbitrary Munin rule #167: No voting on your own props.")
+            message.reply("Arbitrary %s rule #167: No voting on your own props."%(Config.get("Connection", "nick")))
             return
-        if prop.person == user.name and vote == 'veto':
+        if prop.type == 'kick' and vote == 'veto' and prop.kicked == user:
             message.reply("You can't veto a vote to kick you.")
             return
         
         old_vote = prop.votes.filter(Vote.voter==user).first()
+        if old_vote is not None:
+            session.expunge(old_vote)
+        
         prop.votes.filter(Vote.voter==user).delete()
         prop.votes.append(Vote(voter=user, vote=vote, carebears=user.carebears))
         session.commit()
@@ -141,6 +148,9 @@ class prop(loadable):
     @require_user
     def invite(self, message, user, params):
         person = params.group(1)
+        if person.lower() == Config.get("Connection","nick").lower():
+            message.reply("I am already here, shitface.")
+            return
         u = User.load(name=person,access="member")
         if u is not None:
             message.reply("Stupid %s, that wanker %s is already a member."%(user.name,person))
@@ -203,8 +213,11 @@ class prop(loadable):
         if prop is None:
             message.reply("No proposition number %s exists (idiot)."%(id,))
             return
+        if not prop.active:
+            message.reply("You can't expire prop %d, it's already expired."%(prop.id,))
+            return
         if prop.proposer is not user and not user.is_admin():
-            message.reply("Only %s may expire proposition %d."%(prop.proposer.name,id))
+            message.reply("Only %s may expire proposition %d."%(prop.proposer.name,prop.id))
             return
         if prop.type == "invite" and not self.member_count_below_limit():
             message.reply("You have tried to invite somebody, but we have too many losers and I can't be bothered dealing with more than %s of you."%(Config.getint("Alliance", "members"),))
@@ -255,6 +268,9 @@ class prop(loadable):
             message.privmsg("note send %s A proposition to kick you from %s has been raised by %s with reason '%s' and passed by a vote of %s to %s."%(idiot.name,Config.get("Alliance","name"),prop.proposer.name,prop.comment_text,yes,no),'p')
             message.reply("%s has been reduced to \"galmate\" level and removed from the channel."%(idiot.name,))
         
+        if prop.type == "suggestion" and passed:
+            message.reply("Suggestion \"%s\" has passed" %(prop.comment_text))
+        
         prop.active = False
         prop.closed = current_timestamp()
         prop.vote_result = vote_result
@@ -269,10 +285,16 @@ class prop(loadable):
         if prop is None:
             message.reply("No proposition number %s exists (idiot)."%(id,))
             return
+        if not prop.active:
+            message.reply("You can't cancel prop %d, it's already expired."%(prop.id,))
+            return
         if prop.proposer is not user and not user.is_admin():
-            message.reply("Only %s may expire proposition %d."%(prop.proposer.name,id))
+            message.reply("Only %s may cancel proposition %d."%(prop.proposer.name,prop.id))
             return
         
+        self.recalculate_carebears(prop)
+        
+        yes, no, veto = self.sum_votes(prop)
         vote_result = "cancel"
         
         reply = self.text_result(vote_result, yes, no, veto)
@@ -283,23 +305,36 @@ class prop(loadable):
         prop.closed = current_timestamp()
         prop.vote_result = vote_result
         session.commit()
+        
+    @route(r"suggest\s+(.+)")
+    @channel("home")
+    @require_user
+    def suggest(self,message,user,params):
+        prop = Suggestion(proposer=user, comment_text=params.group(1))
+        session.add(prop)
+        session.commit()
+        
+        reply = "%s created a new proposition (nr. %d) : %s" %(user.name,prop.id,prop.comment_text)
+        reply+= " When people have been given a fair shot at voting you can call a count using !prop expire %d."%(prop.id,)
+        message.reply(reply)
     
     def member_count_below_limit(self):
         Q = session.query(User).filter(User.active == True).filter(User.access >= Config.getint("Access", "member"))
         return Q.count() < Config.getint("Alliance", "members")
     
     def is_already_proposed_invite(self, person):
-        Q = session.query(Invite).filter(Invite.person.ilike(person)).filter_by(active=True)
+        Q = session.query(Invite).filter(Invite.person.ilike(person)).filter(Invite.active == True)
         return Q.count() > 0
     
     def is_already_proposed_kick(self, person):
-        Q = session.query(Kick).join(Kick.kicked).filter(User.name.ilike(person)).filter_by(active=True)
+        Q = session.query(Kick).join(Kick.kicked).filter(User.name.ilike(person)).filter(Kick.active == True)
         return Q.count() > 0
     
     def load_prop(self, id):
         invite = session.query(Invite).filter_by(id=id).first()
         kick = session.query(Kick).filter_by(id=id).first()
-        return invite or kick
+        suggestion = session.query(Suggestion).filter_by(id=id).first()
+        return invite or kick or suggestion
     
     def recalculate_carebears(self, prop):
         Q = session.query(Vote, User.carebears).join(Vote.voter).filter(Vote.prop_id==prop.id)
@@ -310,7 +345,7 @@ class prop(loadable):
         yes = session.query(sum(Vote.carebears)).filter_by(prop_id=prop.id, vote="yes").scalar()
         no = session.query(sum(Vote.carebears)).filter_by(prop_id=prop.id, vote="no").scalar()
         veto = session.query(Vote).filter_by(prop_id=prop.id, vote="veto").count()
-        return yes, no, veto
+        return yes or 0, no or 0, veto or 0
     
     def text_result(self, vote_result, yes, no, veto):
         reply = "The prop"
@@ -346,9 +381,28 @@ class prop(loadable):
         session.commit()
     
     def base_props_selectable(self):
-        invites = session.query(Invite.id, Invite.person, Invite.vote_result, literal("invite").label("type"), Invite.active)
-        kicks = session.query(Kick.id, User.name, Kick.vote_result, literal("kick").label("type"), Kick.active).join(Kick.kicked)
-        props = union(invites, kicks).alias("prop")
+        invites = session.query(    Invite.id               .label("id"),
+                                    Invite.person           .label("person"),
+                                    Invite.vote_result      .label("vote_result"),
+                                    literal("invite")       .label("type"),
+                                    Invite.active           .label("active")
+                                )
+        
+        kicks = session.query(      Kick.id                 .label("id"),
+                                    User.name               .label("person"),
+                                    Kick.vote_result        .label("vote_result"),
+                                    literal("kick")         .label("type"),
+                                    Kick.active             .label("active")
+                                ).join(Kick.kicked)
+        
+        suggestion = session.query( Suggestion.id           .label("id"),
+                                    User.name               .label("person"),
+                                    Suggestion.vote_result  .label("vote_result"),
+                                    literal("suggestion")   .label("type"),
+                                    Suggestion.active       .label("active")
+                                ).join(Suggestion.proposer)
+        
+        props = union(invites, kicks, suggestion).alias("prop")
         return props
     
     def get_open_props(self):

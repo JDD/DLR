@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -31,7 +31,6 @@ class cookie(loadable):
     usage = " [howmany] <receiver> <reason> | [stat]"
     access = "member"
     
-    @route(r"statu?s?")
     @route(r"statu?s?")
     @require_user
     def stat(self, message, user, params):

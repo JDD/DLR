@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -28,7 +28,7 @@ from Core.loadable import loadable, route, require_user
 class galchan(loadable):
     """Adds a channel where the access of commands is limited to 1 in that channel (so you don't accidentally do !intel or something 'important')"""
     usage = " <chan>"
-
+    
     @route(r"(#\S+)", access = "member")
     @require_user
     def execute(self, message, user, params):

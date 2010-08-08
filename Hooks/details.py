@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,25 +18,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-from sqlalchemy.sql.functions import count, max
+ 
 from Core.db import session
-from Core.maps import Updates, Planet, Scan, Intel
+from Core.maps import Updates, Planet, Target
 from Core.loadable import loadable, route
 
 class details(loadable):
     """This command basically collates lookup, xp, intel and status into one simple to use command. Neat, huh?"""
     usage = " <x.y.z>"
-
+    
     @route(loadable.planet_coord, access = "member")
     def execute(self, message, user, params):
-
+        
         target = Planet.load(*params.group(1,3,5))
         if target is None:
             message.reply("No planet matching '%s:%s:%s' found"%params.group(1,3,5))
             return
         replies = [str(target)]
-
+        
         if self.user_has_planet(user):
             attacker = user.planet
             reply="Target "
@@ -59,21 +58,14 @@ class details(loadable):
         
         if target.intel is not None:
             replies.append(("Information stored for %s:%s:%s -"+str(target.intel) if str(target.intel) else "No information stored for %s:%s:%s") % (target.x, target.y, target.z,))
-
-        Q = session.query(Scan.scantype, max(Scan.tick), count())
-        Q = Q.filter(Scan.planet == target)
-        Q = Q.group_by(Scan.scantype)
-        result = Q.all()
         
-        if len(result) < 1:
-            replies.append("No scans available on %s:%s:%s" % (target.x,target.y,target.z,))
-            message.reply("\n".join(replies))
-            return
-
-        prev=[]
-        for type, latest, number in result:
-            prev.append("(%d %s, latest pt%s)" % (number,type,latest,))
+        bookings = target.bookings.filter(Target.tick > Updates.current_tick()).all()
+        if len(bookings) < 1:
+            replies.append("No bookings matching planet %s:%s:%s" % (target.x, target.y, target.z,))
+        else:
+            prev = []
+            for booking in bookings:
+                prev.append("(%s user:%s)" % (booking.tick,booking.user.name))
+            replies.append("Status for %s:%s:%s - " % (target.x, target.y, target.z,) + ", ".join(prev))
         
-        reply="scans for %s:%s:%s - " % (target.x,target.y,target.z) + ", ".join(prev)
-        replies.append(reply)
         message.reply("\n".join(replies))

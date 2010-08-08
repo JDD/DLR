@@ -19,35 +19,39 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from sqlalchemy.exc import IntegrityError
 from Core.config import Config
 from Core.db import session
-from Core.maps import Channel
+from Core.maps import User
+from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user
 
-class remchan(loadable):
-    usage = " <chan>"
+class remuser(loadable):
+    """Permenantly delete a user"""
+    usage = " <user>"
     
-    @route(r"(#\S+)", access = "admin")
+    @route(r"(\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):
         
-        channel = params.group(1)
-        chan = Channel.load(channel)
-        if chan is None:
-            message.reply("Channel '%s' does not exist" % (channel,))
-            if user.is_admin():
-                message.privmsg("remuser %s %s" %(channel, Config.get('Connection', 'nick')),'P')
-                message.part(channel)
+        username = params.group(1)
+        member = User.load(name=username, active=False)
+        if member is None:
+            message.alert("No such user '%s'" % (username,))
+            return
+        if member.access > user.access:
+            message.reply("You may not remove %s, his or her access (%s) exceeds your own (%s)" %(member.name, member.access, user.access,))
             return
         
-        if chan.userlevel >= user.access and not user.is_admin():
-            message.reply("You may not remove %s, the channel's access (%s) exceeds your own (%s)" % (chan.name, chan.userlevel, user.access,))
-            return
+        mbraxx = Config.getint("Access","member")
+        home = Config.get("Channels","home")
+        coraxx = Config.getint("Access","core")
+        core = Config.get("Channels","core")
         
-        session.delete(chan)
+        if member.active and member.access >= mbraxx:
+            message.privmsg("remuser %s %s"%(home, member.name,), "P")
+        if member.active and member.access >= coraxx:
+            message.privmsg("remuser %s %s"%(core, member.name,). "P")
+        session.delete(member)
         session.commit()
-        
-        message.privmsg("remuser %s %s" %(chan.name, Config.get('Connection', 'nick')),'P')
-        message.part(chan.name)
-        message.reply("Removed channel %s" % (chan.name,))
+        message.reply("Removed user %s" % (member.name,))
+        CUT.untrack_user(member.name)

@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -28,11 +28,11 @@ from Core.loadable import loadable, route
 class stop(loadable):
     """Calculates the required defence to the specified number of ships"""
     usage = " <number> <ship> [t1|t2|t3]"
-
+    
     @route(r"hammertime")
     def hammertime(self, message, user, params):
         message.reply("Can't touch this!")
-
+    
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)(?:\s+(t1|t2|t3))?")
     def execute(self, message, user, params):
         
@@ -44,9 +44,9 @@ class stop(loadable):
         if ship is not None:
             pass
         elif "asteroids".rfind(name.lower()) > -1:
-            ship = Ship(name="Asteroids",class_="Roids",armor=50,total_cost=20000)
+            ship = Ship(name="Asteroids",class_="Roids",armor=50,total_cost=PA.getint("numbers", "roid_value")*100)
         elif "constructions".rfind(name.lower()) > -1:
-            ship = Ship(name="Constructions",class_="Struct",armor=500,total_cost=150000)
+            ship = Ship(name="Constructions",class_="Struct",armor=500,total_cost=PA.getint("numbers", "cons_value")*100)
         else:
             message.alert("No Ship called: %s" % (name,))
             return

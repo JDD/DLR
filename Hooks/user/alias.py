@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -26,7 +26,7 @@ from Core.loadable import loadable, route, require_user
 class alias(loadable):
     """Set an alias that maps to your pnick, useful if you have a different nick than your pnick and people use autocomplete."""
     usage = " <alias> (at most 15 characters)"
-
+    
     @route(r"(\S{3,15})?")
     @require_user
     def execute(self, message, user, params):
@@ -48,7 +48,7 @@ class alias(loadable):
             if session.query(User).filter(User.active==True).filter(User.alias.ilike(alias)).first() is not None:
                 message.reply("Your alias is already in use or is someone else's pnick (not allowed). Tough noogies.")
                 return
-
+        
         user.alias = alias
         session.commit()
         message.reply("Update alias for %s (that's you) to %s"%(user.name,user.alias,))

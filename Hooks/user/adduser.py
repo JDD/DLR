@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -25,11 +25,10 @@ from Core.db import session
 from Core.maps import User
 from Core.loadable import loadable, route, require_user
 
-
 class adduser(loadable):
     """Used to add new users with the specified pnick and access level"""
     usage = " <pnick> <access>"
-
+    
     @route(r"(.+)\s+(\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):
@@ -52,6 +51,9 @@ class adduser(loadable):
         added = []
         exists = []
         for pnick in pnicks.split():
+            if pnick.lower() == Config.get("Connection","nick").lower():
+                message.reply("I am already here, shitface.")
+                continue
             member = User.load(name=pnick, active=False)
             if member is None:
                 member = User(name=pnick, access=access, sponsor=user.name)
@@ -71,7 +73,7 @@ class adduser(loadable):
         session.commit()
         if len(exists):
             message.reply("Users (%s) already exist" % (",".join(exists),))
-        # Bot access
+       # Bot access
         if len(added):
             message.reply("Added users (%s) at level %s" % (",".join(added),access))
         # P access with netgamers.org (set up to adduser with access 100 to your Home channel from merlin.cfg)

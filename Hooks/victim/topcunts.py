@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -113,6 +113,6 @@ class tophostiles(loadable):
             reply+=" alliance %s"%(alliance.name,)
         reply+=" are (total: %s) "%(sum([attacks for x,y,z, attacks in result]),)
         prev = []
-        for x, y, z, attacks in result[:8]:
+        for x, y, z, attacks in result[:5]:
             prev.append("%s:%s:%s - %s"%(x,y,z,attacks))
         message.reply(reply+" | ".join(prev))

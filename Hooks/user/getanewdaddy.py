@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -33,11 +33,14 @@ class demote(loadable):
     def execute(self, message, user, params):
 
         # do stuff here
+        if params.group(1).lower() == Config.get("Connection","nick").lower():
+            message.reply("I'll peck your eyes out, cunt.")
+            return
         idiot = User.load(name=params.group(1), access="member")
         if idiot is None:
             message.reply("That user isn't a member!")
             return
-        if (not user.is_admin()) and idiot.sponsor != user.name:
+        if (not user.is_admin()) and user != idiot and idiot.sponsor != user.name:
             message.reply("You do not have sufficent access to demote this member.")
             return
         
@@ -53,7 +56,7 @@ class demote(loadable):
                 intel.alliance = None
         
         session.commit()
-
+        
         message.privmsg("remuser %s %s"%(Config.get("Channels","home"), idiot.name,),'p')
         message.privmsg("remuser %s %s"%(Config.get("Channels","core"), idiot.name,),'p')
         if idiot.sponsor != user.name:
@@ -62,3 +65,4 @@ class demote(loadable):
         else:
             message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
             message.reply("%s has been reduced to \"galmate\" level and removed from the channel."%(idiot.name,))
+

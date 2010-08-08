@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class prod(loadable):
     """Calculate ticks it takes to produce <number> <ships> with <factories>. Specify race and/or government for bonuses."""
     usage = " <number> <ship> <factories> [population] [race] [government]"
-
+    
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\S+)\s+(\d+)(?:\s+(.*))?")
     def execute(self, message, user, params):
         
@@ -71,10 +71,11 @@ class prod(loadable):
         reply += " %s"%(PA.get(gov,"name"),) if gov else ""
         reply += " %s"%(PA.get(race,"name"),) if race else ""
         reply += " planet" if race or gov else ""
+        reply += " with %s%% population"%(pop,) if pop else ""
         message.reply(reply)
 
     def calc_ticks(self, cost, num, bonus, factories):
-        """Calculate the cost in ticks. Return (ticks, ticks_with_feudalism)."""
+        """Calculate the cost in ticks."""
 
         ln = lambda x: math.log(x) / math.log(math.e)
         norm_cost = num * cost

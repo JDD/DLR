@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from sqlalchemy import and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import asc
@@ -29,7 +29,7 @@ from Core.loadable import loadable, route
 class exp(loadable):
     """XP of a planet over the last 15 ticks"""
     usage = " <x:y:z>"
-
+    
     @route(loadable.planet_coord+r"(?:\s+(\d+))?")
     def execute(self, message, user, params):
         
@@ -38,13 +38,13 @@ class exp(loadable):
             message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
             return
         tick = params.group(6)
-
+        
         p1 = aliased(PlanetHistory)
         p2 = aliased(PlanetHistory)
         Q = session.query(p1.tick, p1.xp, p1.xp-p2.xp, p1.size, p1.size-p2.size)
         Q = Q.filter(and_(p1.id==p2.id, p1.tick-1==p2.tick))
         Q = Q.filter(p1.current==p)
-
+        
         if tick:
             Q = Q.filter(p1.tick == tick)
             result = Q.first()

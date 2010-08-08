@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -25,7 +25,7 @@ from Core.maps import User, epenis
 from Core.loadable import loadable, route
 
 class lowscorers(loadable):
-
+    
     @route(access = "member")
     def execute(self, message, user, params):
         
@@ -33,7 +33,7 @@ class lowscorers(loadable):
         Q = Q.join(User.epenis)
         Q = Q.order_by(desc(epenis.rank))
         result = Q[:5]
-
+        
         if len(result) < 1:
             message.alert("There is no Growth available yet.")
             return

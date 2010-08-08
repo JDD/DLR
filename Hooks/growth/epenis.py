@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -26,7 +26,7 @@ from Core.loadable import loadable, route
 class growth(loadable):
     """User growth over 72 ticks and growth rank in alliance"""
     usage = " [user]"
-
+    
     @route(r"(\S+)?", access = "member")
     def execute(self, message, user, params):
         
@@ -44,7 +44,7 @@ class growth(loadable):
             else:
                 message.reply("%s is too embarrassed about his tiny penis that he won't let me tell you how small it is." % (penis.name,))
             return
-
+        
         if penis.epenis is None:
             if user == penis:
                 message.reply("Growth data will be available after 72 ticks of setting your planet in !pref.")

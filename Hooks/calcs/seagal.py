@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -25,7 +25,7 @@ from Core.loadable import loadable, route, require_planet
 
 class hack(loadable):
     usage = " <x:y:z> [sum]"
-
+    
     @route(loadable.planet_coord+r"(?:\s+(\d+))?")
     @require_planet
     def execute(self, message, user, params):
@@ -34,7 +34,7 @@ class hack(loadable):
         if p is None:
             message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
             return
-
+        
         sum=params.group(6)
         res=user.planet.resources_per_agent(p)
         reply="Your hack will ninja %s resources from %s:%s:%s - 13: %s, 35: %s."%(res,p.x,p.y,p.z,self.num2short(res*13),self.num2short(res*35))

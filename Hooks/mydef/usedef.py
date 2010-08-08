@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,14 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from Core.db import session
 from Core.maps import Updates, User, Ship, UserFleet, FleetLog
 from Core.loadable import loadable, route, require_user
 
 class usedef(loadable):
     usage = " <pnick> <ship>"
-
+    
     @route(r"(\S+)\s+(.*)", access = "member")
     @require_user
     def execute(self, message, user, params):

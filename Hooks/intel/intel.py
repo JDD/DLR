@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -31,7 +31,7 @@ class intel(loadable):
     __doc__ += ", ".join(options)
     usage = " <x.y[.z]> [option=value]+"
     
-    @route(loadable.coord, access = "half")
+    @route(loadable.coord, access = "member")
     def view_intel(self, message, user, params):
         
         if params.group(5) is None:

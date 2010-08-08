@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -25,19 +25,19 @@ from Core.loadable import loadable, route
 class galgrowth(loadable):
     """Score Growth for galaxies over the past 72 ticks."""
     usage = " <x:y>"
-
+    
     @route(loadable.coord)
     def execute(self, message, user, params):
         
         galaxy = Galaxy.load(*params.group(1,3))
         if galaxy is None:
-            message.alert("No galaxy with coords %s:%s" % params.group(1,3))
+            message.alert("No galaxy growth stats matching %s:%s" % params.group(1,3))
             return
 
         penis = galaxy.galpenis
         if penis is None:
             message.alert("No galaxy growth stats matching %s:%s" % params.group(1,3))
             return
-
+        
         message.reply("Galaxy growth for '%s' is %s score long. This makes %s:%s rank: %s for growth in the universe!" % (
                         galaxy.name, penis.penis, galaxy.x, galaxy.y, penis.rank,))

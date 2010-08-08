@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -28,7 +28,7 @@ from Core.loadable import loadable, route, require_user
 class addchan(loadable):
     """Adds a channel with the given level with maxlevel equal to your own access level"""
     usage = " <chan> <level>"
-
+    
     @route(r"(#\S+)\s+(\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):

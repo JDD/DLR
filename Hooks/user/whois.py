@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,9 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
-
+ 
 from Core.config import Config
 from Core.maps import User
 from Core.loadable import loadable, route
@@ -28,7 +26,7 @@ from Core.loadable import loadable, route
 class whois(loadable):
     """Lookup a user's details"""
     usage = " <pnick>"
-
+    
     @route(r"(\S+)", access = "member")
     def execute(self, message, user, params):
 

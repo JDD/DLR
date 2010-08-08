@@ -25,22 +25,22 @@ from Core.maps import User, Command
 from Core.loadable import loadable, route
 
 class commandlog(loadable):
-    """Search the bot's command log for use of specified command. Parameters is a % encapsulated list of arguments. For example, to search for someone setting the alliance on a planet in 1:1, do: !commandlog intel %alliance=%. You can also limit the search to a specific username using the optional user= argument."""
+    """Search the bot's command log for use of specified command. Parameters is a % encapsulated list of arguments. For example, to search for someone setting the alliance on a planet in 1:1, do: !commandlog intel %1%1%alliance=%. You can also limit the search to a specific username using the optional user= argument."""
     usage = " <command> [user=<username>] <parameters> | <id>"
     access = "admin"
     
     @route(r"(\w+)\s*(.*)")
     def search3_cmd(self, message, user, params):
         self.execute(message, params.group(1), None, params.group(2))
-
+    
     @route(r"(\w+)(?:\s+user=(\S+))?\s*(.*)")
     def search2_cmd_user(self, message, user, params):
         self.execute(message, params.group(1), params.group(2), params.group(3))
-
+    
     @route(r"user=(\S+)\s*(.*)")
     def search1_user(self, message, user, params):
         self.execute(message, None, params.group(1), params.group(2))
-
+    
     def execute(self, message, cmd, usr, prms):
         if usr is not None:
             spy = User.load(name=usr)

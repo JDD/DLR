@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -28,10 +28,10 @@ class rprod(loadable):
     """Calculate how many <ship> you can build in <ticks> with <factories>. Specify race and/or government for bonuses."""
     usage = " <ship> <ticks> <factories> [population] [race] [government]"
     dx = tolerance = 0.00001
-
+    
     @route(r"(\S+)\s+(\d+)\s+(\d+)(?:\s+(.*))?")
     def execute(self, message, user, params):
-
+        
         name, ticks, factories = params.group(1,2,3)
 
         ship = Ship.load(name=name)

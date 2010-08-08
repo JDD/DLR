@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -27,7 +27,7 @@ from Core.loadable import loadable, route, require_user
 
 class pref(loadable):
     """Set your planet, password for the webby, email and phone number; order doesn't matter"""
-    usage = " [planet=x.y.z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F] [smsmode=clickatell|google]"
+    usage = " [planet=x.y.z] [password=pass] [email=my.email@address.com] [phone=999] [pubphone=T|F] [smsmode=clickatell|google|both]"
     planet_coordre = re.compile(loadable.planet_coord)
     
     @route(r"")
@@ -40,8 +40,8 @@ class pref(loadable):
             reply += " email=%s" % (user.email,)
         if user.phone:
             reply += " phone=%s pubphone=%s" % (user.phone, str(user.pubphone)[0],)
-            if Config.get("Misc", "sms") == "combined" and user.googlevoice is not None:
-                reply += " smsmode=%s" % ("Googel Voice" if user.googlevoice else "Clickatell",)
+            if user.smsmode is not None:
+                reply += " smsmode=%s" % (user.smsmode[0],)
         if len(reply) > 0:
             message.reply("Your preferences are:" + reply)
         else:
@@ -74,6 +74,9 @@ class pref(loadable):
                     user.planet = None
                     reply += " planet=None"
             if opt == "password":
+                if message.in_chan():
+                    message.reply("Don't set your password in public you shit")
+                    continue
                 user.passwd = val
                 reply += " password=%s"%(val)
             if opt == "email":
@@ -107,7 +110,7 @@ class pref(loadable):
                 elif val[:1].lower() == "g":
                     user.googlevoice = True
                     reply += " smsmode=googlevoice"
-                elif val in self.nulls:
+                elif val[:1].lower() == "b" or val in self.nulls:
                     user.googlevoice = None
                     reply += " smsmode=None"
         

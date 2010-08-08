@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -24,13 +24,13 @@ from Core.db import session
 from Core.maps import Galaxy, Planet, Alliance, Intel
 from Core.loadable import loadable, route
 
-class fortress(loadable):
-    """Pies"""
-    usage = " [alliance] [number]"
-
+class Fortress(loadable):
+    """Searches for specified number or more of an alliance in a galaxy."""
+    usage = " <alliance> [number]"
+    
     @route(r"(\S+)(?:\s+(\d+))?", access = "member")
     def execute(self, message, user, params):
-
+        
         alliance = Alliance.load(params.group(1))
         if alliance is None:
             message.reply("No alliance matching '%s' found"%(params.group(1),))
@@ -46,7 +46,7 @@ class fortress(loadable):
         Q = Q.having(count() >= bums)
         result = Q.all()
         if len(result) < 1:
-            message.reply("No galaxies with at least %s members from %s"%(bums,alliance.name,))
+            message.reply("No galaxies with at least %s memberss from %s"%(bums,alliance.name,))
             return
         prev=[]
         for x, y, chums in result:

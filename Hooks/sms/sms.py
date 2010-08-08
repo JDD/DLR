@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 import json
 import re
 import time
@@ -26,6 +26,7 @@ from urllib import urlencode
 from urllib2 import urlopen, Request, URLError
 from Core.exceptions_ import LoadableError
 from Core.config import Config
+from Core.string import encode
 from Core.db import session
 from Core.maps import User, SMS
 from Core.loadable import loadable, route, require_user
@@ -40,20 +41,14 @@ class sms(loadable):
         
         rec = params.group(1)
         public_text = params.group(2) + ' - %s' % (user.name,)
-        text = public_text.encode('latin-1') + '/%s' %(user.phone,)
+        text = encode(public_text + '/%s' %(user.phone,))
         receiver=User.load(name=rec,exact=False)
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return
-        if receiver.name.lower() == 'zeb':
-            message.reply("FOR EMERGENCY ONLY!!!! Zeb only has a land line so only rings will work.  Use !phone show Zeb to get his phone number.")
-            return
-        if receiver.name.lower() == 'cormik':
-            message.reply("Cormik has no mobile, but usually responds to emails.  Use !whois Cormik to get his email address.")
-            return
-        if receiver.name.lower() == 'richards':
-            message.reply("SMS does not work, richards is Deaf(no really, he can't hear).")
-            return
+        if receiver.name.lower() == 'valle':
+            message.reply("I refuse to talk to that Swedish clown. Use !phone show Valle and send it using your own phone.")
+            return 
 
         if not receiver.pubphone and user not in receiver.phonefriends:
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
@@ -78,13 +73,11 @@ class sms(loadable):
         
         if mode == "googlevoice" or mode == "combined":
             error = self.send_googlevoice(user, receiver, public_text, phone, text)
-            sent = "Google Voice"
         if mode == "clickatell" or (mode == "combined" and error is not None):
             error = self.send_clickatell(user, receiver, public_text, phone, text)
-            sent = "Clickatell"
-
+        
         if error is None:
-            message.reply("%s successfully processed message to: %s saying: %s" % (sent,receiver.name,text))
+            message.reply("Successfully processed To: %s Message: %s" % (receiver.name,text))
         else:
             message.reply(error or "That wasn't supposed to happen. I don't really know what went wrong. Maybe your mother dropped you.")
     
@@ -127,7 +120,7 @@ class sms(loadable):
             if m is None:
                 raise SMSError("unable to authenticate")
             auth = m.group(1)
-
+            
             # HTTP POST
             post = urlencode({"id"          : '',
                               "phoneNumber" : phone,
@@ -141,10 +134,10 @@ class sms(loadable):
             text = urlopen(req, post, 5).read()
             if text != '{"ok":true,"data":{"code":0}}':
                 raise SMSError("success code not returned")
-
+            
             # Allow a small amount of time for the request to be processed
             time.sleep(5)
-
+            
             # HTTP GET
             get = urlencode({"auth"         : auth,
                            })
@@ -152,7 +145,7 @@ class sms(loadable):
             req = Request("https://www.google.com/voice/inbox/recent/sms/?"+get)
             req.add_header('Authorization', "GoogleLogin auth="+auth)
             text = urlopen(req, None, 5).read()
-
+            
             # Parse the feed and extract JSON data
             m = re.search(self.googlevoice_regex_json(), text)
             if m is None:

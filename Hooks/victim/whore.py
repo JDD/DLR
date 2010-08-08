@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -30,16 +30,16 @@ from Core.paconf import PA
 
 class whore(loadable):
     """Target search, ordered by xp gain"""
-    usage = "  [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
+    usage = " [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
     alliancere=re.compile(r"(\S+)")
     rangere=re.compile(r"(<|>)?(\d+)")
     bashre=re.compile(r"(bash)",re.I)
     clusterre=re.compile(r"c(\d+)",re.I)
-
+    
     @route(r"(.+)", access = "member")
     @require_planet
     def execute(self, message, user, params):
-
+        
         alliance=Alliance()
         race=None
         size_mod=None
@@ -114,7 +114,7 @@ class whore(loadable):
         Q = Q.order_by(desc("xp_gain"))
         Q = Q.order_by(desc(Planet.idle))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:10]
+        result = Q[:6]
         
         if len(result) < 1:
             reply="No"
@@ -133,7 +133,7 @@ class whore(loadable):
             return
         
         replies = []
-        for planet, intel, xp_gain in result[:8]:
+        for planet, intel, xp_gain in result[:5]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s Scoregain: %d" % (planet.value,planet.size, xp_gain*60)
             if intel:
@@ -142,6 +142,6 @@ class whore(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 8:
+        if len(result) > 5:
             replies[-1]+=" (Too many results to list, please refine your search)"
         message.reply("\n".join(replies))

@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from Core.paconf import PA
 from Core.db import session
 from Core.maps import Ship
@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class eff(loadable):
     """Calculates the efficiency of the specified number of ships"""
     usage = " <number> <ship> [t1|t2|t3]"
-
+    
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)(?:\s+(t1|t2|t3))?")
     def execute(self, message, user, params):
         
@@ -47,13 +47,13 @@ class eff(loadable):
             killed = total_damage/50
             message.reply("%s %s (%s) will capture Asteroid: %s (%s)" % (
                 num, ship.name, self.num2short(num*ship.total_cost/100),
-                killed, self.num2short(killed*200),))
+                killed, self.num2short(killed*PA.getint("numbers", "roid_value")),))
             return
         if ship.t1 == "Struct":
             killed = total_damage/500
             message.reply("%s %s (%s) will destroy Structure: %s (%s)" % (
                 num, ship.name, self.num2short(num*ship.total_cost/100),
-                killed, self.num2short(killed*1500),))
+                killed, self.num2short(killed*PA.getint("numbers", "cons_value")),))
             return
         targets = session.query(Ship).filter(Ship.class_ == target_class)
         if targets.count() == 0:

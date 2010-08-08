@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -60,7 +60,7 @@ class gac(loadable):
         elif max:
             order=desc
         return self.base_query().order_by(order("gac")).first()
-
+    
     def get_last_5_gac(self):
         result = self.base_query().order_by(desc(Cookie.year), desc(Cookie.week))[:5]
         return map(lambda x: str(x[0]),result)
