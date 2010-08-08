@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from sqlalchemy.sql import desc
 from Core.db import session
@@ -32,17 +33,11 @@ class planet(loadable):
     def execute(self, request, user, x, y, z, fleets):
         tick = Updates.midnight_tick()
         week = Updates.week_tick()
-
+        
         planet = Planet.load(x,y,z)
         if planet is None:
-            return HttpResponseRedirect("/planets/")
+            return HttpResponseRedirect(reverse("planet_ranks"))
         ph = planet.history(tick)
-        if planet.intel and planet.alliance:
-            planets = (planet, ph, planet.intel.nick, planet.alliance.name),
-        elif planet.intel:
-            planets = (planet, ph, planet.intel.nick, None),
-        else:
-            planets = (planet, ph, None, None),
         
         Q = session.query(FleetScan, Planet, Alliance)
         Q = Q.join(FleetScan.target)
@@ -52,7 +47,7 @@ class planet(loadable):
         if not fleets:
             Q = Q.filter(FleetScan.landing_tick >= week)
         outgoing = Q.all()
-
+        
         Q = session.query(FleetScan, Planet, Alliance)
         Q = Q.join(FleetScan.owner)
         Q = Q.outerjoin(Planet.intel).outerjoin(Intel.alliance)
@@ -61,5 +56,7 @@ class planet(loadable):
         if not fleets:
             Q = Q.filter(FleetScan.landing_tick >= week)
         incoming = Q.all()
-
-        return render("planet.tpl", request, planet=planet, planets=planets, title="%s:%s:%s"%(planet.x, planet.y, planet.z), intel=user.is_member(), outgoing=outgoing, incoming=incoming)
+        
+        scan = planet.scan("A") or planet.scan("U")
+        
+        return render("planet.tpl", request, planet=planet, ph=ph, scan=scan, outgoing=outgoing, incoming=incoming)

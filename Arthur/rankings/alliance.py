@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from sqlalchemy import and_
 from sqlalchemy.sql import asc, desc
@@ -48,7 +49,7 @@ class alliance(loadable):
         
         alliance = Alliance.load(name)
         if alliance is None:
-            return HttpResponseRedirect("/alliances/")
+            return HttpResponseRedirect(reverse("alliance_ranks"))
         
         Q = session.query(Planet, PlanetHistory, Intel.nick, Alliance.name)
         Q = Q.join(Planet.intel)
@@ -69,4 +70,4 @@ class alliance(loadable):
         for o in order:
             Q = Q.order_by(o)
         Q = Q.limit(100).offset(offset)
-        return render("planets.tpl", request, planets=Q.all(), title=alliance.name, alliance=alliance, intel=user.is_member(), offset=offset, pages=pages, page=page, sort=sort, race=race)
+        return render("alliance.tpl", request, alliance=alliance, planets=Q.all(), offset=offset, pages=pages, page=page, sort=sort, race=race)

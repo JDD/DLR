@@ -32,7 +32,7 @@ name = Config.get("Alliance", "name")
 class growth(loadable):
     access = "member"
     def execute(self, request, user):
-
+        
         Q = session.query(User, Planet, epenis)
         Q = Q.join(User.planet)
         Q = Q.join(User.epenis)

@@ -1,6 +1,5 @@
 {% extends "base.tpl" %}
 {% block content %}
-<center>
 <table cellspacing="0" cellpadding="0" width="70%" class="black">
 <tr class="datahigh"><th>
 Introduction to {{ bot }}
@@ -28,13 +27,30 @@ Basic Commands
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
 !lookup <x:y:z/nick/alliance> - Shows basic information on planets/alliances. Leave blank to use your co ords, nick only works for those who have set !pref planet
+
 !intel <x:y:z> - Shows intel for a planet. Add nick=, alliance= or comment= to the end of the line to modify intel.
+
 !search <nick/alliance> - Searches intel for a phrase.
-!Forums - Links you to our forums.
-!bcalc - links you to the PA bcalc
-!stats - links you to the current rounds stats.
-!betastats - links you to the beta server stats.
-!details - collates lookup, xp, intel and status into one simple to use command.
+{% endfilter %}</td>
+<tr class="datahigh"><th>
+Propositions and Cookies
+</th></tr>
+<td>{% filter force_escape|linebreaks %}
+Cookies are used to give out carebears. Carebears are rewards for carefaces. Give cookies to people when you think they've done something beneficial for you or for the alliance in general.
+
+A proposition is a vote to do something. For now, you can raise propositions to invite or kick someone. Once raised the proposition will stand until you expire it.  Make sure you give everyone time to have their say. Votes for and against a proposition are weighted by carebears. You must have at least 1 carebear to vote.
+
+!cookie [howmany] <receiver> <reason> | [stat]
+
+!prop <invite|kick> <pnick> <comment>
+!prop vote <number> <yes|no|abstain>
+!prop show <number>
+!prop cancel <number>
+!prop expire <number> - Close the proposition and count the votes.
+
+!prop list - List active propositions.
+!prop recent - List recently expired propositions.
+!prop search <pnick> - Search all active and expired propositions related to <pnick>.
 {% endfilter %}</td>
 <tr class="datahigh"><th>
 Setting up your Gal
@@ -77,11 +93,26 @@ Defence
 <td>{% filter force_escape|linebreaks %}
 !mydef <# of fleets>x <ship count> <ship name> <comment> - Use this to update what you have free for defence.
 
-!searchdef <ship name> - Use this to search for available ships and fleets.
+!searchdef <minimum ship count> <ship name> - Use this to search for available ships and fleets.
 
 !showdef <pnick> - Show a user's available ships and fleets.
 
 !usedef <pnick> <ship> - Remove a user's ship from the available defence ships.
+{% endfilter %}</td>
+<tr class="datahigh"><th>
+Attacking
+</th></tr>
+<td>{% filter force_escape|linebreaks %}
+!launch - <class|eta> <land_tick> - Calculate launch tick, launch time, prelaunch tick and prelaunch modifier for a given ship class or eta, and land tick.
+
+!book <x:y:z> <land tick/eta> - Books a target with {{ bot }}. Please book all your targets to avoid piggies/miscommunications.
+!unbook <x:y:z> <land tick/eta>
+
+!status [<nick|user>|<x:y[:z]>] [tick] - Show bookings made by nick/user or on gal/planet, at optional landing tick.
+
+!bitches [minimum eta] - Shows number of active bookings by galaxy and by alliance.
+
+!gangbang [alliance] [tick] - Shows booking status for specified alliance.
 {% endfilter %}</td>
 <tr class="datahigh"><th>
 Ship Calcs
@@ -119,7 +150,7 @@ Target Search
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
 A few commands are available for searching for a target:
-!retals [alliance] [race] [<|>][size] [<|>][value] [bash] - Limited to planets currently attacking us, useful for retals.
+!cunts [alliance] [race] [<|>][size] [<|>][value] [bash] - Limited to planets currently attacking us, useful for retals.
 !idler [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by idle ticks.
 !victim [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by potential roids.
 !whore [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by potential xp.
@@ -128,28 +159,26 @@ A few commands are available for searching for a target:
 Alliance
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
-!fortress <alliance> <number> - Shows galaxies with at least this number of players from the specified alliance.
+!bumchums <alliance> <number> - Shows galaxies with at least this number of players from the specified alliance.
 
 !info [alliance] - All information taken from intel, for tag information use the lookup command.
 
-!racism <alliance> | <x:y> - Racial breakdown of a galaxy or an alliance based on intel.
+!racism <alliance> - Racial breakdown of an alliance based on intel.
 {% endfilter %}</td>
 <tr class="datahigh"><th>
 Misc
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
-!growth <user> - Score growth of user's planet over 72 ticks.
-!agrowth <alliance> - Score growth of an alliance over 72 ticks.
-!galgrowth <x:y> - Score growth of a galaxy over 72 ticks.
-!topscorers - Shows the current top five growth in the alliance
-!lowscorers - Shows the current bottom five growth in the alliance
+!epenis <user> - Score growth of user's planet over 72 ticks.
+!apenis <alliance>
+!galpenis <x:y>
+!bigdicks - Shows the current top five epenis in the alliance
 
 !exile - Shows information regarding chances of landing in desired galaxies.
 
-!hostiles [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by alliance.
-!tophostiles [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by planet.
+!surprisesex [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by alliance.
+!topcunts [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by planet.
 {% endfilter %}</td>
 </th></tr>
 </table>
-</center>
 {% endblock %}

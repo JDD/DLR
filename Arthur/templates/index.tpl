@@ -1,9 +1,8 @@
-{% extends "base.tpl" %}
+{% extends "planet_intelintitle.tpl" %}
+{% block title %}Your planet{% endblock %}
 {% block content %}
-<center>
 <p>Welcome {{ user.name }}!</p>
-</center>
-{% if planets %}
-{% include "planet_list.tpl" %}
+{% if planet %}
+{{ super() }}
 {% endif %}
 {% endblock %}

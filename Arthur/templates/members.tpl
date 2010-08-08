@@ -1,38 +1,29 @@
 {% extends "base.tpl" %}
 {% block content %}
 {% for level, members in accesslist %}
-<table cellspacing="0" cellpadding="0" width="100%" class="black">
-<tr>
-<td>
-<table cellspacing="1" cellpadding="3" width="100%">
+<table cellspacing="1" cellpadding="3" class="black">
     <tr class="datahigh">
-        <th colspan="5">
-            {{ level|capfirst }}s
+        <th colspan="7">
+            {{ level|capitalize }}s
         </th>
     </tr>
     <tr class="header">
-        <th width="100"><a href="{% url members "name" %}">User (Alias)</a></th>
-        <th width="100"><a href="{% url members "access" %}">Access</a></th>
-        <th width="100"><a href="{% url members "planet" %}">Planet</a></th>
-        <th width="100"><a href="{% url members "mydef" %}"><a href="{% url members "defage" %}">MyDef Age</a></th>
-        <th width="100"><a href="{% url members "phone" %}">Phone</th>
+        <th width="100"><a href="{% url "members", "name" %}">User (Alias)</a></th>
+        <th width="60"><a href="{% url "members", "access" %}">Access</a></th>
+        <th width="60"><a href="{% url "members", "planet" %}">Planet</a></th>
+        <th width="80"><a href="{% url "members", "defage" %}">MyDef Age</a></th>
+        <th width="200">Phone</th>
     </tr>
-    {% for member, alias, access, planet, fleetupdated, phone, pubphone, phonefriend in members %}
-    <tr class="{% cycle 'odd' 'even' %}">
-        <td>{{ member }}{% if alias %} ({{ alias }}){% endif %}</td>
-        <td>{{ access }}</td>
-        <td>{% if planet %}{{ planet.x }}:{{ planet.y }}:{{ planet.z }}{% endif %}</td>
-        <td>{% if fleetupdated %}{{ tick|add:fleetupdated }}{% endif %}</td>
-        <td>{% if pubphone or phonefriend %}{{ phone }}{% else %}Hidden{% endif %}</td>
+    {% for member, alias, sponsor, access, carebears, p, fleetupdated, phone, pubphone, phonefriend in members %}
+    <tr class="{{ loop.cycle('odd', 'even') }}">
+        <td class="center"><a href="{% url "dashboard", member %}">{{ member }}</a>{% if alias %} ({{ alias }}){% endif %}</td>
+        <td class="right">{{ access }}</td>
+        <td class="center">{% if p %}<a href="{% url "planet", p.x, p.y, p.z %}">{{ p.x }}:{{ p.y }}:{{ p.z }}</a>{% endif %}</td>
+        <td class="right">{% if fleetupdated %}{{ tick + fleetupdated }}{% endif %}</td>
+        <td class="left">{% if pubphone or phonefriend %}{{ phone }}{% else %}Hidden{% endif %}</td>
     </tr>
     {% endfor %}
 </table>
-</td>
-</tr>
-</table>
-{% if forloop.last %}
-{% else %}
-<p />
-{% endif %}
+{% if not loop.last %}<p>&nbsp;</p>{% endif %}
 {% endfor %}
 {% endblock %}

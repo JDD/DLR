@@ -21,6 +21,7 @@
  
 from django.conf.urls.defaults import include, patterns, url
 from django.http import HttpResponseRedirect
+
 from Core.config import Config
 from Core.maps import Updates
 from Arthur.context import menu, render
@@ -34,41 +35,45 @@ handler500 = 'Arthur.errors.server_error'
 
 urlpatterns = patterns('',
     (r'^(?:home/)?$', 'Arthur.home'),
+    url(r'^user/(?P<username>\S+)/$', 'Arthur.dashboard.dashboard', name="dashboard"),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'C:/merlin/Arthur/static/'}),
     (r'^guide/$', 'Arthur.guide'),
     (r'^links/(?P<link>\w+)/$', 'Arthur.links'),
-    (r'', include('Arthur.lookup')),
+    (r'^lookup/$', 'Arthur.lookup.lookup'),
     (r'', include('Arthur.alliance')),
     (r'', include('Arthur.rankings')),
+#    (r'', include('Arthur.attack')),
+    (r'^scans/', include('Arthur.scans')),
+    (r'^(?:scans/)?request/', include('Arthur.scans.request')),
 )
 
 @menu("Home")
 @load
 class home(loadable):
     def execute(self, request, user):
+        from Arthur.dashboard import dashboard
+        if user.is_member():
+            return dashboard.execute(request, user, dashuser=user)
+        
         if user.planet is not None:
             tick = Updates.midnight_tick()
-            planets = (user.planet, user.planet.history(tick), None, None),
+            ph = user.planet.history(tick)
         else:
-            planets = ()
-        return render("index.tpl", request, planets=planets, title="Your planet")
+            ph = None
+        return render("index.tpl", request, planet=user.planet, ph=ph)
 
-@menu(name,                         suffix = name)
-@menu("Planetarion", "Parser",      suffix = "parser")
+@menu(name,          "Intel",       suffix = name)
 @menu("Planetarion", "BCalc",       suffix = "bcalc")
 @menu("Planetarion", "Sandmans",    suffix = "sandmans")
-@menu("Planetarion", "PA Forums",      suffix = "forums")
+@menu("Planetarion", "Forums",      suffix = "forums")
 @menu("Planetarion", "Game",        suffix = "game")
-@menu(name, "DLR Forums",           suffix = "dlr_forums")
 @load
 class links(loadable):
     links = {"game"        : "http://game.planetarion.com",
              "forums"      : "http://pirate.planetarion.com",
              "sandmans"    : "http://sandmans.co.uk",
              "bcalc"       : "http://game.planetarion.com/bcalc.pl",
-             "parser"      : "http://parser.5th-element.org/",
              name          : "/alliance/%s/" % (name,),
-             "dlr_forums"  : "http://progression-uk.com/DLR/forum/index.php",
             }
     def execute(self, request, user, link):
         link = self.links.get(link)
@@ -82,5 +87,7 @@ class guide(loadable):
     def execute(self, request, user):
         return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
-#from Arthur import alliance
+from Arthur import alliance
 from Arthur import rankings
+#from Arthur import attack
+from Arthur import scans
