@@ -23,6 +23,7 @@ import re, time, traceback, urllib2
 from sqlalchemy.sql import text, bindparam
 from Core.config import Config
 from Core.paconf import PA
+from Core.string import decode
 from Core.db import true, false, session
 from Core.maps import Updates, Galaxy, Planet, Alliance, epenis, galpenis, apenis
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
@@ -131,22 +132,22 @@ while True:
         planet_insert = "INSERT INTO planet_temp (x, y, z, planetname, rulername, race, size, score, value, xp) "
         planet_insert+= "VALUES (%s, %s, %s, '%s', '%s', '%s', %s, %s, %s, %s);"
         for line in planets:
-            p=line.strip().split("\t")
-            session.execute(text(unicode(planet_insert % (p[0], p[1], p[2], p[3].strip("\""), p[4].strip("\""), p[5], p[6], p[7], p[8], p[9],), encoding='latin-1')))
+            p=decode(line).strip().split("\t")
+            session.execute(text(planet_insert % (p[0], p[1], p[2], p[3].strip("\""), p[4].strip("\""), p[5], p[6], p[7], p[8], p[9],)))
 
         # As above
         galaxy_insert = "INSERT INTO galaxy_temp (x, y, name, size, score, value, xp) "
         galaxy_insert+= "VALUES (%s, %s, '%s', %s, %s, %s, %s);"
         for line in galaxies:
-            g=line.strip().split("\t")
-            session.execute(text(unicode(galaxy_insert % (g[0], g[1], g[2].strip("\""), g[3], g[4], g[5], g[6],), encoding='latin-1')))
+            g=decode(line).strip().split("\t")
+            session.execute(text(galaxy_insert % (g[0], g[1], g[2].strip("\""), g[3], g[4], g[5], g[6],)))
 
         # As above
-        alliance_insert = "INSERT INTO alliance_temp (score_rank, name, size, members, score, size_avg, score_avg) "
-        alliance_insert+= "VALUES (%s, '%s', %s, %s, %s, %s, %s);"
+        alliance_insert = "INSERT INTO alliance_temp (score_rank, name, size, members, score, points, size_avg, score_avg) "
+        alliance_insert+= "VALUES (%s, '%s', %s, %s, %s, %s, %s, %s);"
         for line in alliances:
-            a=line.strip().split("\t")
-            session.execute(text(unicode(alliance_insert % (a[0], a[1].strip("\""), a[2], a[3], a[4], int(a[2])/int(a[3]), int(a[4])/min(PA.getint("numbers", "tag_count"),int(a[3])),), encoding='latin-1')))
+            a=decode(line).strip().split("\t")
+            session.execute(text(alliance_insert % (a[0], a[1].strip("\""), a[2], a[3], a[4], a[5], int(a[2])/int(a[3]), int(a[4])/min(PA.getint("numbers", "tag_count"),int(a[3])),)))
 
         t2=time.time()-t1
         print "Inserted dumps in %.3f seconds" % (t2,)
@@ -389,7 +390,7 @@ while True:
         #  NULL all the data, leaving only the name and id for FKs
         session.execute(text("""UPDATE alliance SET
                                   active = :false,
-                                  size = NULL, members = NULL, score = NULL, size_avg = NULL, score_avg = NULL,
+                                  size = NULL, members = NULL, score = NULL, points = NULL, size_avg = NULL, score_avg = NULL,
                                   size_rank = NULL, members_rank = NULL, score_rank = NULL, size_avg_rank = NULL, score_avg_rank = NULL
                                 WHERE id NOT IN (SELECT id FROM alliance_temp WHERE id IS NOT NULL)
                             ;""", bindparams=[false]))
@@ -407,12 +408,13 @@ while True:
         # Update everything from the temp table and generate ranks
         # Deactivated items are untouched but NULLed earlier
         session.execute(text("""UPDATE alliance AS a SET
-                                  size = t.size, members = t.members, score = t.score,
+                                  size = t.size, members = t.members, score = t.score, points = t.points,
                                   size_avg = t.size_avg, score_avg = t.score_avg,
-                                  size_rank = t.size_rank, members_rank = t.members_rank, score_rank = t.score_rank,
+                                  size_rank = t.size_rank, members_rank = t.members_rank, score_rank = t.score_rank, points_rank = t.points_rank,
                                   size_avg_rank = t.size_avg_rank, score_avg_rank = t.score_avg_rank
                                 FROM (SELECT *,
                                   rank() OVER (ORDER BY size DESC) AS size_rank,
+                                  rank() OVER (ORDER BY points DESC) AS points_rank,
                                   rank() OVER (ORDER BY members DESC) AS members_rank,
                                   rank() OVER (ORDER BY size_avg DESC) AS size_avg_rank,
                                   rank() OVER (ORDER BY score_avg DESC) AS score_avg_rank

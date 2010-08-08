@@ -1,5 +1,5 @@
 # This file is part of Merlin.
-# Merlin is the Copyright (C)2008, 2009, 2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+# Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
 # are included in this collective work with permission of the copyright
@@ -64,25 +64,24 @@ finally:
 
 Base.metadata.create_all()
 
-## Remove # from this section to set up initial database ##
-#print "Setting up default channels"
-#userlevel = Config.get("Access", "member")
-#maxlevel = Config.get("Access", "admin")
-#for chan, name in Config.items("Channels"):
-#    try:
-#        session.add(Channel(name=name,userlevel=userlevel,maxlevel=maxlevel))
-#        session.flush()
-#    except IntegrityError:
-#        print "Channel '%s' already exists" % (name,)
-#        session.rollback()
-#    else:
-#        print "Created '%s' with access (%s|%s)" % (name, userlevel, maxlevel,)
-#        session.commit()
-#session.close()
+print "Setting up default channels"
+userlevel = Config.get("Access", "member")
+maxlevel = Config.get("Access", "admin")
+for chan, name in Config.items("Channels"):
+    try:
+        session.add(Channel(name=name,userlevel=userlevel,maxlevel=maxlevel))
+        session.flush()
+    except IntegrityError:
+        print "Channel '%s' already exists" % (name,)
+        session.rollback()
+    else:
+        print "Created '%s' with access (%s|%s)" % (name, userlevel, maxlevel,)
+        session.commit()
+session.close()
 
 if round:
     print "Migrating users/friends"
-    session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone, googlevoice, sponsor, fleetcount) SELECT id, name, alias, passwd, active, access, email, phone, pubphone, googlevoice, sponsor, 0 FROM %s.users;" % (round,)))
+    session.execute(text("INSERT INTO users (id, name, alias, passwd, active, access, email, phone, pubphone, googlevoice, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, access, email, phone, pubphone, googlevoice, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.users;" % (round,)))
     session.execute(text("SELECT setval('users_id_seq',(SELECT max(id) FROM users));"))
     session.execute(text("INSERT INTO phonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.phonefriends;" % (round,)))
     print "Migrating slogans/quotes"
@@ -96,12 +95,14 @@ if round:
 #    session.execute(text("INSERT INTO cookie_log (log_time,year,week,howmany,giver_id,receiver_id) SELECT log_time,year,week,howmany,giver_id,receiver_id FROM %s.cookie_log;" % (round,)))
     print "Migrating smslog"
     session.execute(text("INSERT INTO sms_log (sender_id,receiver_id,phone,sms_text,mode) SELECT sender_id,receiver_id,phone,sms_text,mode FROM %s.sms_log;" % (round,)))
-## Add # to the following 2 lines for initial database setup
-    print "Migrating Channels"
-    session.execute(text("INSERT INTO channels (id, name, userlevel, maxlevel) SELECT id, name, userlevel, maxlevel FROM %s.channels;" % (round,)))
     session.commit()
     session.close()
 
+if round == "temp":
+    print "Deleting temporary schema"
+    session.execute(text("DROP SCHEMA temp CASCADE;"))
+    session.commit()
+    session.close()
 
 print "Inserting ship stats"
 shipstats.main()
