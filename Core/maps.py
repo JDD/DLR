@@ -261,11 +261,15 @@ class Alliance(Base):
         alliance = Q.filter(Alliance.name.ilike(name)).first()
         if alliance is None:
             alliance = Q.filter(Alliance.name.ilike(name+"%")).first()
+        if alliance is None:
+            alliance = Q.filter(Alliance.name.ilike("%"+name+"%")).first()
         if alliance is None and active == False:
             Q = session.query(Alliance)
             alliance = Q.filter(Alliance.name.ilike(name)).first()
             if alliance is None:
                 alliance = Q.filter(Alliance.name.ilike(name+"%")).first()
+            if alliance is None:
+                alliance = Q.filter(Alliance.name.ilike("%"+name+"%")).first()
         return alliance
     
     def __str__(self):
@@ -369,7 +373,7 @@ class User(Base):
     phone = Column(String(48))
     pubphone = Column(Boolean, default=False) # Asc
     googlevoice = Column(Boolean, default=None)
-#    sponsor = Column(String(15)) # Asc
+    sponsor = Column(String(15)) # Asc
 #    quits = Column(Integer, default=0) # Asc
 #    available_cookies = Column(Integer, default=0)
 #    carebears = Column(Integer, default=0)
