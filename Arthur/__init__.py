@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from django.conf.urls.defaults import include, patterns, url
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from Core.config import Config
@@ -36,15 +37,15 @@ handler500 = 'Arthur.errors.server_error'
 urlpatterns = patterns('',
     (r'^(?:home/)?$', 'Arthur.home'),
     url(r'^user/(?P<username>\S+)/$', 'Arthur.dashboard.dashboard', name="dashboard"),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'C:/merlin/Arthur/static/'}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
     (r'^guide/$', 'Arthur.guide'),
-    (r'^links/(?P<link>\w+)/$', 'Arthur.links'),
+    (r'^links/(?P<link>[^/]+)/$', 'Arthur.links'),
     (r'^lookup/$', 'Arthur.lookup.lookup'),
     (r'', include('Arthur.alliance')),
     (r'', include('Arthur.rankings')),
 #    (r'', include('Arthur.attack')),
     (r'^scans/', include('Arthur.scans')),
-    (r'^(?:scans/)?request/', include('Arthur.scans.request')),
+#    (r'^(?:scans/)?request/', include('Arthur.scans.request')),
 )
 
 @menu("Home")
@@ -54,7 +55,7 @@ class home(loadable):
         from Arthur.dashboard import dashboard
         if user.is_member():
             return dashboard.execute(request, user, dashuser=user)
-        
+
         if user.planet is not None:
             tick = Updates.midnight_tick()
             ph = user.planet.history(tick)
@@ -69,14 +70,14 @@ class home(loadable):
 @menu("Planetarion", "Game",        suffix = "game")
 @load
 class links(loadable):
-    links = {"game"        : "http://game.planetarion.com",
-             "forums"      : "http://pirate.planetarion.com",
-             "sandmans"    : "http://sandmans.co.uk",
-             "bcalc"       : "http://game.planetarion.com/bcalc.pl",
-             name          : "/alliance/%s/" % (name,),
-            }
     def execute(self, request, user, link):
-        link = self.links.get(link)
+        link = {
+                "game"        : "http://game.planetarion.com",
+                "forums"      : "http://pirate.planetarion.com",
+                "sandmans"    : "http://sandmans.co.uk",
+                "bcalc"       : "http://game.planetarion.com/bcalc.pl",
+                name          : reverse("alliance_members", kwargs={"name":name}),
+               }.get(link)
         if link is None:
             return page_not_found(request)
         return HttpResponseRedirect(link)
@@ -90,4 +91,4 @@ class guide(loadable):
 from Arthur import alliance
 from Arthur import rankings
 #from Arthur import attack
-#from Arthur import scans
+from Arthur import scans
