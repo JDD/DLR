@@ -1,5 +1,4 @@
 cmd.exe.lnk
-merlin.cfg
 log11-19.txt
 log.txt
 traceback.txt
@@ -7,5 +6,6 @@ r35log.txt
 r34log.txt
 r36log.txt
 r37log.txt
+scanlog.txt
 arthurlog.txt
 *.pyc
