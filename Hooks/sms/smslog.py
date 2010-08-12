@@ -33,7 +33,7 @@ class smslog(loadable):
     def get_last_ten(self, message, user, params):
         last_ten = session.query(SMS).order_by(desc(SMS.id))[:10]
         reply="Last 10 SMSes: "
-        reply+=", ".join(map(lambda x: "id: %s (%s) (%s -> %s)"%(x.id,x.mode[:1].upper(),x.sender.name,x.receiver.name),last_ten))
+        reply+=", ".join(map(lambda x: "id: %s (%s) (%s -> %s)"%(x.id,x.mode[:2].upper(),x.sender.name,x.receiver.name),last_ten))
         message.reply(reply)
     
     @route(r"(\d+)")
@@ -41,7 +41,7 @@ class smslog(loadable):
         id = params.group(1)
         sms = session.query(SMS).filter_by(id=id).first()
         if sms:
-            reply = "SMS with ID %s (%s) sent by %s to %s with text: %s"%(sms.id,sms.mode[:1].upper(),sms.sender.name,sms.receiver.name,sms.sms_text)
+            reply = "SMS with ID %s (%s) sent by %s to %s with text: %s"%(sms.id,sms.mode,sms.sender.name,sms.receiver.name,sms.sms_text)
         else:
             reply = "There was no SMS sent with ID %s"%(id,)
         message.reply(reply)
