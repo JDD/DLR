@@ -12,7 +12,7 @@
         <th width="60"><a href="{% url "galmates", "planet" %}">Planet</a></th>
         <th width="200">Phone</th>
     </tr>
-    {% for member, alias, sponsor, access, p, phone, pubphone, phonefriend in members %}
+    {% for member, alias, access, p, phone, pubphone, phonefriend in members %}
     <tr class="{{ loop.cycle('odd', 'even') }}">
         <td class="center"><a href="{% url "dashboard", member %}">{{ member }}</a>{% if alias %} ({{ alias }}){% endif %}</td>
         <td class="right">{{ access }}</td>
