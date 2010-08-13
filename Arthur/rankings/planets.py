@@ -42,24 +42,24 @@ class planets(loadable):
         if sort not in order.keys():
             sort = "score"
         order = order.get(sort)
-        
+
         tick = Updates.midnight_tick()
-        
+
         Q = session.query(Planet, PlanetHistory, Intel.nick, Alliance.name)
         Q = Q.outerjoin(Planet.intel)
         Q = Q.outerjoin(Intel.alliance)
         Q = Q.outerjoin((PlanetHistory, and_(Planet.id == PlanetHistory.id, PlanetHistory.tick == tick)))
         Q = Q.filter(Planet.active == True)
-        
+
         if race.lower() in PA.options("races"):
             Q = Q.filter(Planet.race.ilike(race))
         else:
             race = "all"
-        
+
         count = Q.count()
         pages = count/100 + int(count%100 > 0)
         pages = range(1, 1+pages)
-        
+
         for o in order:
             Q = Q.order_by(o)
         Q = Q.limit(100).offset(offset)

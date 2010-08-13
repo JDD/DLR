@@ -44,8 +44,8 @@ urlpatterns = patterns('',
     (r'', include('Arthur.alliance')),
     (r'', include('Arthur.rankings')),
 #    (r'', include('Arthur.attack')),
-#    (r'^scans/', include('Arthur.scans')),
-#    (r'^(?:scans/)?request/', include('Arthur.scans.request')),
+    (r'^scans/', include('Arthur.scans')),
+    (r'^(?:scans/)?request/', include('Arthur.scans.request')),
 )
 
 @menu("Home")
@@ -55,7 +55,7 @@ class home(loadable):
         from Arthur.dashboard import dashboard
         if user.is_member():
             return dashboard.execute(request, user, dashuser=user)
-
+        
         if user.planet is not None:
             tick = Updates.midnight_tick()
             ph = user.planet.history(tick)
@@ -91,4 +91,4 @@ class guide(loadable):
 from Arthur import alliance
 from Arthur import rankings
 #from Arthur import attack
-#from Arthur import scans
+from Arthur import scans

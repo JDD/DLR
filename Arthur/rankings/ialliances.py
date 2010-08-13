@@ -92,7 +92,7 @@ class ialliances(loadable):
         count_ = Q.count()
         pages = count_/100 + int(count_%100 > 0)
         pages = range(1, 1+pages)
-        
+
         for o in order:
             Q = Q.order_by(o)
         Q = Q.limit(100).offset(offset)

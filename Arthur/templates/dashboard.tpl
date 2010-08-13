@@ -16,8 +16,6 @@
 <p>&nbsp;</p>
 {% endif %}
 
-<p>&nbsp;</p>
-
 <table width="600"><tr valign="top">
     <td width="50%"><center>
         <table cellspacing="1" cellpadding="3" class="black">
@@ -35,14 +33,14 @@
                 </td></tr>
                 <tr class="header"><td>Ship</td><td>Amount</td></tr>
             {% endif %}
-
+            
             {% for ship in ships %}
             <tr class="{{ loop.cycle('odd', 'even') }}">
                 <td>{{ ship.ship.name }}</td>
                 <td class="right">{{ ship.ship_count|intcomma }}</td>
             </tr>
             {% endfor %}
-
+            
             <tr class="header"><th colspan="2" width="200">Comment</th></tr>
             <tr class="odd"><td colspan="2">{{ dashuser.fleetcomment }}</td></tr>
         </table>

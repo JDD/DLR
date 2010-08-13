@@ -40,14 +40,16 @@ class members(loadable):
             levels = [("All member", levels[-1][1],),]
         
         order =  {"name"  : (asc(User.name),),
-                  "access" : (desc(User.access),asc(User.name),),
+#                  "sponsor" : (asc(User.sponsor),),
+                  "access" : (desc(User.access),desc(User.carebears),asc(User.name),),
+#                  "carebears" : (desc(User.carebears),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   "defage" : (asc(User.fleetupdated),),
                   }
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
-        
+
         members = []
         for level in levels:
             Q = session.query(User.name, User.alias, User.access, Planet, User.fleetupdated,
@@ -72,6 +74,7 @@ class galmates(loadable):
         levels = [] + User.levels
         
         order =  {"name"  : (asc(User.name),),
+#                  "sponsor" : (asc(User.sponsor),),
                   "access" : (desc(User.access),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   }

@@ -40,7 +40,8 @@ class alliance(loadable):
                   "size"  : (asc(Planet.size_rank),),
                   "xp"    : (asc(Planet.xp_rank),),
                   "race"  : (asc(Planet.race), asc(Planet.size_rank),),
-                  "xyz"   : (asc(Planet.x), asc(Planet.y), asc(Planet.z),),                  }
+                  "xyz"   : (asc(Planet.x), asc(Planet.y), asc(Planet.z),),
+                  }
         if sort not in order.keys():
             sort = "score"
         order = order.get(sort)
@@ -66,7 +67,7 @@ class alliance(loadable):
         count = Q.count()
         pages = count/100 + int(count%100 > 0)
         pages = range(1, 1+pages)
-        
+
         for o in order:
             Q = Q.order_by(o)
         Q = Q.limit(100).offset(offset)

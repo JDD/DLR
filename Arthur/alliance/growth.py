@@ -27,9 +27,9 @@ from Arthur.context import menu, render
 from Arthur.loadable import loadable, load
 name = Config.get("Alliance", "name")
 
-@menu(name, "Growth")
+@menu(name, "eQueens")
 @load
-class growth(loadable):
+class equeens(loadable):
     access = "member"
     def execute(self, request, user):
         
@@ -37,4 +37,4 @@ class growth(loadable):
         Q = Q.join(User.planet)
         Q = Q.join(User.epenis)
         Q = Q.order_by(asc(epenis.rank))
-        return render("growth.tpl", request, queens=Q.all())
+        return render("equeens.tpl", request, queens=Q.all())
