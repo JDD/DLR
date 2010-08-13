@@ -41,7 +41,7 @@ class members(loadable):
         
         order =  {"name"  : (asc(User.name),),
 #                  "sponsor" : (asc(User.sponsor),),
-                  "access" : (desc(User.access),desc(User.carebears),asc(User.name),),
+                  "access" : (desc(User.access),asc(User.name),),
 #                  "carebears" : (desc(User.carebears),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   "defage" : (asc(User.fleetupdated),),
