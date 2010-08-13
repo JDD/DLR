@@ -19,7 +19,7 @@
         <td class="center"><a href="{% url "dashboard", member %}">{{ member }}</a>{% if alias %} ({{ alias }}){% endif %}</td>
         <td class="right">{{ access }}</td>
         <td class="center">{% if p %}<a href="{% url "planet", p.x, p.y, p.z %}">{{ p.x }}:{{ p.y }}:{{ p.z }}</a>{% endif %}</td>
-        <td class="right">{% if fleetupdated %}{{ tick + fleetupdated }}{% endif %}</td>
+        <td class="right">{% if fleetupdated %}{{ tick - fleetupdated }} ticks{% endif %}</td>
         <td class="left">{% if pubphone or phonefriend %}{{ phone }}{% else %}Hidden{% endif %}</td>
     </tr>
     {% endfor %}
