@@ -1,63 +1,43 @@
 http://www.sqlalchemy.org/trac/ticket/1529 (reloading/err)
-http://www.sqlalchemy.org/trac/ticket/1537 (alias/join0.6)
-http://www.sqlalchemy.org/trac/ticket/1565 (sequences 0.6)
-http://www.sqlalchemy.org/trac/ticket/1638 (unicode/noerr)
+http://www.sqlalchemy.org/trac/ticket/1844 (rank()/window)
 
 |       Known Bugs       |   Occurrence   |     Effect     |
 | SQLA map reload (1529) | ext. rare      | recoverable    |
-| Merlin.nick            | unlikely       | unknown/low    |
 
 exception model refactor
 rewrite CLI or integrate as an extra IO stream
 rewrite Connection.write and Action.write to use detached threaded system
 
-Google voice inbox parsing
-OR push google voice inbox to email AND:
-email server and parsing with Lamson
+Core Stuff:
+    Break up mappings to seperate files, avoid singleton problem, sqla 1529
+    
+    @route params reverser
+        loadable.planet_coord x/y/z, planet_coord2 a/b/c
+        self.short2num
 
-Arthur message object that can be pushed to merlin hooks?
+Google stuff: (no rush now it's limited to USA)
+    migrate googlevoice code to use /m/
+        /m/sendsms/
+        /m/i/sms/
+    Google voice inbox parsing
+    OR push google voice inbox to email AND:
+    email server and parsing with Lamson
 
-Arthur scan request interface
+Lamson side project for integrating with PA alerts
 
-!attack command, creates arthur page with scans and ability to book in the web
-    !attack x:y[:z] landtick
-    !editattack id add x:y[:z]
-    !editattack id rem x:y[:z]
-    !editattack id land tick
-/attack/id/
-    booking table
-    show latest P/A(U)/D for each, xvx style
-    link to /scans/ and /planet/ for each
-    if landtick - currenttick < 5, show latest jgp
-    if landtick + 12 < currenttick, remove attack
-    (/attack/id)?/book/x:y:z/
-    (/attack/id)?/unbook/x:y:z/
-        (possible to book without an attack)
-        forward to /attack/id/ or /user/name/
+General changes:
+    pref option for receiving scan links to webby or pa
+    pref mode to set prefered PA url (ip etc)
+        replaces output on irc and webby
 
-/planet/x:y:z/
-    shows latest P/A(U)/D
-    shows incoming/outgoing fleets (froglet)
-    links to /scans/x:y:z/
+IRC commands
+    command to search intel from previous rounds
+    supersearch
+    anti
 
-/scans/x:y:z/
-    table of latest scans etc
-    click shows scan info in webby where possible /scan/id/
-    shift+click opens PA link
-
-/user/name/
-    access=member
-    forward to /planet/ ?
-    sponsor, gimps
-    access
-    mydef
-    phone
-        (phone allow list? - only if self?)
-    carebears
-    scans done (if self?)
-    requested scans (if self)
-    current bookings w/ /unbook/ link
-        (link to /attack/id/ if possible?)
-    include part of /planet/ or link?
-
-/home/ forwards to /user/name/
+Arthur additions:
+    mydef overview page
+        nick | x.y.z | fleets | ships | comment | phone | age
+    
+    bcalc add to last active
+        relies on Cin providing a service API
