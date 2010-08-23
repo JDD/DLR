@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
+from math import floor
 from Core.paconf import PA
 from Core.maps import Ship
 from Core.loadable import loadable, route
@@ -26,33 +27,33 @@ from Core.loadable import loadable, route
 class cost(loadable):
     """Calculates the cost of producing the specified number of ships"""
     usage = " <number> <ship>"
-    
+
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)")
     def execute(self, message, user, params):
-        
+
         num, name = params.groups()
-        
+
         ship = Ship.load(name=name)
         if ship is None:
             message.alert("No Ship called: %s" % (name,))
             return
-        
+
         num = self.short2num(num)
         reply="Buying %s %s will cost %s metal, %s crystal and %s eonium."%(num,ship.name,
                 self.num2short(ship.metal*num),
                 self.num2short(ship.crystal*num),
                 self.num2short(ship.eonium*num))
-        
+
         for gov in PA.options("govs"):
             bonus = PA.getfloat(gov, "prodcost")
             if bonus == 0:
                 continue
-            
+
             reply += " %s: %s metal, %s crystal and %s eonium."%(
                         PA.get(gov, "name"),
-                        self.num2short(ship.metal*(1+bonus)*num),
-                        self.num2short(ship.crystal*(1+bonus)*num),
-                        self.num2short(ship.eonium*(1+bonus)*num))
-        
+                        self.num2short(floor(ship.metal*(1+bonus))*num),
+                        self.num2short(floor(ship.crystal*(1+bonus))*num),
+                        self.num2short(floor(ship.eonium*(1+bonus))*num))
+
         reply+=" It will add %s value"%(self.num2short(ship.total_cost*num/100),)
         message.reply(reply)
