@@ -29,6 +29,7 @@ class links(loadable):
         
         links = [Config.get("URL","arthur"),
                  Config.get("URL","PA"),
+                 "http://progression-uk.com/DLR/forum/index.php",
                  "http://sandmans.co.uk",
                  "http://game.planetarion.com/bcalc.pl",
                  Config.get("URL","ships"),
