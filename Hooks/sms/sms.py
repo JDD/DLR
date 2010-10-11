@@ -26,7 +26,7 @@ from urllib import urlencode
 from urllib2 import urlopen, Request, URLError
 from Core.exceptions_ import LoadableError
 from Core.config import Config
-from Core.string import encode
+from Core.string import decode, encode
 from Core.db import session
 from Core.maps import User, SMS
 from Core.loadable import loadable, route, require_user
@@ -60,6 +60,10 @@ class sms(loadable):
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
             return
 
+        if receiver.smsmode == "Email":
+            message.reply("Emailing not yet implemented")
+            return
+
         phone = self.prepare_phone_number(receiver.phone)
         if not phone or len(phone) <= 7:
             message.reply("%s has no phone number or their phone number is too short to be valid (under 6 digits). Super secret message not sent." % (receiver.name,))
@@ -70,12 +74,8 @@ class sms(loadable):
             return
 
         mode = Config.get("Misc", "sms")
-        if mode == "combined":
-            if receiver.googlevoice == True:
-                mode = "googlevoice"
-
-            if receiver.googlevoice == False:
-                mode = "clickatell"
+        mode = receiver.smsmode or mode if mode == "combined" else mode
+        mode = mode.lower()
         error = ""
         
         if mode == "googlevoice" or mode == "combined":
@@ -84,9 +84,9 @@ class sms(loadable):
         if mode == "clickatell" or (mode == "combined" and error is not None):
             error = self.send_clickatell(user, receiver, public_text, phone, text)
             sent = "Clickatell"
-
+        
         if error is None:
-            message.reply("%s successfully processed message to: %s saying: %s" % (sent,receiver.name,text))
+            message.reply("%s successfully processed message to: %s saying: %s" % (sent,receiver.name,decode(text)))
         else:
             message.reply(error or "That wasn't supposed to happen. I don't really know what went wrong. Maybe your mother dropped you.")
     
