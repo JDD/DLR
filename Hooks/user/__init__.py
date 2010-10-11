@@ -37,8 +37,8 @@ __all__ = [
            "remchan",
            "alias",
            "email",
-           "updatedist",
-           "dist",
-           "amps",
-           "updateamps",
+#           "updatedist",
+#           "dist",
+#           "amps",
+#           "updateamps",
            ]

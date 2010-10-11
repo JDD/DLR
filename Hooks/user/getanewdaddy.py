@@ -60,9 +60,9 @@ class demote(loadable):
         message.privmsg("remuser %s %s"%(Config.get("Channels","home"), idiot.name,),'p')
         message.privmsg("remuser %s %s"%(Config.get("Channels","core"), idiot.name,),'p')
         if idiot.sponsor != user.name:
-            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
+#            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
             message.reply("%s has been reduced to \"galmate\" level and removed from the channel. "%(idiot.name,))
         else:
-            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
+#            message.privmsg("note send %s You have been removed from private channels."%(idiot.name,),'p')
             message.reply("%s has been reduced to \"galmate\" level and removed from the channel."%(idiot.name,))
 
