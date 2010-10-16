@@ -24,10 +24,10 @@
         <th>Score</th>
         <th>XP</th>
         
-        <th>Size</th>
-        <th>Value</th>
-        <th>Score</th>
-        
+        <th><a href="{% url "galaxies", "gsize", page|default(1) %}">Size</a></th>
+        <th><a href="{% url "galaxies", "gvalue", page|default(1) %}">Value</a></th>
+        <th><a href="{% url "galaxies", "gscore", page|default(1) %}">Score</a></th>
+
     </tr>
     {% for galaxy, gh in galaxies %}
     <tr class="{{ loop.cycle('odd', 'even') }}">
@@ -48,7 +48,7 @@
         <td align="right">{% if gh %}{{ galaxy.size|growth_roid(gh.size) }}{% endif %}</td>
         <td align="right">{% if gh %}{{ galaxy.value|growth(gh.value) }}{% endif %}</td>
         <td align="right">{% if gh %}{{ galaxy.score|growth(gh.score) }}{% endif %}</td>
-        
+
     </tr>
     {% endfor %}
     
