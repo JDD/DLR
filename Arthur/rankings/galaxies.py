@@ -36,9 +36,6 @@ class galaxies(loadable):
                   "value" : (asc(Galaxy.value_rank),),
                   "size"  : (asc(Galaxy.size_rank),),
                   "xp"    : (asc(Galaxy.xp_rank),), 
-                  "gscore": (asc(Galaxy.size),),
-                  "gsize" : (asc(Galaxy.score),),
-                  "gvalue"   : (asc(Galaxy.value),),
                   }
         if sort not in order.keys():
             sort = "score"

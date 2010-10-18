@@ -24,9 +24,9 @@
         <th>Score</th>
         <th>XP</th>
         
-        <th><a href="{% url "galaxies", "gsize", page|default(1) %}">Size</a></th>
-        <th><a href="{% url "galaxies", "gvalue", page|default(1) %}">Value</a></th>
-        <th><a href="{% url "galaxies", "gscore", page|default(1) %}">Score</a></th>
+        <th>Size</th>
+        <th>Value</th>
+        <th>Score</th>
 
     </tr>
     {% for galaxy, gh in galaxies %}
