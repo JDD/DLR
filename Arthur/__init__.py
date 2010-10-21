@@ -27,7 +27,7 @@ from Core.config import Config
 from Core.maps import Updates
 from Arthur.context import menu, render
 from Arthur.errors import page_not_found
-from Arthur.loadable import loadable, load
+from Arthur.loadable import loadable, load, require_user
 bot = Config.get("Connection","nick")
 name = Config.get("Alliance", "name")
 
@@ -35,8 +35,9 @@ handler404 = 'Arthur.errors.page_not_found'
 handler500 = 'Arthur.errors.server_error'
 
 urlpatterns = patterns('',
-    (r'^(?:home/)?$', 'Arthur.home'),
-    url(r'^user/(?P<username>\S+)/$', 'Arthur.dashboard.dashboard', name="dashboard"),
+    (r'^login/', 'Arthur.login'),
+    (r'^(?:home|logout)?/?$', 'Arthur.overview.home'),
+    (r'', include('Arthur.dashboard')),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
     (r'^guide/$', 'Arthur.guide'),
     (r'^links/(?P<link>[^/]+)/$', 'Arthur.links'),
@@ -48,33 +49,31 @@ urlpatterns = patterns('',
     (r'^(?:scans/)?request/', include('Arthur.scans.request')),
 )
 
-@menu("Home")
 @load
-class home(loadable):
+@require_user
+class login(loadable):
     def execute(self, request, user):
         from Arthur.dashboard import dashboard
         if user.is_member():
             return dashboard.execute(request, user, dashuser=user)
-        
-        if user.planet is not None:
-            tick = Updates.midnight_tick()
-            ph = user.planet.history(tick)
         else:
-            ph = None
-        return render("index.tpl", request, planet=user.planet, ph=ph)
+            return home.execute(request, user)
+
+from Arthur.overview import home
 
 @menu(name,          "Intel",       suffix = name)
 @menu("Planetarion", "BCalc",       suffix = "bcalc")
-@menu("Planetarion", "Sandmans",    suffix = "sandmans")
+@menu("Planetarion", "DLR Forums",    suffix = "dlr")
 @menu("Planetarion", "Forums",      suffix = "forums")
 @menu("Planetarion", "Game",        suffix = "game")
 @load
+@require_user
 class links(loadable):
     def execute(self, request, user, link):
         link = {
                 "game"        : "http://game.planetarion.com",
                 "forums"      : "http://pirate.planetarion.com",
-                "sandmans"    : "http://sandmans.co.uk",
+                "dlr"         : "http://progression-uk.com/DLR/forum/index.php",
                 "bcalc"       : "http://game.planetarion.com/bcalc.pl",
                 name          : reverse("alliance_members", kwargs={"name":name}),
                }.get(link)
@@ -84,10 +83,12 @@ class links(loadable):
 
 @menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
 @load
+@require_user
 class guide(loadable):
     def execute(self, request, user):
         return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
+from Arthur import dashboard
 from Arthur import alliance
 from Arthur import rankings
 #from Arthur import attack

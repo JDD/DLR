@@ -23,6 +23,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from sqlalchemy import and_
 from sqlalchemy.sql import asc, desc
+from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
 from Core.maps import Updates, Alliance, Planet, PlanetHistory, Alliance, Intel
@@ -31,10 +32,10 @@ from Arthur.loadable import loadable, load
 
 @load
 class alliance(loadable):
-    access = "member"
+    access = Config.get("Arthur", "intel")
     def execute(self, request, user, name, page="1", sort="score", race="all"):
         page = int(page)
-        offset = (page - 1)*100
+        offset = (page - 1)*50
         order =  {"score" : (asc(Planet.score_rank),),
                   "value" : (asc(Planet.value_rank),),
                   "size"  : (asc(Planet.size_rank),),
@@ -65,10 +66,10 @@ class alliance(loadable):
             race = "all"
         
         count = Q.count()
-        pages = count/100 + int(count%100 > 0)
+        pages = count/50 + int(count%50 > 0)
         pages = range(1, 1+pages)
-
+        
         for o in order:
             Q = Q.order_by(o)
-        Q = Q.limit(100).offset(offset)
+        Q = Q.limit(50).offset(offset)
         return render("alliance.tpl", request, alliance=alliance, planets=Q.all(), offset=offset, pages=pages, page=page, sort=sort, race=race)

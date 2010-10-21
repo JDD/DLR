@@ -32,7 +32,7 @@ from Arthur.loadable import loadable, load
 class planets(loadable):
     def execute(self, request, user, page="1", sort="score", race="all"):
         page = int(page)
-        offset = (page - 1)*100
+        offset = (page - 1)*50
         order =  {"score" : (asc(Planet.score_rank),),
                   "value" : (asc(Planet.value_rank),),
                   "size"  : (asc(Planet.size_rank),),
@@ -42,25 +42,25 @@ class planets(loadable):
         if sort not in order.keys():
             sort = "score"
         order = order.get(sort)
-
+        
         tick = Updates.midnight_tick()
-
+        
         Q = session.query(Planet, PlanetHistory, Intel.nick, Alliance.name)
         Q = Q.outerjoin(Planet.intel)
         Q = Q.outerjoin(Intel.alliance)
         Q = Q.outerjoin((PlanetHistory, and_(Planet.id == PlanetHistory.id, PlanetHistory.tick == tick)))
         Q = Q.filter(Planet.active == True)
-
+        
         if race.lower() in PA.options("races"):
             Q = Q.filter(Planet.race.ilike(race))
         else:
             race = "all"
-
+        
         count = Q.count()
-        pages = count/100 + int(count%100 > 0)
+        pages = count/50 + int(count%50 > 0)
         pages = range(1, 1+pages)
-
+        
         for o in order:
             Q = Q.order_by(o)
-        Q = Q.limit(100).offset(offset)
+        Q = Q.limit(50).offset(offset)
         return render("planets.tpl", request, planets=Q.all(), offset=offset, pages=pages, page=page, sort=sort, race=race)
