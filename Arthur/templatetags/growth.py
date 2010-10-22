@@ -32,7 +32,7 @@ def growth(present, past):
     else:
         ret += '"yellow"'
     ret += ' title="' + str(diff) + ' points">'
-    ret += str(round((float(diff) / past * 100),2) if past else present)
+    ret += str(round((float(diff) / past * 100),1) if past else present)
     ret += '%</span>'
     return ret
 
@@ -47,8 +47,27 @@ def growth_roid(present, past):
     else:
         ret += '"yellow"'
     ret += ' title="' + str(diff) + ' roids">'
-    ret += str(round((float(diff) / past * 100),2) if past else present)
+    ret += str(round((float(diff) / past * 100),1) if past else present)
     ret += '%</span>'
+    return ret
+
+@filter
+def growth_members(present, past, all=False):
+    diff = present - past
+    ret = '<span class='
+    if diff < 0:
+        ret += '"red"'
+    elif diff > 0:
+        ret += '"green"'
+    else:
+        ret += '"yellow"'
+    ret += ' title="' + str(diff) + ' members">'
+    if all and diff != 0:
+        ret += '<span class="white">(</span>'
+        ret += str(diff)
+        ret += '<span class="white">)</span> '
+    ret += str(present)
+    ret += '</span>'
     return ret
 
 @filter
