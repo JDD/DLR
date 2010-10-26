@@ -82,12 +82,12 @@ class links(loadable):
             return page_not_found(request)
         return HttpResponseRedirect(link)
 
-@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
-@load
-@require_user
-class guide(loadable):
-    def execute(self, request, user):
-        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
+#@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
+#@load
+#@require_user
+#class guide(loadable):
+#    def execute(self, request, user):
+#        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
 from Arthur import dashboard
 from Arthur import alliance
