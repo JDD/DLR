@@ -56,9 +56,7 @@ class Updates(Base):
     @staticmethod
     def midnight_tick():
         now = datetime.utcnow()
-        d1 = datetime(now.year, now.month, now.day, now.hour)
-        d2 = datetime(now.year, now.month, now.day)
-        hours = (d1-d2).seconds/60/60
+        hours = now.hour
         tick = Updates.current_tick() - hours
         return tick
     
@@ -78,10 +76,24 @@ class Galaxy(Base):
     score = Column(Integer)
     value = Column(Integer)
     xp = Column(Integer)
+    members = Column(Integer)
     size_rank = Column(Integer)
     score_rank = Column(Integer)
     value_rank = Column(Integer)
     xp_rank = Column(Integer)
+    size_growth = Column(Integer)
+    score_growth = Column(Integer)
+    value_growth = Column(Integer)
+    xp_growth = Column(Integer)
+    member_growth = Column(Integer)
+    size_growth_pc = Column(Float)
+    score_growth_pc = Column(Float)
+    value_growth_pc = Column(Float)
+    xp_growth_pc = Column(Float)
+    size_rank_change = Column(Integer)
+    score_rank_change = Column(Integer)
+    value_rank_change = Column(Integer)
+    xp_rank_change = Column(Integer)
     private = Column(Boolean)
     
     def history(self, tick):
@@ -147,6 +159,18 @@ class Planet(Base):
     score_rank = Column(Integer)
     value_rank = Column(Integer)
     xp_rank = Column(Integer)
+    size_growth = Column(Integer)
+    score_growth = Column(Integer)
+    value_growth = Column(Integer)
+    xp_growth = Column(Integer)
+    size_growth_pc = Column(Float)
+    score_growth_pc = Column(Float)
+    value_growth_pc = Column(Float)
+    xp_growth_pc = Column(Float)
+    size_rank_change = Column(Integer)
+    score_rank_change = Column(Integer)
+    value_rank_change = Column(Integer)
+    xp_rank_change = Column(Integer)
     vdiff = Column(Integer)
     idle = Column(Integer)
     
@@ -250,8 +274,30 @@ class Alliance(Base):
     points_rank = Column(Integer)
     size_avg = Column(Integer)
     score_avg = Column(Integer)
+    points_avg = Column(Integer)
     size_avg_rank = Column(Integer)
     score_avg_rank = Column(Integer)
+    points_avg_rank = Column(Integer)
+    size_growth = Column(Integer)
+    score_growth = Column(Integer)
+    points_growth = Column(Integer)
+    member_growth = Column(Integer)
+    size_growth_pc = Column(Float)
+    score_growth_pc = Column(Float)
+    points_growth_pc = Column(Float)
+    size_avg_growth = Column(Integer)
+    score_avg_growth = Column(Integer)
+    points_avg_growth = Column(Integer)
+    size_avg_growth_pc = Column(Float)
+    score_avg_growth_pc = Column(Float)
+    points_avg_growth_pc = Column(Float)
+    size_rank_change = Column(Integer)
+    members_rank_change = Column(Integer)
+    score_rank_change = Column(Integer)
+    points_rank_change = Column(Integer)
+    size_avg_rank_change = Column(Integer)
+    score_avg_rank_change = Column(Integer)
+    points_avg_rank_change = Column(Integer)
     
     def history(self, tick):
         return self.history_loader.filter_by(tick=tick).first()
@@ -306,8 +352,10 @@ class AllianceHistory(Base):
     points_rank = Column(Integer)
     size_avg = Column(Integer)
     score_avg = Column(Integer)
+    points_avg = Column(Integer)
     size_avg_rank = Column(Integer)
     score_avg_rank = Column(Integer)
+    points_avg_rank = Column(Integer)
 Alliance.history_loader = dynamic_loader(AllianceHistory, backref="current")
 
 # ########################################################################### #
@@ -344,7 +392,8 @@ alliance_temp = Table('alliance_temp', Base.metadata,
     Column('points', Integer),
     Column('score_rank', Integer),
     Column('size_avg', Integer),
-    Column('score_avg', Integer))
+    Column('score_avg', Integer),
+    Column('points_avg', Integer))
 planet_new_id_search = Table('planet_new_id_search', Base.metadata,
     Column('id', Integer),
     Column('x', Integer, primary_key=True),
