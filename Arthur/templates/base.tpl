@@ -38,7 +38,6 @@
     </tr>
 </table>
 </center>
-{% block headerbar %}{% include "headerbar.tpl" %}{% endblock%}
     {% if menu %}
     <table cellspacing="1" cellpadding="3">
         <tr class="header">
@@ -67,6 +66,7 @@
         </tr>
     </table>
     {% endif %}
+{% block headerbar %}{% include "headerbar.tpl" %}{% endblock%}
 
     <div style="clear: both; height: 2em"></div>
     <table cellspacing="1" cellpadding="3" width="100%"><tr><td><center>

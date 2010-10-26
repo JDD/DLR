@@ -5,7 +5,7 @@
         {% if planet.intel and planet.intel.nick %}
             <i>{{ planet.intel.nick }}</i>
             {% if planet.alliance %}
-                /
+                --
             {% endif %}
         {% endif %}
         {% if planet.intel and planet.alliance %}
