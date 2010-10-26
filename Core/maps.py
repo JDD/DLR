@@ -252,10 +252,10 @@ class Alliance(Base):
     score_avg = Column(Integer)
     size_avg_rank = Column(Integer)
     score_avg_rank = Column(Integer)
-
+    
     def history(self, tick):
         return self.history_loader.filter_by(tick=tick).first()
-
+    
     @staticmethod
     def load(name, alias=True, active=True):
         filters = (
@@ -266,22 +266,22 @@ class Alliance(Base):
                     Alliance.alias.ilike(name+"%"),
                     Alliance.alias.ilike("%"+name+"%"),
                     )
-
+        
         Q = session.query(Alliance).filter_by(active=True)
         for filter in filters:
             alliance = Q.filter(filter).first()
             if alliance is not None:
                 break
-
+        
         if alliance is not None or active == True:
             return alliance
-
+        
         Q = session.query(Alliance)
         for filter in filters:
             alliance = Q.filter(filter).first()
             if alliance is not None:
                 break
-
+        
         return alliance
     
     def __str__(self):
@@ -398,7 +398,7 @@ class User(Base):
     
     def is_user(self):
         return self in session
-
+    
     @property
     def level(self):
         if not self.active:
@@ -426,19 +426,19 @@ class User(Base):
         assert mode in User._sms_modes or mode is None
         return mode
     
-#    @property
-#    def gimps(self):
-#        return session.query(User.name).filter(User.sponsor == self.name).all()
-
-#    @property
-#    def mums(self):
-#        from sqlalchemy.sql.functions import sum
-#        Q = session.query(User.name, sum(Cookie.howmany).label("gac"))
-#        Q = Q.join(Cookie.giver)
-#        Q = Q.filter(Cookie.receiver == self)
-#        Q = Q.group_by(User.name)
-#        Q = Q.order_by(desc("gac"))
-#        return Q.all()
+    @property
+    def gimps(self):
+        return session.query(User.name).filter(User.sponsor == self.name).all()
+    
+    @property
+    def mums(self):
+        from sqlalchemy.sql.functions import sum
+        Q = session.query(User.name, sum(Cookie.howmany).label("gac"))
+        Q = Q.join(Cookie.giver)
+        Q = Q.filter(Cookie.receiver == self)
+        Q = Q.group_by(User.name)
+        Q = Q.order_by(desc("gac"))
+        return Q.all()
     
     @validates('passwd')
     def valid_passwd(self, key, passwd):
@@ -702,7 +702,7 @@ class Ship(Base):
     eonium = Column(Integer)
     total_cost = Column(Integer)
     race = Column(String(10))
-
+    
     @staticmethod
     def load(name=None, id=None):
         assert id or name
@@ -724,7 +724,7 @@ class Ship(Base):
             if ship is None and name[-3:].lower()=="ies":
                 ship = Q.filter(Ship.name.ilike("%"+name[:-3]+"%")).first()
         return ship
-
+    
     def __str__(self):
         reply="%s (%s) is class %s | Target 1: %s |"%(self.name,self.race[:3],self.class_,self.t1)
         if self.t2:
@@ -755,45 +755,45 @@ class Scan(Base):
     pa_id = Column(String(32), index=True)
     group_id = Column(String(32), index=True)
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-
+    
     @property
     def type(self):
         return PA.get(self.scantype,"name")
-
+    
     @property
     def link(self):
         return Config.get("URL","viewscan") % (self.pa_id,)
-
+    
     def ship_count(self, cloak):
         if self.scantype not in ("U","A",):
             return
-
+        
         count = 0
         for unitscan in self.units:
             count += unitscan.amount if cloak else unitscan.visible
-
+        
         return count
-
+    
     def ship_value(self):
         if self.scantype not in ("U","A",):
             return
-
+        
         value = 0
         for unitscan in self.units:
             value += unitscan.amount * unitscan.ship.total_cost / 100
-
+        
         return value
-
+    
     def bcalc(self, target):
         if self.scantype not in ("U","A",):
             return
-
+        
         bcalc = Config.get("URL","bcalc")
         for unitscan in self.units:
             bcalc += "%s_1_%d=%d&" % (("att", "def",)[target], unitscan.ship_id - 1, unitscan.amount,)
         bcalc += "%s_planet_value_1=%d&" % (("att", "def",)[target], self.planet.value,)
         bcalc += "%s_planet_score_1=%d&" % (("att", "def",)[target], self.planet.score,)
-
+        
         if target:
             pscan = self.planet.scan("P")
             if pscan and pscan.planetscan.size == self.planet.size:
@@ -802,70 +802,70 @@ class Scan(Base):
                 bcalc += "def_eonium_asteroids=%d&" % (pscan.planetscan.roid_eonium,)
             else:
                 bcalc += "def_metal_asteroids=%d&" % (self.planet.size,)
-
+            
             dscan = self.planet.scan("D")
             if dscan:
                 bcalc += "def_structures=%d&" % (dscan.devscan.total,)
-
+        
         return bcalc
-
+    
     @property
     def total_hostile(self):
         if self.scantype not in ("J",):
             return
         return sum([fleet.fleet_size for fleet in self.fleets if fleet.mission.lower() == "attack"])
-
+    
     @property
     def total_hostile_fleets(self):
         if self.scantype not in ("J",):
             return
         return len([fleet for fleet in self.fleets if fleet.mission.lower() == "attack"])
-
+    
     @property
     def total_friendly(self):
         if self.scantype not in ("J",):
             return
         return sum([fleet.fleet_size for fleet in self.fleets if fleet.mission.lower() == "defend"])
-
+    
     @property
     def total_friendly_fleets(self):
         if self.scantype not in ("J",):
             return
         return len([fleet for fleet in self.fleets if fleet.mission.lower() == "defend"])
-
+    
     def fleet_overview(self):
         if self.scantype not in ("J",):
             return
-
+        
         from sqlalchemy.sql.functions import min, sum
         f=aliased(FleetScan)
         a=aliased(FleetScan)
         d=aliased(FleetScan)
-
+        
         Q = session.query(f.landing_tick, f.landing_tick - min(Scan.tick),
                             count(a.id), coalesce(sum(a.fleet_size),0),
                             count(d.id), coalesce(sum(d.fleet_size),0))
         Q = Q.join(f.scan)
         Q = Q.filter(f.scan == self)
-
+        
         Q = Q.outerjoin((a, and_(a.id==f.id, a.mission.ilike("Attack"))))
         Q = Q.outerjoin((d, and_(d.id==f.id, d.mission.ilike("Defend"))))
 
         Q = Q.group_by(f.landing_tick)
         Q = Q.order_by(asc(f.landing_tick))
         return Q.all()
-
+    
     def __str__(self):
         p = self.planet
         ph = p.history(self.tick)
-
+        
         head = "%s on %s:%s:%s " % (self.type,p.x,p.y,p.z,)
         pa_id = self.pa_id
         pa_id = encode(self.pa_id)
         id_tick = "(id: %s, pt: %s)" % (pa_id,self.tick,)
         vdiff = p.value-ph.value if ph else None
         id_age_value = "(id: %s, age: %s, value diff: %s)" % (pa_id,Updates.current_tick()-self.tick,vdiff)
-
+        
         if self.scantype in ("P",):
             return head + id_tick + str(self.planetscan)
         if self.scantype in ("D",):
@@ -890,22 +890,22 @@ class Request(Base):
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='set null'))
     active = Column(Boolean, default=True)
     tick = Column(Integer,default=Updates.current_tick)
-
+    
     @staticmethod
     def load(id, active=True):
         Q = session.query(Request)
         Q = Q.filter_by(active = True) if active == True else Q
         request = Q.filter_by(id = id).first()
         return request
-
+        
     @property
     def link(self):
         return Config.get("URL", "reqscan") % (PA.get(self.scantype, "type"), self.target.x, self.target.y, self.target.z,)
-
+    
     @property
     def type(self):
         return PA.get(self.scantype,"name")
-
+    
 Request.user = relation(User, backref="requests")
 Request.target = relation(Planet)
 Request.scan = relation(Scan)
@@ -926,11 +926,11 @@ class PlanetScan(Base):
     prod_res = Column(Integer)
     agents = Column(Integer)
     guards = Column(Integer)
-
+    
     @property
     def size(self):
         return self.roid_metal + self.roid_crystal + self.roid_eonium
-
+    
     def __str__(self):
         reply = " Roids: (m:%s, c:%s, e:%s) |" % (self.roid_metal,self.roid_crystal,self.roid_eonium,)
         reply+= " Resources: (m:%s, c:%s, e:%s) |" % (self.res_metal,self.res_crystal,self.res_eonium,)
@@ -960,10 +960,10 @@ class DevScan(Base):
     core = Column(Integer)
     covert_op = Column(Integer)
     mining = Column(Integer)
-
+    
     def travel_str(self):
         return "eta -%s" %(self.travel,)
-
+    
     def infra_str(self):
         level = self.infrastructure
         if level==0:
@@ -976,7 +976,7 @@ class DevScan(Base):
             return "150 constructions"
         if level==4:
             return "250 constructions"
-
+    
     def hulls_str(self):
         level = self.hulls
         if level==1:
@@ -985,7 +985,7 @@ class DevScan(Base):
             return "FR/DE"
         if level==3:
             return "CR/BS"
-
+    
     def waves_str(self):
         level = self.waves
         if level==0:
@@ -1004,10 +1004,10 @@ class DevScan(Base):
             return "JGP"
         if level==7:
             return "Advanced Unit"
-
+    
     def core_str(self):
         return ("1000","3500","6000","9000","12000")[self.core] + " ept"
-
+    
     def covop_str(self):
         level = self.covert_op
         if level==0:
@@ -1026,7 +1026,7 @@ class DevScan(Base):
             return "Resource hacking (OMG!)"
         if level==7:
             return "Blow up strucs"
-
+    
     def mining_str(self):
         level = self.mining
         if level==0:
@@ -1046,7 +1046,7 @@ class DevScan(Base):
         if level==7:
             return "1500 roids"
         if level==8:
-            return "2000 rpods"
+            return "2000 roids"
         if level==9:
             return "2500 roids"
         if level==10:
@@ -1063,7 +1063,7 @@ class DevScan(Base):
             return "8000 roids"
         if level==16:
             return "top10 or dumb"
-
+    
     @property
     def total(self):
         total = self.light_factory+self.medium_factory+self.heavy_factory
@@ -1071,7 +1071,7 @@ class DevScan(Base):
         total+= self.metal_refinery+self.crystal_refinery+self.eonium_refinery
         total+= self.research_lab+self.finance_centre+self.security_centre
         return total
-
+        
     def __str__(self):
         reply = " Travel: %s, Infra: %s, Hulls: %s," % (self.travel_str(),self.infra_str(),self.hulls_str(),)
         reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core_str(),self.covop_str(),self.mining_str(),)

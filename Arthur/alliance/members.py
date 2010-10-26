@@ -81,7 +81,7 @@ class galmates(loadable):
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
-
+        
         members = []
         Q = session.query(User.name, User.alias, User.access, Planet,
                           User.phone, User.pubphone, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user)))
@@ -90,7 +90,7 @@ class galmates(loadable):
         Q = Q.filter(User.access < levels[-1][1])
         for o in order:
             Q = Q.order_by(o)
-
+        
         return render("galmates.tpl", request, members=Q.all())
 
 @menu(bot, "Channels")
@@ -98,16 +98,16 @@ class galmates(loadable):
 class channels(loadable):
     access = "member"
     def execute(self, request, user, sort=None):
-
+        
         levels = [] + User.levels
         if "galmate" in Config.options("Access"):
             levels.append(("Galaxy", Config.getint("Access","galmate"),))
         else:
             levels.append(("Galaxy", 0,))
-
+        
         if sort is not None:
             levels = [("All", 0,),]
-
+        
         order =  {"name"  : (asc(Channel.name),),
                   "userlevel" : (desc(Channel.userlevel),),
                   "maxlevel" : (desc(Channel.maxlevel),),
@@ -115,7 +115,7 @@ class channels(loadable):
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
-
+        
         channels = []
         for level in levels:
             Q = session.query(Channel.name, Channel.userlevel, Channel.maxlevel)
@@ -123,7 +123,7 @@ class channels(loadable):
             Q = Q.filter(Channel.userlevel < levels[levels.index(level)-1][1]) if levels.index(level) > 0 else Q
             for o in order:
                 Q = Q.order_by(o)
-
+            
             channels.append((level[0], Q.all(),))
-
+        
         return render("channels.tpl", request, accesslist=channels)

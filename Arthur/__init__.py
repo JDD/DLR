@@ -47,6 +47,7 @@ urlpatterns = patterns('',
 #    (r'', include('Arthur.attack')),
     (r'^scans/', include('Arthur.scans')),
     (r'^(?:scans/)?request/', include('Arthur.scans.request')),
+    (r'^search/(?P<params>.*)/$', 'Arthur.search.search'),
 )
 
 @load
@@ -73,7 +74,7 @@ class links(loadable):
         link = {
                 "game"        : "http://game.planetarion.com",
                 "forums"      : "http://pirate.planetarion.com",
-                "dlr"         : "http://progression-uk.com/DLR/forum/index.php",
+                "sandmans"    : "http://progression-uk.com/DLR/forum/index.php",
                 "bcalc"       : "http://game.planetarion.com/bcalc.pl",
                 name          : reverse("alliance_members", kwargs={"name":name}),
                }.get(link)
@@ -81,15 +82,16 @@ class links(loadable):
             return page_not_found(request)
         return HttpResponseRedirect(link)
 
-#@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
-#@load
-#@require_user
-#class guide(loadable):
-#    def execute(self, request, user):
-#        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
+@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
+@load
+@require_user
+class guide(loadable):
+    def execute(self, request, user):
+        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
 from Arthur import dashboard
 from Arthur import alliance
 from Arthur import rankings
+from Arthur import search
 #from Arthur import attack
 from Arthur import scans

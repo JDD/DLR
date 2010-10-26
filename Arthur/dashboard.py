@@ -50,10 +50,10 @@ class dashboard(loadable):
             ph = dashuser.planet.history(tick)
         else:
             ph = None
-        
+
 #        gimps = dashuser.gimps
 #        mums = dashuser.mums
         ships = dashuser.fleets.all()
         phonefriend = user == dashuser or user in dashuser.phonefriends
-        
+
         return render("dashboard.tpl", request, dashuser=dashuser, planet=dashuser.planet, ph=ph, ships=ships, phonefriend=phonefriend)

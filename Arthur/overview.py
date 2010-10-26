@@ -52,4 +52,8 @@ class home(loadable):
         Q = Q.order_by(asc(Alliance.score_rank))
         alliances = Q[:8]
         
-        return render("index.tpl", request, topplanets=planets, topgalaxies=galaxies, topalliances = alliances)
+        return render("index.tpl", request,
+                                    topplanets=planets,
+                                    topgalaxies=galaxies,
+                                    topalliances = alliances,
+                            )
