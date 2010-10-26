@@ -74,7 +74,7 @@ class links(loadable):
         link = {
                 "game"        : "http://game.planetarion.com",
                 "forums"      : "http://pirate.planetarion.com",
-                "sandmans"    : "http://progression-uk.com/DLR/forum/index.php",
+                "dlr"    : "http://progression-uk.com/DLR/forum/index.php",
                 "bcalc"       : "http://game.planetarion.com/bcalc.pl",
                 name          : reverse("alliance_members", kwargs={"name":name}),
                }.get(link)
