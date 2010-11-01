@@ -131,6 +131,6 @@
         {% endif %}
     </tr>
     {% endif %}
-
+    
 </table>
 {% endblock %}

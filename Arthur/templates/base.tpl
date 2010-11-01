@@ -25,7 +25,7 @@
               return true;
             }
         }
-
+        
         var cssRules = document.styleSheets[0].cssRules || document.styleSheets[0].rules;
         function getStyle(name) {
             for(var i = 0;i < cssRules.length;i++)
@@ -35,10 +35,10 @@
         function toggleGrowth() {
             var growth_pc = getStyle('.growth_pc');
             var growth_diff = getStyle('.growth_diff');
-
+            
             if(!growth_pc || !growth_diff)
                 return;
-
+            
             growth_pc.display = growth_pc.display == 'none' ? 'inline' : 'none';
             growth_diff.display = growth_diff.display == 'none' ? 'inline' : 'none';
         }
