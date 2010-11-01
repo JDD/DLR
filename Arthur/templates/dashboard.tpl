@@ -19,42 +19,6 @@
 <table width="600"><tr valign="top">
     <td width="50%"><center>
         <table cellspacing="1" cellpadding="3" class="black">
-            <tr class="datahigh"><th width="200">Family Tree</th></tr>
-            <tr class="header"><th>Daddy</th></tr>
-            <tr class="odd">
-                <td class="center"><a href="{% url "dashboard", dashuser.sponsor %}">{{ dashuser.sponsor }}</a></td>
-            </tr>
-            <tr class="header"><th>{{ who }} Gimps</th></tr>
-             {% for gimp in gimps %}
-            <tr class="{{ loop.cycle('odd', 'even') }}">
-                <td class="center"><a href="{% url "dashboard", gimp.name%}">{{ gimp.name }}</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    </center></td>
-    
-    <td width="50%"><center>
-        <table cellspacing="1" cellpadding="3" class="black">
-            <tr class="datahigh"><th colspan="2">WHO ATE ALL THE COOKIES?!</th></tr>
-            <tr class="header">
-                <th width="125">Mum</th>
-                <th width="75">Cookies</th>
-            </tr>
-            {% for giver, amount in mums %}
-            <tr class="{{ loop.cycle('odd', 'even') }}">
-                <td class="center"><a href="{% url "dashboard", giver %}">{{ giver }}</a></td>
-                <td class="right">{{ amount }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </center></td>
-</tr></table>
-
-<p>&nbsp;</p>
-
-<table width="600"><tr valign="top">
-    <td width="50%"><center>
-        <table cellspacing="1" cellpadding="3" class="black">
             <tr class="header"><th colspan="2">{{ who }} def</th></tr>
             {% if ships|length < 1 %}
                 <tr class="odd"><td colspan="2" width="200">
