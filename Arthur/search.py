@@ -65,15 +65,21 @@ class search(loadable):
                     "galvalue" : Galaxy.value,
                     "galsize" : Galaxy.size,
                     "galxp" : Galaxy.xp,
-                    "idle" : Planet.idle,
+#                    "idle" : Planet.idle,
                     "x" : Planet.x,
                     "y" : Planet.y,
                     "planets" : Galaxy.members,
+                    "totalroundroids" : Planet.totalroundroids,
+                    "totallostroids" : Planet.totallostroids,
+                    "ticksroiding" : Planet.ticksroiding,
+                    "ticksroided" : Planet.ticksroided,
+                    "tickroids" : Planet.tickroids,
                     }
         
         floatfilts = {
                     "ratio" : Planet.ratio,
                     "galratio" : Galaxy.ratio,
+                    "avroids" : Planet.avroids,
                     }
         
         rankfilts = {
@@ -274,18 +280,20 @@ class search(loadable):
             orders.append((desc, "score",))
         if len(orders) < 2:
             orders.append((desc, "score",))
+        search["order1"] = orders[0][1]
+        search["order1o"] = orders[0][0].__name__
+        search["order2"] = orders[1][1]
+        search["order2o"] = orders[1][0].__name__
         for d, os in orders:
-            if type(os) is tuple:
+            if type(order[os]) is tuple:
                 for o in order[os]:
                     Q = Q.order_by(d(o))
             else:
                 Q = Q.order_by(d(order[os]))
-            if not search["order1"]:
-                search["order1"] = os
-                search["order1o"] = d.__name__
-            elif not search["order2"]:
-                search["order2"] = os
-                search["order2o"] = d.__name__
+        
+        showsort = True if search["order1"] not in ("xyz","size","value","score","ratio","xp",
+                                                    "size_growth","value_growth","score_growth",
+                                                    "size_growth_pc","value_growth_pc","score_growth_pc",) else False
         
         count = Q.count()
         pages = count/50 + int(count%50 > 0)
@@ -296,4 +304,6 @@ class search(loadable):
         
         results = Q.all() if query else None
         
-        return render("search.tpl", request, planets=results, s=search, params=params, offset=offset, pages=pages, page=page)
+        return render("search.tpl", request, planets=results, sort=search["order1"],
+                                showsort=showsort, s=search, params=params,
+                                offset=offset, pages=pages, page=page)
