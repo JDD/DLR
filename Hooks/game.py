@@ -27,7 +27,7 @@ class game(loadable):
     def execute(self, message, user, params):
         
         game = ["http://game.planetarion.com (prefered)",
-                "http://87.124.126.17 (only use if game.pa isnt working)"
+                "http://66.116.124.61 (only use if game.pa isnt working)"
                 ]
         
         message.reply("PA urls: "+" | ".join(game))
