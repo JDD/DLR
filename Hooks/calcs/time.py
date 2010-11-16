@@ -49,11 +49,8 @@ class time(loadable):
         if timezone.lower() in self.class_timezone.keys():
              timezone = self.class_timezone[timezone.lower()]   
         else:
-            try:
-                timezone = int(timezone)
-            except ValueError:
-                message.alert("Invalid timezone '%s'" % (timezone,))
-                return
+            message.alert("Invalid timezone '%s'" % (timezone,))
+            return
 
         current_tick=Updates.current_tick()
 
