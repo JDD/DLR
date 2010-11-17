@@ -43,6 +43,7 @@ urlpatterns = patterns('',
     (r'^links/(?P<link>[^/]+)/$', 'Arthur.links'),
     (r'^lookup/$', 'Arthur.lookup.lookup'),
     (r'', include('Arthur.alliance')),
+    (r'', include('Arthur.growth')),
     (r'', include('Arthur.rankings')),
 #    (r'', include('Arthur.attack')),
     (r'^scans/', include('Arthur.scans')),
@@ -92,6 +93,7 @@ class links(loadable):
 
 from Arthur import dashboard
 from Arthur import alliance
+from Arthur import growth
 from Arthur import rankings
 from Arthur import search
 #from Arthur import attack
