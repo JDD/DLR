@@ -3,7 +3,7 @@
 <table cellspacing="1" cellpadding="3" class="black">
     <tr class="datahigh">
         <th colspan="4">
-            Growth
+            Members 72hr Growth
         </th>
     </tr>
     <tr class="header">
