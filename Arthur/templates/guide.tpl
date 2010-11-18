@@ -33,33 +33,11 @@ Basic Commands
 !search <nick/alliance> - Searches intel for a phrase.
 {% endfilter %}</td>
 <tr class="datahigh"><th>
-Propositions and Cookies
-</th></tr>
-<td>{% filter force_escape|linebreaks %}
-Cookies are used to give out carebears. Carebears are rewards for carefaces. Give cookies to people when you think they've done something beneficial for you or for the alliance in general.
-
-A proposition is a vote to do something. For now, you can raise propositions to invite or kick someone. Once raised the proposition will stand until you expire it.  Make sure you give everyone time to have their say. Votes for and against a proposition are weighted by carebears. You must have at least 1 carebear to vote.
-
-!cookie [howmany] <receiver> <reason> | [stat]
-
-!prop <invite|kick> <pnick> <comment>
-!prop vote <number> <yes|no|abstain>
-!prop show <number>
-!prop cancel <number>
-!prop expire <number> - Close the proposition and count the votes.
-
-!prop list - List active propositions.
-!prop recent - List recently expired propositions.
-!prop search <pnick> - Search all active and expired propositions related to <pnick>.
-{% endfilter %}</td>
-<tr class="datahigh"><th>
 Setting up your Gal
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
 !galchan <#channel> - Add {{ bot }} to your channel. Make sure {{ bot }} is added to P with 24 access first!
-!remchan <#channel>
 !galmate <pnick> - Add your galmates to the bot with low level access, they can store their planet, phone, etc.
-!remuser <pnick>
 {% endfilter %}</td>
 <tr class="datahigh"><th>
 Phone
@@ -68,7 +46,7 @@ Phone
 !pref phone=#### - Will add your phone-number to {{ bot }}.
 
 !phone <allow/deny> <nick> - Add or remove a user to those able to see your number.
-!phone list - List those able to see your number, as set by allow/deny. This list is ignore if you set !pref pubphone=yes.
+!phone list - List those able to see your number, as set by allow/deny. This list is ignored if you set !pref pubphone=yes.
 !phone show <nick> - Show someone's number.
 
 !sms <nick> <message> - Sends an SMS to the specified user. Your username will be appended to the end of each sms. The user must have their phone correctly added and you must have access to their number.
@@ -98,21 +76,6 @@ Defence
 !showdef <pnick> - Show a user's available ships and fleets.
 
 !usedef <pnick> <ship> - Remove a user's ship from the available defence ships.
-{% endfilter %}</td>
-<tr class="datahigh"><th>
-Attacking
-</th></tr>
-<td>{% filter force_escape|linebreaks %}
-!launch - <class|eta> <land_tick> - Calculate launch tick, launch time, prelaunch tick and prelaunch modifier for a given ship class or eta, and land tick.
-
-!book <x:y:z> <land tick/eta> - Books a target with {{ bot }}. Please book all your targets to avoid piggies/miscommunications.
-!unbook <x:y:z> <land tick/eta>
-
-!status [<nick|user>|<x:y[:z]>] [tick] - Show bookings made by nick/user or on gal/planet, at optional landing tick.
-
-!bitches [minimum eta] - Shows number of active bookings by galaxy and by alliance.
-
-!gangbang [alliance] [tick] - Shows booking status for specified alliance.
 {% endfilter %}</td>
 <tr class="datahigh"><th>
 Ship Calcs
@@ -150,7 +113,7 @@ Target Search
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
 A few commands are available for searching for a target:
-!cunts [alliance] [race] [<|>][size] [<|>][value] [bash] - Limited to planets currently attacking us, useful for retals.
+!retals [alliance] [race] [<|>][size] [<|>][value] [bash] - Limited to planets currently attacking us, useful for retals.
 !idler [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by idle ticks.
 !victim [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by potential roids.
 !whore [alliance] [race] [<|>][size] [<|>][value] [bash] - Sort by potential xp.
@@ -159,7 +122,7 @@ A few commands are available for searching for a target:
 Alliance
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
-!bumchums <alliance> <number> - Shows galaxies with at least this number of players from the specified alliance.
+!fortress <alliance> <number> - Shows galaxies with at least this number of players from the specified alliance.
 
 !info [alliance] - All information taken from intel, for tag information use the lookup command.
 
@@ -169,15 +132,15 @@ Alliance
 Misc
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
-!epenis <user> - Score growth of user's planet over 72 ticks.
-!apenis <alliance>
-!galpenis <x:y>
-!bigdicks - Shows the current top five epenis in the alliance
+!growth <user> - Score growth of user's planet over 72 ticks.
+!agrowth <alliance>
+!gagrowth <x:y>
+!topscorers - Shows the current top five scorers in the alliance
 
 !exile - Shows information regarding chances of landing in desired galaxies.
 
-!surprisesex [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by alliance.
-!topcunts [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by planet.
+!hostiles [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by alliance.
+!tophostiles [<[x:y[:z]]|[alliancename]>] - Shows total incoming on the planet/gal/alliance from the whole round, sorted by planet.
 {% endfilter %}</td>
 </th></tr>
 </table>

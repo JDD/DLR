@@ -39,7 +39,7 @@ urlpatterns = patterns('',
     (r'^(?:home|logout)?/?$', 'Arthur.overview.home'),
     (r'', include('Arthur.dashboard')),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
-#    (r'^guide/$', 'Arthur.guide'),
+    (r'^guide/$', 'Arthur.guide'),
     (r'^links/(?P<link>[^/]+)/$', 'Arthur.links'),
     (r'^lookup/$', 'Arthur.lookup.lookup'),
     (r'', include('Arthur.alliance')),
@@ -84,12 +84,12 @@ class links(loadable):
             return page_not_found(request)
         return HttpResponseRedirect(link)
 
-#@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
-#@load
-#@require_user
-#class guide(loadable):
-#    def execute(self, request, user):
-#        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
+@menu(bot, "Guide to %s"%(Config.get("Connection","nick"),))
+@load
+@require_user
+class guide(loadable):
+    def execute(self, request, user):
+        return render("guide.tpl", request, bot=Config.get("Connection","nick"), alliance=name)
 
 from Arthur import dashboard
 from Arthur import alliance
