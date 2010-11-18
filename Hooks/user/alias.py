@@ -31,7 +31,7 @@ class alias(loadable):
     @require_user
     def execute(self, message, user, params):
 
-        # assign param variables 
+        # assign param variables
         alias=params.group(1)
         if alias is None:
             m = message.get_msg().split()
