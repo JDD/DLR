@@ -40,19 +40,19 @@ class members(loadable):
             levels = [("All member", levels[-1][1],),]
         
         order =  {"name"  : (asc(User.name),),
-#                  "sponsor" : (asc(User.sponsor),),
-                  "access" : (desc(User.access),asc(User.name),),
-#                  "carebears" : (desc(User.carebears),),
+                  "sponsor" : (asc(User.sponsor),),
+                  "access" : (desc(User.access),desc(User.carebears),asc(User.name),),
+                  "carebears" : (desc(User.carebears),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   "defage" : (asc(User.fleetupdated),),
                   }
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
-
+        
         members = []
         for level in levels:
-            Q = session.query(User.name, User.alias, User.access, Planet, User.fleetupdated,
+            Q = session.query(User.name, User.alias, User.sponsor, User.access, User.carebears, Planet, User.fleetupdated,
                               User.phone, User.pubphone, or_(User.id == user.id, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user))))
             Q = Q.outerjoin(User.planet)
             Q = Q.filter(User.active == True)
@@ -74,7 +74,7 @@ class galmates(loadable):
         levels = [] + User.levels
         
         order =  {"name"  : (asc(User.name),),
-#                  "sponsor" : (asc(User.sponsor),),
+                  "sponsor" : (asc(User.sponsor),),
                   "access" : (desc(User.access),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   }
@@ -83,7 +83,7 @@ class galmates(loadable):
         order = order.get(sort)
         
         members = []
-        Q = session.query(User.name, User.alias, User.access, Planet,
+        Q = session.query(User.name, User.alias, User.sponsor, User.access, Planet,
                           User.phone, User.pubphone, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user)))
         Q = Q.outerjoin(User.planet)
         Q = Q.filter(User.active == True)

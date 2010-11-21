@@ -20,10 +20,24 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from django.conf.urls.defaults import include, patterns, url
-from Arthur.growth import growth, galgrowth, agrowth
 
-urlpatterns = patterns('Arthur.growth',
-    url(r'^growth/$', 'growth.growth'),
-    url(r'^galgrowth/$', 'galgrowth.galgrowth'),
-    url(r'^agrowth/$', 'agrowth.agrowth'),
+urlpatterns = patterns('Arthur.views',
+    (r'', include('Arthur.views.home')),
+    (r'', include('Arthur.views.lookup')),
+    (r'', include('Arthur.views.dashboard')),
+    (r'', include('Arthur.views.members')),
+    (r'', include('Arthur.views.growth')),
+    (r'', include('Arthur.views.rankings')),
+    (r'', include('Arthur.views.search')),
+#    (r'', include('Arthur.views.attack')),
+    (r'', include('Arthur.views.scans')),
 )
+
+from Arthur.views import home
+from Arthur.views import dashboard
+from Arthur.views import members
+from Arthur.views import growth
+from Arthur.views import rankings
+from Arthur.views import search
+#from Arthur.views import attack
+from Arthur.views import scans

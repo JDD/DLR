@@ -18,15 +18,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
+ 
 from django.conf.urls.defaults import include, patterns, url
-from Arthur.alliance import members
+from Arthur.views.members import members, equeens
 
-urlpatterns = patterns('Arthur.alliance',
+urlpatterns = patterns('Arthur.views.members',
     url(r'^members/$', 'members.members', name="memberlist"),
     url(r'^members/(?P<sort>\w+)/$', 'members.members', name="members"),
     url(r'^galmates/$', 'members.galmates'),
     url(r'^galmates/(?P<sort>\w+)/$', 'members.galmates', name="galmates"),
     url(r'^channels/$', 'members.channels'),
     url(r'^channels/(?P<sort>\w+)/$', 'members.channels', name="channels"),
+    url(r'^equeens/$', 'equeens.equeens'),
 )

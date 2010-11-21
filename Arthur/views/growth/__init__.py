@@ -20,9 +20,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from django.conf.urls.defaults import include, patterns, url
-handler404 = 'Arthur.errors.page_not_found'
-handler500 = 'Arthur.errors.server_error'
-urlpatterns = patterns('',
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
-    (r'', include('Arthur.views')),
+from Arthur.views.growth import growth, galgrowth, agrowth
+
+urlpatterns = patterns('Arthur.views.growth',
+    url(r'^growth/$', 'growth.growth'),
+    url(r'^galgrowth/$', 'galgrowth.galgrowth'),
+    url(r'^agrowth/$', 'agrowth.agrowth'),
 )

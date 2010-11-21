@@ -19,10 +19,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from django.conf.urls.defaults import include, patterns, url
-handler404 = 'Arthur.errors.page_not_found'
-handler500 = 'Arthur.errors.server_error'
-urlpatterns = patterns('',
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
-    (r'', include('Arthur.views')),
-)
+from sqlalchemy.sql import asc
+from Core.config import Config
+from Core.db import session
+from Core.maps import User, Planet, epenis
+from Arthur.context import menu, render
+from Arthur.loadable import loadable, load
+name = Config.get("Alliance", "name")
+
+@menu(name, "eQueens")
+@load
+class equeens(loadable):
+    access = "member"
+    def execute(self, request, user):
+        
+        Q = session.query(User, Planet, epenis)
+        Q = Q.join(User.planet)
+        Q = Q.join(User.epenis)
+        Q = Q.order_by(asc(epenis.rank))
+        return render("equeens.tpl", request, queens=Q.all())
