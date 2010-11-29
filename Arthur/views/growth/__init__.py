@@ -20,10 +20,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from django.conf.urls.defaults import include, patterns, url
-from Arthur.views.growth import growth, galgrowth, agrowth
+from Arthur.views.growth import agrowth, galgrowth, growth
 
 urlpatterns = patterns('Arthur.views.growth',
-    url(r'^growth/$', 'growth.growth'),
-    url(r'^galgrowth/$', 'galgrowth.galgrowth'),
     url(r'^agrowth/$', 'agrowth.agrowth'),
+    url(r'^galgrowth/$', 'galgrowth.galgrowth'),
+    url(r'^growth/$', 'growth.growth'),
 )
