@@ -51,7 +51,7 @@
         <td width="70%" colspan="2"> {{ dscan.travel_str() }} </td>
     </tr>
     <tr class="even">
-        <td class="datahigh" width="25%"> Infrajerome </td>
+        <td class="datahigh" width="25%"> Infrastructure </td>
         <td width="5%"> {{ dscan.infrastructure }} </td>
         <td width="70%" colspan="2"> {{ dscan.infra_str() }} </td>
     </tr>
