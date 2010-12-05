@@ -36,7 +36,7 @@ class planet(loadable):
         planet = Planet.load(x,y,z)
         if planet is None:
             return HttpResponseRedirect(reverse("planet_ranks"))
-
+        
         Q = session.query(FleetScan, Planet, Alliance)
         Q = Q.join(FleetScan.target)
         Q = Q.outerjoin(Planet.intel).outerjoin(Intel.alliance)

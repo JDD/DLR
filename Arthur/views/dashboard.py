@@ -39,7 +39,7 @@ urlpatterns = patterns('Arthur.views.dashboard',
 @load
 class dashboard(loadable):
     access = "member"
-
+    
     def execute(self, request, user, username="", dashuser=None):
         dashuser = dashuser or User.load(username or user.name, exact=False)
         if dashuser is None:
@@ -49,5 +49,5 @@ class dashboard(loadable):
 #        mums = dashuser.mums
         ships = dashuser.fleets.all()
         phonefriend = user == dashuser or user in dashuser.phonefriends
-
+        
         return render("dashboard.tpl", request, dashuser=dashuser, planet=dashuser.planet, ships=ships, phonefriend=phonefriend)
