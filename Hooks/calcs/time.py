@@ -34,7 +34,7 @@ class time(loadable):
                       "eest": 3,
                       "eet": 2,
                       "gmt": 0,
-                      "est": 1,
+                      "utc": 0,
                       "msd": 4,
                       "msk": 3,
                       "wedt": 1,
