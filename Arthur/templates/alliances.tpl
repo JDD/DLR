@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block content %}
-<table cellspacing="1" cellpadding="3" width="100%" class="black">
+<table cellspacing="1" cellpadding="3" width="95%" class="black">
     <tr class="datahigh">
         <th colspan="15">Alliance listing</th>
     </tr>
@@ -15,7 +15,7 @@
         <th>Size</th>
         <th>Av Score</th>
         <th>Av Size</th>
-        
+
         <th>Name</th>
         <th><a href="{% url "alliances", "members", page|default(1) %}">Members</a></th>
         <th><a href="{% url "alliances", "avg_size", page|default(1) %}">Av Size</a></th>

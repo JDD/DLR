@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block content %}
-<table cellspacing="1" cellpadding="3" width="100%" class="black">
+<table cellspacing="1" cellpadding="3" width="95%" class="black">
     <tr class="datahigh">
         <th colspan="16">Galaxy listing</th>
     </tr>
@@ -37,7 +37,7 @@
         <td align="right">{{ galaxy|rank("value") }}</td>
         <td align="right">{{ galaxy|rank("size") }}</td>
         <td align="right">{{ galaxy|rank("xp") }}</td>
-        
+
         <td align="right"><a href="{% url "galaxy", galaxy.x, galaxy.y %}">{{ galaxy.x }}:{{ galaxy.y }}</a></td>
         <td><a class="{% if galaxy == user.planet.galaxy %}myplanet{% else %}gray{% endif %}" href="{% url "galaxy", galaxy.x, galaxy.y %}">
                 {{ galaxy.name }}
