@@ -14,7 +14,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
- 
+
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -40,7 +40,7 @@ while True:
 
         # How long has passed since starting?
         # If 55 mins, we're not likely getting dumps this tick, so quit
-        if (time.time() - t_start) >= (55 * 60):
+        if (time.time() - t_start) >= (55 * 25):
             print "55 minutes without a successful dump, giving up!"
             session.close()
             exit()
@@ -49,7 +49,7 @@ while True:
         try:
             planets = urllib2.urlopen(Config.get("URL", "planets"))
             galaxies = urllib2.urlopen(Config.get("URL", "galaxies"))
-            alliances = urllib2.urlopen(Config.get("URL", "alliances"))
+            alliances = []
         except Exception, e:
             print "Failed gathering dump files."
             print e.__str__()
@@ -83,16 +83,7 @@ while True:
         galaxies.readline();galaxies.readline();galaxies.readline();
 
         # As above
-        alliances.readline();alliances.readline();alliances.readline();
-        tick=alliances.readline()
-        m=re.search(r"tick:\s+(\d+)",tick,re.I)
-        if not m:
-            print "Invalid tick: '%s'" % (tick,)
-            time.sleep(120)
-            continue
-        alliance_tick=int(m.group(1))
-        print "Alliance dump for tick %s" % (alliance_tick,)
-        alliances.readline();alliances.readline();alliances.readline();
+        alliance_tick= planet_tick if planet_tick == galaxy_tick else 0
 
         # Check the ticks of the dumps are all the same and that it's
         #  greater than the previous tick, i.e. a new tick
@@ -121,7 +112,6 @@ while True:
             print "Pre-shuffle dumps detected, emptying out the data"
             planets.readlines()
             galaxies.readlines()
-            alliances.readlines()
 
         # Insert the data to the temporary tables, some DBMS do not support
         #  multiple row insert in the same statement so we have to do it one at

@@ -152,7 +152,7 @@ class Planet(Base):
     z = Column(Integer)
     planetname = Column(String(20))
     rulername = Column(String(20))
-    race = Column(String(3))
+    race = Column(String(4))
     size = Column(Integer)
     score = Column(Integer)
     value = Column(Integer)
@@ -242,7 +242,7 @@ class PlanetHistory(Base):
     z = Column(Integer)
     planetname = Column(String(20))
     rulername = Column(String(20))
-    race = Column(String(3))
+    race = Column(String(4))
     size = Column(Integer)
     score = Column(Integer)
     value = Column(Integer)
@@ -394,7 +394,7 @@ planet_temp = Table('planet_temp', Base.metadata,
     Column('z', Integer, primary_key=True),
     Column('planetname', String(20)),
     Column('rulername', String(20)),
-    Column('race', String(3)),
+    Column('race', String(4)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
@@ -415,7 +415,7 @@ planet_new_id_search = Table('planet_new_id_search', Base.metadata,
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
     Column('z', Integer, primary_key=True),
-    Column('race', String(3)),
+    Column('race', String(4)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
@@ -425,7 +425,7 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
     Column('z', Integer, primary_key=True),
-    Column('race', String(3)),
+    Column('race', String(4)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
