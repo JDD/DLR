@@ -14,7 +14,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+ 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -40,7 +40,7 @@ while True:
 
         # How long has passed since starting?
         # If 55 mins, we're not likely getting dumps this tick, so quit
-        if (time.time() - t_start) >= (55 * 25):
+        if (time.time() - t_start) >= (55 * 60):
             print "55 minutes without a successful dump, giving up!"
             session.close()
             exit()
@@ -49,7 +49,7 @@ while True:
         try:
             planets = urllib2.urlopen(Config.get("URL", "planets"))
             galaxies = urllib2.urlopen(Config.get("URL", "galaxies"))
-            alliances = []
+            alliances = urllib2.urlopen(Config.get("URL", "alliances"))
         except Exception, e:
             print "Failed gathering dump files."
             print e.__str__()
@@ -83,7 +83,16 @@ while True:
         galaxies.readline();galaxies.readline();galaxies.readline();
 
         # As above
-        alliance_tick= planet_tick if planet_tick == galaxy_tick else 0
+        alliances.readline();alliances.readline();alliances.readline();
+        tick=alliances.readline()
+        m=re.search(r"tick:\s+(\d+)",tick,re.I)
+        if not m:
+            print "Invalid tick: '%s'" % (tick,)
+            time.sleep(120)
+            continue
+        alliance_tick=int(m.group(1))
+        print "Alliance dump for tick %s" % (alliance_tick,)
+        alliances.readline();alliances.readline();alliances.readline();
 
         # Check the ticks of the dumps are all the same and that it's
         #  greater than the previous tick, i.e. a new tick
@@ -112,6 +121,7 @@ while True:
             print "Pre-shuffle dumps detected, emptying out the data"
             planets.readlines()
             galaxies.readlines()
+            alliances.readlines()
 
         # Insert the data to the temporary tables, some DBMS do not support
         #  multiple row insert in the same statement so we have to do it one at
@@ -599,12 +609,8 @@ while True:
                           alliances=Alliance.__table__.count(Alliance.active==True)
                         ))
 
-        # Create records of new planets,
-        session.execute(text("INSERT INTO planet_exiles (tick, id, newx, newy, newz) SELECT :tick, planet.id, planet.x, planet.y, planet.z FROM planet WHERE planet.id NOT IN (SELECT id FROM planet_history WHERE planet_history.tick = :oldtick) AND planet.active = :true;", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true]))
-        # deleted plantes
-        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND planet.active = :false;", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), false]))
-        # and planet movements
-        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz, newx, newy, newz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z, planet.x, planet.y, planet.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND planet.active = :true AND (planet.x != planet_history.x OR planet.y != planet_history.y OR planet.z != planet_history.z);", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true]))
+        # Create records of planet movements or deletions
+        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz, newx, newy, newz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z, planet.x, planet.y, planet.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND (planet.active = :true AND (planet.x != planet_history.x OR planet.y != planet_history.y OR planet.z != planet_history.z) OR planet.active = :false);", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true, false]))
 
         # Copy the dumps to their respective history tables
         session.execute(text("INSERT INTO galaxy_history (tick, id, x, y, name, size, score, value, xp, size_rank, score_rank, value_rank, xp_rank) SELECT :tick, id, x, y, name, size, score, value, xp, size_rank, score_rank, value_rank, xp_rank FROM galaxy WHERE galaxy.active = :true ORDER BY id ASC;", bindparams=[bindparam("tick",planet_tick), true]))

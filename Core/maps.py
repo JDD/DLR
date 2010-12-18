@@ -791,7 +791,7 @@ class Ship(Base):
         return ship
     
     def __str__(self):
-        reply="%s (%s) is class %s | Target 1: %s |"%(self.name,self.race[:3],self.class_,self.t1)
+        reply="%s (%s) is class %s | Target 1: %s |"%(self.name,self.race[:4],self.class_,self.t1)
         if self.t2:
             reply+=" Target 2: %s |"%(self.t2,)
         if self.t3:

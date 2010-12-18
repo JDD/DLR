@@ -131,7 +131,7 @@ tr.unknown {
 	color: #ffa500;
 }
 
-.Cat {
+.Prty {
 	color: #6699cc !important;
 	font-weight: bold;
 }
@@ -141,12 +141,12 @@ tr.unknown {
 	font-weight: bold;
 }
 
-.Xan {
+.Good {
 	color: #00cc00 !important;
 	font-weight: bold;
 }
 
-.Zik {
+.Bad {
 	color: #cccc00 !important;
 	font-weight: bold;
 }
