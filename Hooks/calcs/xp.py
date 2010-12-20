@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from Cor.paconf import PA
+from Core.paconf import PA
 from Core.maps import Planet
 from Core.loadable import loadable, route, require_planet
 
