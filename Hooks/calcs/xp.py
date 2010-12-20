@@ -19,6 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
+from Cor.paconf import PA
 from Core.maps import Planet
 from Core.loadable import loadable, route, require_planet
 
@@ -37,7 +38,7 @@ class xp(loadable):
             return
         
         self.execute(message, target, attacker)
-    
+
     @route(loadable.planet_coord)
     @require_planet
     def me(self, message, user, params):
@@ -65,5 +66,5 @@ class xp(loadable):
 
         cap=target.maxcap(attacker)
         xp=attacker.calc_xp(target)
-        reply+="| Roids: %s | XP: %s | Score: %s" % (cap,xp,xp*60)
+        reply+="| Roids: %s | XP: %s | Score: %s" % (cap,xp,xp*PA.getint("numbers", "xp_value"))
         message.reply(reply)
