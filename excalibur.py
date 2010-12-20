@@ -40,7 +40,7 @@ while True:
 
         # How long has passed since starting?
         # If 55 mins, we're not likely getting dumps this tick, so quit
-        if (time.time() - t_start) >= (55 * 60):
+        if (time.time() - t_start) >= (25 * 60):
             print "55 minutes without a successful dump, giving up!"
             session.close()
             exit()
@@ -130,6 +130,7 @@ while True:
         #  INSERT INTO .. row UNION row UNION row...
         #  Some DBMS complained the resultant query was too long for the planet
         #  dumps, so back at one row per statement
+        mapping = {"Prty": "Cat", "Bad": "Zik", "Good": "Xan"}
         planet_insert = "INSERT INTO planet_temp (x, y, z, planetname, rulername, race, size, score, value, xp) "
         planet_insert+= "VALUES (:x, :y, :z, :planet, :ruler, :race, :size, :score, :value, :xp);"
         for line in planets:
@@ -140,7 +141,7 @@ while True:
                                                             bindparam("z", int(p[2])),
                                                             bindparam("planet", p[3].strip("\"")),
                                                             bindparam("ruler", p[4].strip("\"")),
-                                                            bindparam("race", p[5]),
+                                                            bindparam("race", mapping[p[5]]),
                                                             bindparam("size", int(p[6])),
                                                             bindparam("score", int(p[7])),
                                                             bindparam("value", int(p[8])),

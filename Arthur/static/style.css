@@ -131,17 +131,17 @@ tr.unknown {
 	color: #ffa500;
 }
 
-.Prty {
+.Cat {
 	color: #6699cc !important;
 	font-weight: bold;
 }
 
-.Ter {
+.Good {
 	color: #aa7744 !important;
 	font-weight: bold;
 }
 
-.Good {
+.Prty {
 	color: #00cc00 !important;
 	font-weight: bold;
 }
