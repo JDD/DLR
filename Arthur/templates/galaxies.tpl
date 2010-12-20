@@ -16,7 +16,7 @@
         <th>Size</th>
         <th>XP</th>
         
-        <th align="right">X:Y</th>
+        <th align="right"><a href="{% url "galaxies", "coords", page|default(1) %}">X:Y</th>
         <th>Name</th>
         <th><a href="{% url "galaxies", "size", page|default(1) %}">Size</a></th>
         <th><a href="{% url "galaxies", "value", page|default(1) %}">Value</a></th>
