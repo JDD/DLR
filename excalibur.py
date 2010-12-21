@@ -418,6 +418,7 @@ while True:
                                   size_rank_change = NULL, score_rank_change = NULL, value_rank_change = NULL, xp_rank_change = NULL,
                                   size_rank = NULL, score_rank = NULL, value_rank = NULL, xp_rank = NULL,
                                   totalroundroids = NULL, totallostroids = NULL, ticksroiding = NULL, ticksroided = NULL, tickroids = NULL, avroids = NULL,
+                                  totalroundroids_rank = NULL, totallostroids_rank = NULL, totalroundroids_rank_change = NULL, totallostroids_rank_change = NULL,
                                   vdiff = NULL, idle = NULL
                                 WHERE id NOT IN (SELECT id FROM planet_temp WHERE id IS NOT NULL)
                             ;""", bindparams=[false]))
@@ -454,6 +455,12 @@ while True:
                                   score_rank_change = t.score_rank - COALESCE(p.score_rank - p.score_rank_change, 0),
                                   value_rank_change = t.value_rank - COALESCE(p.value_rank - p.value_rank_change, 0),
                                   xp_rank_change = t.xp_rank - COALESCE(p.xp_rank - p.xp_rank_change, 0),
+                                  totalroundroids_rank_change = t.totalroundroids_rank - COALESCE(p.totalroundroids_rank - p.totalroundroids_rank_change, 0),
+                                  totallostroids_rank_change = t.totallostroids_rank - COALESCE(p.totallostroids_rank - p.totallostroids_rank_change, 0),
+                                  totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids - p.totalroundroids_growth, 0),
+                                  totalroundroids_growth_pc = CASE WHEN (p.totalroundroids - p.totalroundroids_growth != 0) THEN COALESCE((t.totalroundroids - (p.totalroundroids - p.totalroundroids_growth)) * 100.0 / (p.totalroundroids - p.totalroundroids_growth), 0) ELSE 0 END,
+                                  totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids - p.totallostroids_growth, 0),
+                                  totallostroids_growth_pc = CASE WHEN (p.totallostroids - p.totallostroids_growth != 0) THEN COALESCE((t.totallostroids - (p.totallostroids - p.totallostroids_growth)) * 100.0 / (p.totallostroids - p.totallostroids_growth), 0) ELSE 0 END,
                              """ if not midnight
                                  else
                              """
@@ -469,11 +476,17 @@ while True:
                                   score_rank_change = t.score_rank - COALESCE(p.score_rank, 0),
                                   value_rank_change = t.value_rank - COALESCE(p.value_rank, 0),
                                   xp_rank_change = t.xp_rank - COALESCE(p.xp_rank, 0),
+                                  totalroundroids_rank_change = t.totalroundroids_rank - COALESCE(p.totalroundroids_rank, 0),
+                                  totallostroids_rank_change = t.totallostroids_rank - COALESCE(p.totallostroids_rank, 0),
+                                  totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids, 0),
+                                  totalroundroids_growth_pc = CASE WHEN (p.totalroundroids != 0) THEN COALESCE((t.totalroundroids - p.totalroundroids) * 100.0 / p.totalroundroids, 0) ELSE 0 END,
+                                  totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids, 0),
+                                  totallostroids_growth_pc = CASE WHEN (p.totallostroids != 0) THEN COALESCE((t.totallostroids - p.totallostroids) * 100.0 / p.totallostroids, 0) ELSE 0 END,
                              """ ) +
                              """
                                   size_rank = t.size_rank, score_rank = t.score_rank, value_rank = t.value_rank, xp_rank = t.xp_rank,
-                                  totalroundroids = COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), 0),
-                                  totallostroids = COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0),
+                                  totalroundroids = t.totalroundroids, totallostroids = t.totallostroids,
+                                  totalroundroids_rank = t.totalroundroids_rank, totallostroids_rank = t.totallostroids_rank,
                                   ticksroiding = COALESCE(p.ticksroiding, 0) + CASE WHEN (t.size > p.size AND (t.size - p.size) != (t.xp - p.xp)) THEN 1 ELSE 0 END,
                                   ticksroided = COALESCE(p.ticksroided, 0) + CASE WHEN (t.size < p.size) THEN 1 ELSE 0 END,
                                   tickroids = COALESCE(p.tickroids, 0) + t.size,
@@ -481,11 +494,17 @@ while True:
                                   vdiff = t.value - p.value,
                                   idle = COALESCE(1 + (SELECT p.idle WHERE (t.value-p.value) BETWEEN (p.vdiff-1) AND (p.vdiff+1) AND (p.xp-t.xp=0) ), 0)
                                 FROM (SELECT *,
+                                  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
+                                  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
                                   rank() OVER (ORDER BY size DESC) AS size_rank,
                                   rank() OVER (ORDER BY score DESC) AS score_rank,
                                   rank() OVER (ORDER BY value DESC) AS value_rank,
                                   rank() OVER (ORDER BY xp DESC) AS xp_rank
-                                FROM planet_temp) AS t
+                                FROM (SELECT t.*,
+                                  COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), 0) AS totalroundroids,
+                                  COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0) AS totallostroids
+                                FROM planet AS p, planet_temp AS t
+                                  WHERE p.id = t.id AND p.active = :true) AS t) AS t
                                   WHERE p.id = t.id
                                 AND p.active = :true
                             ;""", bindparams=[true]))
@@ -626,8 +645,12 @@ while True:
                           alliances=Alliance.__table__.count(Alliance.active==True)
                         ))
 
-        # Create records of planet movements or deletions
-        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz, newx, newy, newz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z, planet.x, planet.y, planet.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND (planet.active = :true AND (planet.x != planet_history.x OR planet.y != planet_history.y OR planet.z != planet_history.z) OR planet.active = :false);", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true, false]))
+        # Create records of new planets,
+        session.execute(text("INSERT INTO planet_exiles (tick, id, newx, newy, newz) SELECT :tick, planet.id, planet.x, planet.y, planet.z FROM planet WHERE planet.id NOT IN (SELECT id FROM planet_history WHERE planet_history.tick = :oldtick) AND planet.active = :true;", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true]))
+        # deleted plantes
+        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND planet.active = :false;", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), false]))
+        # and planet movements
+        session.execute(text("INSERT INTO planet_exiles (tick, id, oldx, oldy, oldz, newx, newy, newz) SELECT :tick, planet.id, planet_history.x, planet_history.y, planet_history.z, planet.x, planet.y, planet.z FROM planet, planet_history WHERE planet.id = planet_history.id AND planet_history.tick = :oldtick AND planet.active = :true AND (planet.x != planet_history.x OR planet.y != planet_history.y OR planet.z != planet_history.z);", bindparams=[bindparam("tick",planet_tick), bindparam("oldtick",last_tick), true]))
 
         # Copy the dumps to their respective history tables
         session.execute(text("INSERT INTO galaxy_history (tick, id, x, y, name, size, score, real_score, value, xp, members, size_rank, score_rank, real_score_rank, value_rank, xp_rank) SELECT :tick, id, x, y, name, size, score, real_score, value, xp, members, size_rank, score_rank, real_score_rank, value_rank, xp_rank FROM galaxy WHERE galaxy.active = :true ORDER BY id ASC;", bindparams=[bindparam("tick",planet_tick), true]))
