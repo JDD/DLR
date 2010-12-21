@@ -32,7 +32,7 @@ class _menu(object):
     
     def __call__(self, head, sub=None, prefix=False, suffix=""):
         pre = prefix
-        
+
         def wrapper(hook):
             prefix = hook.__module__.split(".")[2] if pre else ""
             url = ("/%s/%s/%s/"%(prefix,hook.name,suffix,)).replace("//","/")
@@ -81,8 +81,7 @@ def base_context(request):
     if getattr(request, "user", None) is not None:
         context["user"] = request.user
         context["menu"] = menu.generate(request.user)
-    else:
-        context["user"] = None
+
     if getattr(request, "session", None) is not None:
         slogan, count = Slogan.search("")
         if slogan is not None:
